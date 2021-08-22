@@ -1,0 +1,871 @@
+
+
+
+
+* find out before editing
+** message
+   #+begin_src emacs-lisp
+     (setq garbage-collection-messages t
+	   large-file-warning-threshold nil)
+     (fset 'yes-or-no-p 'y-or-n-p)
+   #+end_src
+
+** buffer switch
+*** Counsel
+  #+BEGIN_SRC emacs-lisp
+    (use-package counsel)
+  #+END_SRC
+*** Swiper
+  #+BEGIN_SRC emacs-lisp
+    (use-package swiper
+      :ensure try
+      :bind (("C-s"  . swiper)
+	     ("M-x"  . counsel-M-x)
+	     ("C-x C-f"  . counsel-find-file))
+      :config
+      (progn
+	(ivy-mode 1)
+	(setq ivy-use-virtual-buffers t)
+	(setq ivy-display-style 'fancy)))
+
+  #+END_SRC
+** UTILS
+*** Try
+  #+BEGIN_SRC emacs-lisp
+  (use-package try
+    :defer t
+    )
+
+  #+END_SRC
+*** Which Key
+  #+BEGIN_SRC emacs-lisp
+    (use-package which-key
+      :defer t
+      :config (which-key-mode)
+      )
+
+  #+END_SRC
+
+*** smex
+    #+begin_src emacs-lisp
+      (use-package smex)
+    #+end_src
+*** undo tree
+    #+begin_src emacs-lisp
+ ;;     (use-package undo-tree
+ ;;       :diminish undo-tree-mode
+ ;;       :config (global-undo-tree-mode))
+
+    #+end_src
+
+*** jump to definition
+    #+begin_src emacs-lisp
+		  (use-package dumb-jump
+			:defer t
+      )
+		  
+		  (use-package xref
+		        :defer t
+)
+		  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+		  (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+    #+end_src
+
+    #+RESULTS:
+    : xref-show-definitions-completing-read
+
+* behavior & moving & outfit of emacs
+** interface
+*** frame
+    #+begin_src emacs-lisp
+      ;;(setq frame-title-format "Emacs@GNU_Project")
+      (toggle-frame-maximized)
+      ;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+    #+end_src
+
+    #+RESULTS:
+
+*** bars
+   #+BEGIN_SRC emacs-lisp
+(tool-bar-mode -1)
+(scroll-bar-mode -1)
+   #+END_SRC
+*** tranparent
+#+BEGIN_SRC emacs-lisp
+;; (set-frame-parameter nil 'alpha 75)
+#+END_SRC
+*** theme
+  #+BEGIN_SRC emacs-lisp
+    (use-package tangotango-theme
+      :ensure t
+      )
+
+    (enable-theme 'tangotango)
+
+  #+END_SRC
+*** Welcome word
+    #+begin_src emacs-lisp
+      (setq inhibit-startup-message t)
+      (defun startup-echo-area-message ()
+	(if (daemonp)
+	    ""
+	  (substitute-command-keys
+	   "")))
+    #+end_src
+*** cursor
+rainbow cursor
+    #+begin_src emacs-lisp
+
+
+     ;; we don't want the cursor vanish
+     (blink-cursor-mode -1)
+     
+     (setq rainbow-color-list '("#FF0000";red
+				"#FF5000"
+				"#FF9F00";orange
+				"#FFFF00";yellow
+				"#BFFF00"
+				"#00FF00";green
+				"#00FFFF";
+				"#0088FF"
+				"#0000FF";blue
+				"#5F00FF"
+				"#8B00FF";purple
+				"#CF00FF"
+				"#FF0088"
+				))
+     ;; declair the variable
+     (setq cursor-color-pointer 1)
+     
+     ;; declaire the function
+     (defun cursor-color-change ()
+       "Take a color from `rainbow-color-list' by the pointer.  
+     The pointer moves by +1, and restore by taking mod.  "
+       (setq cursor-color-pointer (% (1+ cursor-color-pointer)
+				     (length rainbow-color-list)))
+       (set-cursor-color (nth cursor-color-pointer
+			  rainbow-color-list))
+       )
+     
+     ;; main function.  gothrough the `rainbow-color-list' within 0.5s. calls `cursor-color-change' .  
+     (run-with-timer ()
+		     (/ .5 (length rainbow-color-list))
+		     'cursor-color-change)
+    #+end_src    
+
+    #+RESULTS:
+    : [nil 24865 54197 858529 0.038461538461538464 cursor-color-change nil nil 659000]
+
+*** battery
+#+BEGIN_SRC emacs-lisp
+  (display-battery-mode)
+
+  (setq  battery-load-critical 25
+	 battery-load-low 50
+	 battery-mode-line-format "  [%p%% %m]  "
+	 battery-update-interval 30)
+#+END_SRC
+*** average load
+#+BEGIN_SRC emacs-lisp
+  ;;  (setq display-time-load-average-threshold 100)
+  (setq display-time-default-load-average nil)
+#+END_SRC
+
+*** Time
+  #+BEGIN_SRC emacs-lisp
+    (display-time-mode)
+
+    (setq display-time-24hr-format t
+	  display-time-day-and-date t
+	  display-time-format "%H:%M %m-%d %a")
+
+  #+END_SRC
+*** scroll
+   #+BEGIN_SRC emacs-lisp
+     (setq scroll-step 2
+	   scroll-margin 2
+	   scroll-conservatively 101
+	   scroll-up-aggressively 0.01
+	   scroll-down-aggressively 0.01)
+      
+   #+END_SRC
+*** line number
+  #+BEGIN_SRC emacs-lisp
+    (use-package linum-relative)
+    (line-number-mode -1)
+  #+END_SRC
+
+*** paren
+  #+BEGIN_SRC emacs-lisp
+    (use-package paren
+      :ensure nil
+      :hook (after-init . show-paren-mode)
+      :init (setq show-paren-when-point-inside-paren t
+		  show-paren-when-point-in-periphery t
+		  show-paren-highlight-openparen t))
+
+    (use-package rainbow-delimiters 
+      :ensure t 
+      :config
+      ;; 设置每一级括号的颜色
+      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
+      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
+      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
+      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
+      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
+      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
+      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+  #+END_SRC
+*** info help
+  #+BEGIN_SRC emacs-lisp
+    (use-package 
+      info-colors 
+    :defer t
+      :hook ('Info-selection-hook . 'info-colors-fontify-node))
+
+  #+END_SRC
+** buffer relative
+ #+BEGIN_SRC emacs-lisp
+   (setq initial-scratch-message nil)
+   (setq initial-buffer-choice nil
+	 inhibit-startup-screen t)
+   (setq ring-bell-function 'ignore)
+   (setq inhibit-compacting-font-caches t)
+   (setq confirm-kill-processes nil)
+   (setq scroll-step 1
+	 scroll-conservatively 10000)
+ #+END_SRC
+
+ #+RESULTS:
+ : 10000
+
+** line wrap
+   #+begin_src emacs-lisp
+     (set-default 'truncate-lines t)
+   #+end_src
+
+** UTILS
+*** Auto Complete
+  #+BEGIN_SRC emacs-lisp
+    ;; (use-package auto-complete
+    ;;   :ensure t
+    ;;   :init
+    ;;   (progn
+    ;;     (ac-config-default)
+    ;;     (global-auto-complete-mode t)
+    ;;     ))
+    ;; (use-package fuzzy
+    ;;   )
+
+    ;; (use-package js2-mode
+    ;;   )
+    ;; (use-package ac-html
+    ;;   )
+    ;; (use-package web-mode  )
+    ;;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
+    ;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+    ;;(add-hook 'js2-mode-hook 'ac-js2-mode)
+
+
+
+
+
+  #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    ;; :hook
+    ;; ((prog-mode . company-mode)
+    ;;  (conf-mode . company-mode)
+    ;;  (shell-mode . company-mode))
+    )
+  (add-hook 'after-init-hook 'global-company-mode)
+  
+  (use-package company-tabnine
+    :ensure t
+    )
+  
+  (add-to-list 'company-backends #'company-tabnine)
+  (setq company-idle-delay 0)
+  (setq company-show-numbers t)
+  
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+		 (stringp (funcall company-message-func)))
+	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+	  ad-do-it))))
+  #+END_SRC
+
+  #+RESULTS:
+  : company-echo-show
+
+*** magit
+    #+begin_src emacs-lisp
+	    (use-package magit
+	          :defer t
+)
+	      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
+	      ;;   (use-package diff-hl)
+      
+    #+end_src
+
+    #+RESULTS:
+
+*** projectile
+    #+begin_src emacs-lisp
+
+    #+end_src
+*** browse
+  #+BEGIN_SRC emacs-lisp
+ ;;   (use-package firefox-controller)
+  #+END_SRC
+*** quickrun
+    #+begin_src emacs-lisp
+	     (use-package quickrun
+	           :defer t
+)
+      
+      
+    #+end_src
+*** treemacs
+    #+begin_src emacs-lisp
+;;      (use-package treemacs)
+    #+end_src
+
+** emacs-application-framework.git
+#+BEGIN_SRC emacs-lisp
+    ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
+    ;; (require 'eaf)
+  ;;   (use-package eaf
+  ;;     :load-path "~./emacs.d/site-lisp/emacs-application-framework"
+  ;;     :custom
+  ;;     (eaf-browser-continue-where-left-off t)
+  ;;     :config
+  ;;     (require 'eaf-airshare)
+  ;;     (require 'eaf-browser)
+  ;;     (setq eaf-browser-enable-adblocker t)
+  ;;     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  ;;     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;;     (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  ;;     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+#+END_SRC
+
+#+RESULTS:
+: t
+
+** initial mode
+#+BEGIN_SRC emacs-lisp
+(setq initial-major-mode 'org-mode)
+       
+#+END_SRC
+* static form of codes
+
+** ORG mode
+*** outfit
+**** org bullets
+  #+BEGIN_SRC emacs-lisp
+    (use-package org-bullets
+      :ensure t
+      :config
+      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+    (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭")
+	  org-ellipsis " ▼")
+  #+END_SRC
+
+**** block
+ #+BEGIN_SRC emacs-lisp
+   ;; hide src blocks
+   (setq org-hide-block-startup t)
+
+ #+END_SRC
+**** table font
+  (let ((emacs-font-size 14)
+	(emacs-font-name "WenQuanYi Micro Hei Mono"))
+    (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+    (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+
+  (with-eval-after-load 'org
+    (defun org-buffer-face-mode-variable ()
+      (interactive)
+      (make-face 'width-font-face)
+      (set-face-attribute 'width-font-face nil :font "等距更纱黑体 SC 15")
+      (setq buffer-face-mode-face 'width-font-face)
+      (buffer-face-mode))
+
+    (add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
+
+
+
+*** structure's behavior
+**** cycle
+ #+BEGIN_SRC emacs-lisp
+   (setq org-cycle-emulate-tab t
+	 org-cycle-global-at-bob t
+	 )
+
+ #+END_SRC
+*** actions
+**** keybinds
+  #+BEGIN_SRC emacs-lisp
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  #+END_SRC
+**** capture
+***** capture configurations
+#+begin_src emacs-lisp
+  (global-set-key "\C-cc" 'org-capture)
+  (setq org-default-notes-file "~/ORG/gtd.org"
+	org-capture-templates nil)
+
+  ;; '(key   description  type         target                        template                 )
+  ;; '("t"   "Task"       entry        (file+headline "" "Tasks")    "* TODO %?\n  %u\n  %a"  )
+  ;;			item
+  ;;			checkitem
+  ;;			table-line
+  ;;			plain
+
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; (add-to-list 'org-capture-templates		        ;;
+  ;; 	     '("t" "Tasks"))			        ;;
+  ;; (add-to-list 'org-capture-templates		        ;;
+  ;; 	     '("tr" "Book Reading Task" entry	        ;;
+  ;; 	       (file+olp "..." "..." "...")	        ;;
+  ;; 	       "* TODO %^{书名}\n%u\n%a\n"	        ;;
+  ;; 	       :clock-in t			        ;;
+  ;; 	       :clock-resume t			        ;;
+  ;; 	       ))				        ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  #+end_src
+
+***** diary
+  #+begin_src emacs-lisp
+  (add-to-list 'org-capture-templates
+	       '("d" "diary" entry
+		 (file+weektree "~/ORG/diary.org")
+		 "* %U - %^{heading}\n  %?"
+		 ))
+  #+end_src
+
+***** gtd
+  #+begin_src emacs-lisp
+  (add-to-list 'org-capture-templates
+	       '("g" "GTD"))
+  (add-to-list 'org-capture-templates
+	       '("gd" "daily things" entry
+		 (file+headline "~/ORG/gtd.org" "daily things(intelectual)")
+		 "* %^{What?}\n%^{description}\n%?"
+		 :empty-lines 1
+		 ))
+  (add-to-list 'org-capture-templates
+	       '("gp" "period things" entry
+		 (file+headline "~/ORG/gtd.org" "period things")
+		 "* %^{What?}\n%^{description}\n%?"
+		 :empty-lines 1
+		 ))
+  (add-to-list 'org-capture-templates
+	       '("gs" "school things" entry
+		 (file+headline "~/ORG/gtd.org" "学校活动")
+		 "* %^{What?}\n%^{description}\n%?"
+		 :empty-lines 1
+		 ))
+
+
+#+end_src
+***** billing
+#+begin_src emacs-lisp
+  (defun get-year-and-month ()
+    (list (format-time-string "%Y年") (format-time-string "%m月")))
+
+  (defun find-month-tree ()
+    (let* ((path (get-year-and-month))
+	   (level 1)
+	   end)
+      (unless (derived-mode-p 'org-mode)
+	(error "Target buffer \"%s\" should be in Org mode" (current-buffer)))
+      (goto-char (point-min))             ;移动到 buffer 的开始位置
+      ;; 先定位表示年份的 headline，再定位表示月份的 headline
+      (dolist (heading path)
+	(let ((re (format org-complex-heading-regexp-format
+			  (regexp-quote heading)))
+	      (cnt 0))
+	  (if (re-search-forward re end t)
+	      (goto-char (point-at-bol))  ;如果找到了 headline 就移动到对应的位置
+	    (progn                        ;否则就新建一个 headline
+	      (or (bolp) (insert "\n"))
+	      (if (/= (point) (point-min)) (org-end-of-subtree t t))
+	      (insert (make-string level ?*) " " heading "\n"))))
+	(setq level (1+ level))
+	(setq end (save-excursion (org-end-of-subtree t t))))
+      (org-end-of-subtree)))
+
+  (add-to-list 'org-capture-templates
+	       '("b" "billing" plain
+		 (file+function "~/ORG/billing.org" find-month-tree)
+		 " | %U | %^{类别} | %^{what?} | %^{金额} |"
+		 :kill-buffer t
+		 ))
+
+#+end_src
+***** contacts
+#+begin_src emacs-lisp
+  (add-to-list 'org-capture-templates
+	       '("c" "Contacs" entry
+		 (file "~/ORG/contacts.org")
+		 "* %^{姓名} %^{手机号}p %^{mail}p %^{住址}p\n\n  %?"
+		 :empty-lines 1
+		 ))
+#+end_src
+**** org-mouse
+     #+begin_src emacs-lisp
+       (setq org-mouse-features '(activate-checkboxes))
+     #+end_src
+
+*** functions
+**** agenda
+     #+begin_src emacs-lisp
+       (setq-default org-agenda-include-diary nil)
+     #+end_src
+**** ox-reveal
+ #+BEGIN_SRC emacs-lisp
+	 (use-package ox-reveal
+	   :commands (org-reveal)
+	   :init
+	   (add-hook 'after-init-hook #'org-reveal)
+	   :config
+	   (setq ;; org-reveal-root "file:///home/qb/.reveal.js"
+		 org-reveal-theme "moon"
+		 org-reveal-plugins '(classList markdown zoom notes)
+		 ))
+      ;; colors for blocks
+	 (use-package htmlize
+	       :defer t
+)
+ #+END_SRC
+**** babel
+ #+BEGIN_SRC emacs-lisp
+   (org-babel-do-load-languages
+	 'org-babel-load-languages
+	 '((emacs-lisp . t)
+	   (C . t)
+	   (java . t)
+	   (js . t)
+	   (ruby . t)
+	   (ditaa . t)
+	   (python . t)
+	   (shell . t)
+	   (latex . t)
+	   (plantuml . t)
+	   (R . t)))
+ #+END_SRC
+
+*** org-plus-contrib
+     #+begin_src emacs-lisp
+;;       (use-package org-plus-contrib)
+     #+end_src
+
+     #+RESULTS:
+     : t
+
+** C mode
+   #+begin_src emacs-lisp
+;;     (use-package cc-mode)
+   #+end_src
+
+   #+RESULTS:
+
+** python mode
+    #+begin_src emacs-lisp
+;;      (use-package elpy
+;;	:config
+;;	(elpy-enable))
+
+      ;;(use-package jedi)
+      ;;(use-package jedi-direx)
+    #+end_src
+
+** vue
+    #+begin_src emacs-lisp
+      (use-package lsp-mode
+	:commands lsp)
+
+      ;; (use-package company-lsp
+      ;;   :after lsp-mode
+      ;;   :config (push 'company-lsp company-backends))
+
+      (use-package vue-mode
+	:mode "\\.vue\\'"
+	:config
+	(add-hook 'vue-mode-hook #'lsp))
+
+    #+end_src
+
+** UTILS
+#+BEGIN_SRC emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/awesome-pair")
+  (require 'awesome-pair)
+  
+  (dolist (hook (list
+		 'emacs-lisp-mode-hook
+		 'lisp-mode-hook
+		 'lisp-interaction-mode-hook
+		 ))
+    (add-hook hook '(lambda () (awesome-pair-mode 1))))
+  
+  (global-set-key "\M-'" 'awesome-pair-wrap-double-quote)
+  (global-set-key "\M-[" 'awesome-pair-wrap-bracket)
+  (global-set-key "\M-{" 'awesome-pair-wrap-curly)
+  (global-set-key "\M-9" 'awesome-pair-wrap-round)
+  (global-set-key "\M-0" 'awesome-pair-unwrap)
+  
+  (global-set-key "\M-p" 'awesome-pair-jump-left)
+  (global-set-key "\M-n" 'awesome-pair-jump-right)
+  
+  ;;I want to start a newline acts like this in global mode like o in vim
+  ;;(global-set-key "\M-:") 'awesome-pair-jump-out-pair-and-newline)
+  (defun open-newline-below()
+    (interactive)
+    (move-end-of-line 1)
+    (newline-and-indent))
+  
+  (global-set-key "\C-o" 'open-newline-below)
+  
+  (defun open-newline-above()
+    (interactive)
+    (line-move -1)
+    (move-end-of-line 1)
+    (newline-and-indent))
+  
+  (global-set-key "\M-o" 'open-newline-above)
+#+END_SRC
+
+#+RESULTS:
+: open-newline-above
+
+* deforming the structure of code block
+** IO
+   #+BEGIN_SRC emacs-lisp
+     (setq process-adaptive-read-buffering nil
+	   read-process-output-max (* 1024 1024))
+   #+END_SRC
+
+   #+RESULTS:
+   : 1048576
+
+** word
+   #+BEGIN_SRC emacs-lisp
+     (global-subword-mode 1)
+     (defun kill-word-at-point () 
+       "Kill characters at point or forward"
+       (interactive)
+       (save-excursion
+	 (forward-word)
+	 (kill-word -1)))
+     
+     (global-set-key "\M-d" 'kill-word-at-point)
+   #+END_SRC
+
+** replace
+   #+BEGIN_SRC emacs-lisp
+     (global-set-key "\C-r" 'query-replace)
+   #+END_SRC
+** clipboard
+** line
+  #+BEGIN_SRC emacs-lisp
+    (setq  line-move-ignore-invisible t
+	   next-line-add-newlines t)
+  #+END_SRC
+** fill collomn
+  #+BEGIN_SRC emacs-lisp
+    (setq-default fill-column 78)
+  #+END_SRC
+** UTILS
+*** flycheck
+  #+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+          :defer t
+
+      :hook
+      (prog-mode . flycheck-mode))
+    (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
+  #+END_SRC
+
+*** figlet
+    #+begin_src emacs-lisp
+	    (use-package figlet
+	          :defer t
+)
+    #+end_src
+
+*** youdao-dictionary
+    #+begin_src emacs-lisp
+      ;; (use-package youdao-dictionary)
+      ;; (global-set-key "\C-w" 'youdao-dictionary-search)
+    #+end_src
+
+*** multiple-cursors
+slow down speed not good
+    #+begin_src emacs-lisp
+	    ;; (use-package multiple-cursors)
+	    
+	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    #+end_src    
+
+    #+RESULTS:
+    : mc/mark-all-like-this
+
+* leaving
+** idle setups
+   #+begin_src emacs-lisp
+     (setq idle-play-function '(zone)
+	   idle-play-time 500
+	   n 0)
+
+     (while (< n (length idle-play-function))
+       (run-with-idle-timer idle-play-time t (nth n idle-play-function))
+       (setq n (1+ n)))
+     (setq n 0)
+     ;; (run-with-idle-timer 500 t 'zone)
+     (run-with-idle-timer 120 t 'garbage-collect)
+
+   #+end_src
+
+** delete
+  #+BEGIN_SRC emacs-lisp
+(setq delete-by-moving-to-trash t)
+  #+END_SRC
+** backup
+ #+BEGIN_SRC emacs-lisp
+ (setq make-backup-files nil)
+
+ #+END_SRC
+** auto-save 
+ #+BEGIN_SRC emacs-lisp
+   (setq auto-save-default nil)
+   (setq auto-save-idle 4)
+   (defun auto-save-buffers ()
+     (interactive)
+     (let ((auto-save-buffer-list))
+       (save-excursion
+	 (dolist (buf (buffer-list))
+	   (set-buffer buf)
+	   (if (and (buffer-file-name) (buffer-modified-p))
+	       (progn
+		 (push (buffer-name) auto-save-buffer-list)
+		 (with-temp-message "" (basic-save-buffer))
+		 ))))))
+
+   (defun auto-save-enable ()
+     (interactive)
+     (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
+
+   (auto-save-enable)
+ #+END_SRC
+
+ #+RESULTS:
+ : [nil 0 4 0 t auto-save-buffers nil idle 0]
+ 
+
+***  Auto Save Directory
+we haven't enable auto save yet. 
+let's pray that no missing will happen till we set up the auto save. 
+#+begin_src emacs-lisp
+  ;;(setq tramp-auto-save-directory "~/.emacs.d/auto-save/")
+
+#+end_src
+** Restart Emacs
+ #+BEGIN_SRC emacs-lisp
+ (use-package restart-emacs
+    :defer t
+   )
+
+ #+END_SRC
+
+** revert buffer
+   #+BEGIN_SRC emacs-lisp
+     ;; (global-set-key (kbd "<f5>") 'revert-buffer)
+   #+END_SRC
+
+
+
+* MAYBE USEFUL AREA
+gif-screencast
+
+  #+begin_src emacs-lisp
+    ;; (defun setup-ac-for-html ()
+    ;;   ;; Require ac-html since we are setup html auto completion
+    ;;   (require 'ac-html)
+    ;;   ;; Require default data provider if you want to use
+    ;;   (require 'ac-html-default-data-provider)
+    ;;   ;; Enable data providers,
+    ;;   ;; currently only default data provider available
+    ;;   (ac-html-enable-data-provider 'ac-html-default-data-provider)
+    ;;   ;; Let ac-html do some setup
+    ;;   (ac-html-setup)
+    ;;   ;; Set your ac-source
+    ;;   (setq ac-sources '(ac-source-html-tag
+    ;; 		     ac-source-html-attr
+    ;; 		     ac-source-html-attrv))
+    ;;   ;; Enable auto complete mode
+    ;;   (auto-complete-mode))
+
+    ;; (add-hook 'html-mode-hook 'setup-ac-for-html)
+
+  #+end_src
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
