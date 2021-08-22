@@ -254,10 +254,11 @@ rainbow cursor
    (setq confirm-kill-processes nil)
    (setq scroll-step 1
 	 scroll-conservatively 10000)
+   (setq split-width-threshold 80)
+   (setq split-height-threshold nil)   
  #+END_SRC
 
  #+RESULTS:
- : 10000
 
 *** initial mode
 #+BEGIN_SRC emacs-lisp
@@ -358,13 +359,13 @@ rainbow cursor
 
 ** keybinding for navigation
    #+begin_src emacs-lisp
-	  (global-set-key "\M-," 'beginning-of-buffer)
-	  (global-set-key "\M-." 'end-of-buffer)
-	  (global-set-key "\M->" 'xref-find-definitions-other-window)
-(require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
-	  ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
-	  (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
-	  (define-key company-mode-map (kbd "M-j") 'company-complete-selection)
+	       (global-set-key "\M-," 'beginning-of-buffer)
+	       (global-set-key "\M-." 'end-of-buffer)
+     (global-set-key "\M->" 'xref-find-definitions-other-window)
+     (require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
+	       ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
+	       (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
+	       (define-key company-mode-map (kbd "M-j") 'company-complete-selection)
    #+end_src
 
    #+RESULTS:
