@@ -40,11 +40,13 @@
 *** Which Key
   #+BEGIN_SRC emacs-lisp
     (use-package which-key
-      :defer t
       :config (which-key-mode)
       )
 
   #+END_SRC
+
+  #+RESULTS:
+  : t
 
 *** smex
     #+begin_src emacs-lisp
@@ -237,6 +239,11 @@ rainbow cursor
       :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
   #+END_SRC
+*** line wrap
+   #+begin_src emacs-lisp
+     (set-default 'truncate-lines t)
+   #+end_src
+
 ** buffer relative
  #+BEGIN_SRC emacs-lisp
    (setq initial-scratch-message nil)
@@ -252,11 +259,11 @@ rainbow cursor
  #+RESULTS:
  : 10000
 
-** line wrap
-   #+begin_src emacs-lisp
-     (set-default 'truncate-lines t)
-   #+end_src
-
+*** initial mode
+#+BEGIN_SRC emacs-lisp
+(setq initial-major-mode 'org-mode)
+       
+#+END_SRC
 ** UTILS
 *** Auto Complete
   #+BEGIN_SRC emacs-lisp
@@ -349,32 +356,54 @@ rainbow cursor
 ;;      (use-package treemacs)
     #+end_src
 
+** keybinding for navigation
+   #+begin_src emacs-lisp
+	  (global-set-key "\M-," 'beginning-of-buffer)
+	  (global-set-key "\M-." 'end-of-buffer)
+	  (global-set-key "\M->" 'xref-find-definitions-other-window)
+(require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
+	  ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
+	  (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
+	  (define-key company-mode-map (kbd "M-j") 'company-complete-selection)
+   #+end_src
+
+   #+RESULTS:
+   : company-complete-selection
+
 ** emacs-application-framework.git
 #+BEGIN_SRC emacs-lisp
-    ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework/")
-    ;; (require 'eaf)
-  ;;   (use-package eaf
-  ;;     :load-path "~./emacs.d/site-lisp/emacs-application-framework"
-  ;;     :custom
-  ;;     (eaf-browser-continue-where-left-off t)
-  ;;     :config
-  ;;     (require 'eaf-airshare)
-  ;;     (require 'eaf-browser)
-  ;;     (setq eaf-browser-enable-adblocker t)
-  ;;     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  ;;     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;;     (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  ;;     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
+(require 'eaf)
+  (use-package eaf
+    :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
+    :custom
+    (eaf-browser-continue-where-left-off t)
+    :config
+    (require 'eaf-jupyter)
+    (require 'eaf-pdf-viewer)
+;;    (require 'eaf-mermaid)
+    (require 'eaf-system-monitor)
+    (require 'eaf-video-player)
+    (require 'eaf-terminal)
+    (require 'eaf-vue-demo)
+    (require 'eaf-org-previewer)
+    (require 'eaf-file-browser)
+    (require 'eaf-image-viewer)
+    (require 'eaf-file-sender)
+    (require 'eaf-browser)
+    (require 'eaf-demo)
+    (require 'eaf-file-manager)
+    (setq eaf-browser-enable-adblocker t)
+    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+    (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  
 #+END_SRC
 
 #+RESULTS:
 : t
 
-** initial mode
-#+BEGIN_SRC emacs-lisp
-(setq initial-major-mode 'org-mode)
-       
-#+END_SRC
 * static form of codes
 
 ** ORG mode
