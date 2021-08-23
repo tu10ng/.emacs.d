@@ -718,7 +718,13 @@ rainbow cursor
    #+BEGIN_SRC emacs-lisp
      (global-set-key "\C-r" 'query-replace)
    #+END_SRC
-** clipboard
+** register
+   #+BEGIN_SRC emacs-lisp
+(setq register-preview-delay nil)
+   #+END_SRC
+
+   #+RESULTS:
+
 ** line
   #+BEGIN_SRC emacs-lisp
     (setq  line-move-ignore-invisible t
@@ -765,7 +771,16 @@ slow down speed not good
 
     #+RESULTS:
     : mc/mark-all-like-this
+*** popup killring
+    #+begin_src emacs-lisp
+      (use-package popup-kill-ring)
+      (global-set-key "\M-y" 'popup-kill-ring)
+(define-key popup-kill-ring-keymap (kbd "M-j") 'popup-kill-ring-select)      
+(define-key popup-kill-ring-keymap (kbd "C-j") 'popup-kill-ring-select)
+#+end_src    
 
+    #+RESULTS:
+    : popup-kill-ring-current
 * leaving
 ** idle setups
    #+begin_src emacs-lisp
