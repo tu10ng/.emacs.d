@@ -3,14 +3,15 @@
 
 
 * finding in order to edit
-** message
-   #+begin_src emacs-lisp
-     (setq garbage-collection-messages t
-	   large-file-warning-threshold nil)
-     (fset 'yes-or-no-p 'y-or-n-p)
-   #+end_src
-
-** buffer switch
+** scroll with mouse
+   #+BEGIN_SRC emacs-lisp
+     (setq scroll-step 1
+	   scroll-margin 2
+	   scroll-conservatively 101
+	   scroll-up-aggressively 0.01
+	   scroll-down-aggressively 0.01)
+   #+END_SRC** buffer switch
+** UTILS
 *** Counsel
   #+BEGIN_SRC emacs-lisp
     (use-package counsel)
@@ -29,80 +30,6 @@
 	(setq ivy-display-style 'fancy)))
 
   #+END_SRC
-** mark(selection)
-*** shift-selec-mode
-too hard to activate
-#+BEGIN_SRC emacs-lisp
-  (setq shift-select-mode nil)
-#+END_SRC    
-
-#+RESULTS:
-
-*** multiple-cursors
-slow down speed not good
-    #+begin_src emacs-lisp
-	    ;; (use-package multiple-cursors)
-	    
-	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-    #+end_src    
-
-    #+RESULTS:
-    : mc/mark-all-like-this
-
-*** visible mark
-    #+begin_src emacs-lisp
-      (defface visible-mark-face1
-	'((((type tty) (class mono)))
-	  (t (:background "#aaa")))
-	"Example face which can be customized and added to subsequent face lists."
-	:group 'visible-mark)
-      
-      (defface visible-mark-face2
-	'((((type tty) (class mono)))
-	  (t (:background "#47e")))
-	"Example face which can be customized and added to subsequent face lists."
-	:group 'visible-mark)
-      
-      (defface visible-mark-face3
-	'((((type tty) (class mono)))
-	  (t (:background "#0ef")))
-	"Example face which can be customized and added to subsequent face lists."
-	:group 'visible-mark)
-      
-      (defface visible-mark-face4
-	'((((type tty) (class mono)))
-	  (t (:background "#9de")))
-	"Example face which can be customized and added to subsequent face lists."
-	:group 'visible-mark)
-      
-      (defface visible-mark-face5
-	'((((type tty) (class mono)))
-	  (t (:background "pale green")))
-	"Example face which can be customized and added to subsequent face lists."
-	:group 'visible-mark)
-      
-      (use-package visible-mark)
-      (global-visible-mark-mode 1) ;; or add (visible-mark-mode) to specific hooks
-      (setq visible-mark-max 4)
-      (setq visible-mark-faces `(visible-mark-face1
-				 visible-mark-face2
-				 visible-mark-face3
-				 visible-mark-face4
-				 visible-mark-face5
-				 visible-mark-face6      
-				 ))
-      
-      
-      
-    #+end_src
-
-    #+RESULTS:
-    | visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
-
-** UTILS
 *** Try
   #+BEGIN_SRC emacs-lisp
   (use-package try
@@ -125,14 +52,11 @@ slow down speed not good
     #+begin_src emacs-lisp
       (use-package smex)
     #+end_src
-*** undo tree
+*** youdao-dictionary
     #+begin_src emacs-lisp
- ;;     (use-package undo-tree
- ;;       :diminish undo-tree-mode
- ;;       :config (global-undo-tree-mode))
-
+      ;; (use-package youdao-dictionary)
+      ;; (global-set-key "\C-w" 'youdao-dictionary-search)
     #+end_src
-
 *** jump to definition
     #+begin_src emacs-lisp
 		  (use-package dumb-jump
@@ -150,16 +74,42 @@ slow down speed not good
     : xref-show-definitions-completing-read
 
 * behavior & moving & outfit of emacs
-** interface
-*** frame
+** in total
+*** message and gc
+   #+begin_src emacs-lisp
+     (setq garbage-collection-messages t
+	   large-file-warning-threshold nil)
+     (setq inhibit-compacting-font-caches t)
+     (setq confirm-kill-processes nil)
+     (fset 'yes-or-no-p 'y-or-n-p)
+     
+
+     ;; (run-with-idle-timer 500 t 'zone)
+     (run-with-idle-timer 30 t 'garbage-collect)
+     
+   #+end_src     
+
+   #+RESULTS:
+   : [nil 0 30 0 t garbage-collect nil idle 0]
+** frame
+*** startup
+**** maximize frame on startup and set title
     #+begin_src emacs-lisp
-      ;;(setq frame-title-format "Emacs@GNU_Project")
       (toggle-frame-maximized)
       ;;(add-to-list 'default-frame-alist '(fullscreen . maximized))
     #+end_src
 
     #+RESULTS:
 
+**** startup-message
+    #+begin_src emacs-lisp
+      (setq inhibit-startup-message t)
+      (defun startup-echo-area-message ()
+	(if (daemonp)
+	    ""
+	  (substitute-command-keys
+	   "")))
+    #+end_src
 *** bars
    #+BEGIN_SRC emacs-lisp
 (tool-bar-mode -1)
@@ -169,6 +119,11 @@ slow down speed not good
 #+BEGIN_SRC emacs-lisp
 ;; (set-frame-parameter nil 'alpha 75)
 #+END_SRC
+*** title
+    #+begin_src emacs-lisp
+      ;;(setq frame-title-format "Emacs@GNU_Project")
+    #+end_src
+
 *** theme
   #+BEGIN_SRC emacs-lisp
     (use-package tangotango-theme
@@ -178,15 +133,6 @@ slow down speed not good
     (enable-theme 'tangotango)
 
   #+END_SRC
-*** Welcome word
-    #+begin_src emacs-lisp
-      (setq inhibit-startup-message t)
-      (defun startup-echo-area-message ()
-	(if (daemonp)
-	    ""
-	  (substitute-command-keys
-	   "")))
-    #+end_src
 *** cursor
 rainbow cursor
     #+begin_src emacs-lisp
@@ -232,6 +178,7 @@ rainbow cursor
     : [nil 24865 54197 858529 0.038461538461538464 cursor-color-change nil nil 659000]
 
 *** modeline
+**** battery
 #+BEGIN_SRC emacs-lisp
   (display-battery-mode)
   
@@ -239,15 +186,18 @@ rainbow cursor
 	 battery-load-low 50
 	 battery-mode-line-format "  [%p%% %m]  "
 	 battery-update-interval 30)
-  (setq which-function-mode 1)
 #+END_SRC
-*** average load
+**** average load
 #+BEGIN_SRC emacs-lisp
   ;;  (setq display-time-load-average-threshold 100)
   (setq display-time-default-load-average nil)
 #+END_SRC
+**** which-function
+#+BEGIN_SRC emacs-lisp
+  (setq which-function-mode 1)
+#+END_SRC
 
-*** Time
+**** Time
   #+BEGIN_SRC emacs-lisp
     (display-time-mode)
 
@@ -256,189 +206,65 @@ rainbow cursor
 	  display-time-format "%H:%M %m-%d %a")
 
   #+END_SRC
-*** scroll
-   #+BEGIN_SRC emacs-lisp
-     (setq scroll-step 2
-	   scroll-margin 2
-	   scroll-conservatively 101
-	   scroll-up-aggressively 0.01
-	   scroll-down-aggressively 0.01)
-      
-   #+END_SRC
-*** line number
+
+*** sound
+ #+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC  
+** buffer relative
+*** startup
+ #+BEGIN_SRC emacs-lisp
+   (setq initial-scratch-message nil)
+   (setq initial-buffer-choice nil
+	 inhibit-startup-screen t)
+   (setq initial-major-mode 'org-mode)   
+ #+END_SRC
+
+ #+RESULTS:
+*** delete
+  #+BEGIN_SRC emacs-lisp
+(setq delete-by-moving-to-trash t)
+  #+END_SRC
+*** zone
+   #+begin_src emacs-lisp
+     (setq idle-play-function '(zone)
+	   idle-play-time 500
+	   n 0)
+     (while (< n (length idle-play-function))
+       (run-with-idle-timer idle-play-time t (nth n idle-play-function))
+       (setq n (1+ n)))
+     (setq n 0)
+   #+end_src
+
+   #+RESULTS:
+   : 0
+
+** line relative  
+*** relative-line number
   #+BEGIN_SRC emacs-lisp
     (use-package linum-relative)
     (line-number-mode -1)
   #+END_SRC
 
-*** paren
-  #+BEGIN_SRC emacs-lisp
-    (use-package paren
-      :ensure nil
-      :hook (after-init . show-paren-mode)
-      :init (setq show-paren-when-point-inside-paren t
-		  show-paren-when-point-in-periphery t
-		  show-paren-highlight-openparen t))
-
-    (use-package rainbow-delimiters 
-      :ensure t 
-      :config
-      ;; 设置每一级括号的颜色
-      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
-      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
-      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
-      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
-      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
-      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
-      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
-      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
-      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
-  #+END_SRC
-*** info help
-  #+BEGIN_SRC emacs-lisp
-    (use-package 
-      info-colors 
-    :defer t
-      :hook ('Info-selection-hook . 'info-colors-fontify-node))
-
-  #+END_SRC
+** word-relative
 *** line wrap
    #+begin_src emacs-lisp
      (set-default 'truncate-lines t)
    #+end_src
 
-** buffer relative
+** Window
  #+BEGIN_SRC emacs-lisp
-   (setq initial-scratch-message nil)
-   (setq initial-buffer-choice nil
-	 inhibit-startup-screen t)
-   (setq ring-bell-function 'ignore)
-   (setq inhibit-compacting-font-caches t)
-   (setq confirm-kill-processes nil)
-   (setq scroll-step 1
-	 scroll-conservatively 10000)
    (setq split-width-threshold 80)
    (setq split-height-threshold nil)   
+
  #+END_SRC
-
- #+RESULTS:
-
-*** initial mode
-#+BEGIN_SRC emacs-lisp
-(setq initial-major-mode 'org-mode)
-       
-#+END_SRC
-** UTILS
-*** Auto Complete
-  #+BEGIN_SRC emacs-lisp
-    ;; (use-package auto-complete
-    ;;   :ensure t
-    ;;   :init
-    ;;   (progn
-    ;;     (ac-config-default)
-    ;;     (global-auto-complete-mode t)
-    ;;     ))
-    ;; (use-package fuzzy
-    ;;   )
-
-    ;; (use-package js2-mode
-    ;;   )
-    ;; (use-package ac-html
-    ;;   )
-    ;; (use-package web-mode  )
-    ;;(add-to-list 'auto-mode-alist '("\\.js$" . js2-mode))
-    ;; (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-    ;;(add-hook 'js2-mode-hook 'ac-js2-mode)
-
-
-
-
-
-  #+END_SRC
-
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    ;; :hook
-    ;; ((prog-mode . company-mode)
-    ;;  (conf-mode . company-mode)
-    ;;  (shell-mode . company-mode))
-    )
-  (add-hook 'after-init-hook 'global-company-mode)
-  
-  (use-package company-tabnine
-    :ensure t
-    )
-  
-  (add-to-list 'company-backends #'company-tabnine)
-  (setq company-idle-delay 0)
-  (setq company-show-numbers t)
-  
-  ;; The free version of TabNine is good enough,
-  ;; and below code is recommended that TabNine not always
-  ;; prompt me to purchase a paid version in a large project.
-  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-    (let ((company-message-func (ad-get-arg 0)))
-      (when (and company-message-func
-		 (stringp (funcall company-message-func)))
-	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-	  ad-do-it))))
-  #+END_SRC
-
-  #+RESULTS:
-  : company-echo-show
-
-*** magit
-    #+begin_src emacs-lisp
-	    (use-package magit
-	          :defer t
-)
-	      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
-	      ;;   (use-package diff-hl)
-      
-    #+end_src
-
-    #+RESULTS:
-
-*** projectile
-    #+begin_src emacs-lisp
-
-    #+end_src
-*** browse
-  #+BEGIN_SRC emacs-lisp
- ;;   (use-package firefox-controller)
-  #+END_SRC
-*** quickrun
-    #+begin_src emacs-lisp
-	     (use-package quickrun
-	           :defer t
-)
-      
-      
-    #+end_src
-*** treemacs
-    #+begin_src emacs-lisp
-;;      (use-package treemacs)
-    #+end_src
-
 ** keybinding (navigation, etc.)
    #+begin_src emacs-lisp
      (global-set-key "\M-," 'beginning-of-buffer)
      (global-set-key "\M-." 'end-of-buffer)
      (global-set-key "\M->" 'xref-find-definitions-other-window)
      (require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
-     ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
-     (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
+
      (global-set-key "\C-xu" 'nil)     
      (global-set-key "\C-xl" 'nil)     
      (global-set-key "\C-@" 'nil)     	
@@ -454,42 +280,7 @@ rainbow cursor
    #+RESULTS:
    : pop-to-mark-command
 
-** emacs-application-framework.git
-#+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
-(require 'eaf)
-  (use-package eaf
-    :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
-    :custom
-    (eaf-browser-continue-where-left-off t)
-    :config
-    (require 'eaf-jupyter)
-    (require 'eaf-pdf-viewer)
-;;    (require 'eaf-mermaid)
-    (require 'eaf-system-monitor)
-    (require 'eaf-video-player)
-    (require 'eaf-terminal)
-    (require 'eaf-vue-demo)
-    (require 'eaf-org-previewer)
-    (require 'eaf-file-browser)
-    (require 'eaf-image-viewer)
-    (require 'eaf-file-sender)
-    (require 'eaf-browser)
-    (require 'eaf-demo)
-    (require 'eaf-file-manager)
-    (setq eaf-browser-enable-adblocker t)
-    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-    (eaf-bind-key nil "M-q" eaf-browser-keybinding))
-  
-#+END_SRC
-
-#+RESULTS:
-: t
-
 * static form of codes
-
 ** ORG mode
 *** outfit
 **** org bullets
@@ -732,7 +523,80 @@ rainbow cursor
 
     #+end_src
 
+** emacs-application-framework.git
+#+BEGIN_SRC emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
+(require 'eaf)
+  (use-package eaf
+    :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
+    :custom
+    (eaf-browser-continue-where-left-off t)
+    :config
+    (require 'eaf-jupyter)
+    (require 'eaf-pdf-viewer)
+;;    (require 'eaf-mermaid)
+    (require 'eaf-system-monitor)
+    (require 'eaf-video-player)
+    (require 'eaf-terminal)
+    (require 'eaf-vue-demo)
+    (require 'eaf-org-previewer)
+    (require 'eaf-file-browser)
+    (require 'eaf-image-viewer)
+    (require 'eaf-file-sender)
+    (require 'eaf-browser)
+    (require 'eaf-demo)
+    (require 'eaf-file-manager)
+    (setq eaf-browser-enable-adblocker t)
+    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+    (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  
+#+END_SRC
+
+#+RESULTS:
+: t
+
 ** UTILS
+*** projectile
+    #+begin_src emacs-lisp
+
+    #+end_src
+*** rainbow parentheses
+  #+BEGIN_SRC emacs-lisp
+    (use-package paren
+      :ensure nil
+      :hook (after-init . show-paren-mode)
+      :init (setq show-paren-when-point-inside-paren t
+		  show-paren-when-point-in-periphery t
+		  show-paren-highlight-openparen t))
+
+    (use-package rainbow-delimiters 
+      :ensure t 
+      :config
+      ;; 设置每一级括号的颜色
+      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
+      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
+      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
+      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
+      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
+      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
+      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
+
+  #+END_SRC
+*** awesome-pair
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/site-lisp/awesome-pair")
   (require 'awesome-pair)
@@ -753,7 +617,18 @@ rainbow cursor
   (global-set-key "\M-p" 'awesome-pair-jump-left)
   (global-set-key "\C-\M-n" 'awesome-pair-jump-right)
   (global-set-key "\M-n" 'awesome-pair-jump-right)
-  
+#+END_SRC
+
+*** info help
+  #+BEGIN_SRC emacs-lisp
+    (use-package 
+      info-colors 
+    :defer t
+      :hook ('Info-selection-hook . 'info-colors-fontify-node))
+
+  #+END_SRC
+*** open newline above and below 
+#+BEGIN_SRC emacs-lisp
   ;;I want to start a newline acts like this in global mode like o in vim
   ;;(global-set-key "\M-:") 'awesome-pair-jump-out-pair-and-newline)
   (defun open-newline-below()
@@ -802,7 +677,86 @@ rainbow cursor
    #+BEGIN_SRC emacs-lisp
      (global-set-key "\C-r" 'query-replace)
    #+END_SRC
-** register
+** mark(jump and selection)
+*** shift-selec-mode
+too hard to activate
+#+BEGIN_SRC emacs-lisp
+  (setq shift-select-mode nil)
+#+END_SRC    
+
+#+RESULTS:
+
+*** multiple-cursors
+slow down speed not good
+    #+begin_src emacs-lisp
+	    ;; (use-package multiple-cursors)
+	    
+	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    #+end_src    
+
+    #+RESULTS:
+    : mc/mark-all-like-this
+
+*** visible mark
+    #+begin_src emacs-lisp
+      (defface visible-mark-face1
+	'((((type tty) (class mono)))
+	  (t (:background "gold")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face2
+	'((((type tty) (class mono)))
+	  (t (:background "DodgerBlue1")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face3
+	'((((type tty) (class mono)))
+	  (t (:background "lime green")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face4
+	'((((type tty) (class mono)))
+	  (t (:background "deep pink")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face5
+	'((((type tty) (class mono)))
+	  (t (:background "DarkOrange2")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face5
+	'((((type tty) (class mono)))
+	  (t (:background "turquoise")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (use-package visible-mark)
+      (global-visible-mark-mode 1) ;; or add (visible-mark-mode) to specific hooks
+      (setq visible-mark-max 4)
+      (setq visible-mark-faces `(visible-mark-face1
+				 visible-mark-face2
+				 visible-mark-face3
+				 visible-mark-face4
+				 visible-mark-face5
+				 visible-mark-face6      
+				 ))
+      
+      
+      
+    #+end_src
+
+    #+RESULTS:
+    | visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
+
+*** register
    #+BEGIN_SRC emacs-lisp
      (setq register-preview-delay nil
 	   bookmark-save-flag 1
@@ -825,6 +779,60 @@ rainbow cursor
     (setq-default fill-column 78)
   #+END_SRC
 ** UTILS
+*** Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    ;; :hook
+    ;; ((prog-mode . company-mode)
+    ;;  (conf-mode . company-mode)
+    ;;  (shell-mode . company-mode))
+    )
+  (add-hook 'after-init-hook 'global-company-mode)
+  
+  (use-package company-tabnine
+    :ensure t
+    )
+  
+  (add-to-list 'company-backends #'company-tabnine)
+  (setq company-idle-delay 0)
+  (setq company-show-numbers t)
+  
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+		 (stringp (funcall company-message-func)))
+	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+	  ad-do-it))))
+  
+  (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
+  (define-key company-mode-map (kbd "C-n") 'nil)
+  (define-key company-mode-map (kbd "C-p") 'nil)
+  
+  #+END_SRC
+
+  #+RESULTS:
+*** magit
+    #+begin_src emacs-lisp
+	    (use-package magit
+	          :defer t
+)
+	      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
+	      ;;   (use-package diff-hl)
+      
+    #+end_src
+
+    #+RESULTS:
+*** quickrun
+    #+begin_src emacs-lisp
+	     (use-package quickrun
+	           :defer t
+)
+      
+      
+    #+end_src
 *** flycheck
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck
@@ -842,11 +850,7 @@ rainbow cursor
 )
     #+end_src
 
-*** youdao-dictionary
-    #+begin_src emacs-lisp
-      ;; (use-package youdao-dictionary)
-      ;; (global-set-key "\C-w" 'youdao-dictionary-search)
-    #+end_src
+    #+RESULTS:
 
 *** popup killring
     #+begin_src emacs-lisp
@@ -858,26 +862,7 @@ rainbow cursor
 
     #+RESULTS:
     : popup-kill-ring-current
-* leaving
-** idle setups
-   #+begin_src emacs-lisp
-     (setq idle-play-function '(zone)
-	   idle-play-time 500
-	   n 0)
-
-     (while (< n (length idle-play-function))
-       (run-with-idle-timer idle-play-time t (nth n idle-play-function))
-       (setq n (1+ n)))
-     (setq n 0)
-     ;; (run-with-idle-timer 500 t 'zone)
-     (run-with-idle-timer 120 t 'garbage-collect)
-
-   #+end_src
-
-** delete
-  #+BEGIN_SRC emacs-lisp
-(setq delete-by-moving-to-trash t)
-  #+END_SRC
+* about leaving
 ** backup
  #+BEGIN_SRC emacs-lisp
  (setq make-backup-files nil)
@@ -909,14 +894,6 @@ rainbow cursor
  #+RESULTS:
  : [nil 0 4 0 t auto-save-buffers nil idle 0]
  
-
-***  Auto Save Directory
-we haven't enable auto save yet. 
-let's pray that no missing will happen till we set up the auto save. 
-#+begin_src emacs-lisp
-  ;;(setq tramp-auto-save-directory "~/.emacs.d/auto-save/")
-
-#+end_src
 ** Restart Emacs
  #+BEGIN_SRC emacs-lisp
  (use-package restart-emacs
@@ -924,7 +901,6 @@ let's pray that no missing will happen till we set up the auto save.
    )
 
  #+END_SRC
-
 
 
 * MAYBE USEFUL AREA
@@ -951,6 +927,13 @@ gif-screencast
     ;; (add-hook 'html-mode-hook 'setup-ac-for-html)
 
   #+end_src
+
+
+
+
+
+
+
 
 
 
