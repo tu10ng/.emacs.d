@@ -2,7 +2,7 @@
 
 
 
-* find out before editing
+* finding in order to edit
 ** message
    #+begin_src emacs-lisp
      (setq garbage-collection-messages t
@@ -29,6 +29,79 @@
 	(setq ivy-display-style 'fancy)))
 
   #+END_SRC
+** mark(selection)
+*** shift-selec-mode
+too hard to activate
+#+BEGIN_SRC emacs-lisp
+  (setq shift-select-mode nil)
+#+END_SRC    
+
+#+RESULTS:
+
+*** multiple-cursors
+slow down speed not good
+    #+begin_src emacs-lisp
+	    ;; (use-package multiple-cursors)
+	    
+	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
+	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
+	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
+      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
+    #+end_src    
+
+    #+RESULTS:
+    : mc/mark-all-like-this
+
+*** visible mark
+    #+begin_src emacs-lisp
+      (defface visible-mark-face1
+	'((((type tty) (class mono)))
+	  (t (:background "#aaa")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face2
+	'((((type tty) (class mono)))
+	  (t (:background "#47e")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face3
+	'((((type tty) (class mono)))
+	  (t (:background "#0ef")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face4
+	'((((type tty) (class mono)))
+	  (t (:background "#9de")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (defface visible-mark-face5
+	'((((type tty) (class mono)))
+	  (t (:background "pale green")))
+	"Example face which can be customized and added to subsequent face lists."
+	:group 'visible-mark)
+      
+      (use-package visible-mark)
+      (global-visible-mark-mode 1) ;; or add (visible-mark-mode) to specific hooks
+      (setq visible-mark-max 4)
+      (setq visible-mark-faces `(visible-mark-face1
+				 visible-mark-face2
+				 visible-mark-face3
+				 visible-mark-face4
+				 visible-mark-face5
+				 visible-mark-face6      
+				 ))
+      
+      
+      
+    #+end_src
+
+    #+RESULTS:
+    | visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
+
 ** UTILS
 *** Try
   #+BEGIN_SRC emacs-lisp
@@ -158,14 +231,15 @@ rainbow cursor
     #+RESULTS:
     : [nil 24865 54197 858529 0.038461538461538464 cursor-color-change nil nil 659000]
 
-*** battery
+*** modeline
 #+BEGIN_SRC emacs-lisp
   (display-battery-mode)
-
+  
   (setq  battery-load-critical 25
 	 battery-load-low 50
 	 battery-mode-line-format "  [%p%% %m]  "
 	 battery-update-interval 30)
+  (setq which-function-mode 1)
 #+END_SRC
 *** average load
 #+BEGIN_SRC emacs-lisp
@@ -357,19 +431,28 @@ rainbow cursor
 ;;      (use-package treemacs)
     #+end_src
 
-** keybinding for navigation
+** keybinding (navigation, etc.)
    #+begin_src emacs-lisp
-	       (global-set-key "\M-," 'beginning-of-buffer)
-	       (global-set-key "\M-." 'end-of-buffer)
+     (global-set-key "\M-," 'beginning-of-buffer)
+     (global-set-key "\M-." 'end-of-buffer)
      (global-set-key "\M->" 'xref-find-definitions-other-window)
      (require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
-	       ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
-	       (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
-	       (define-key company-mode-map (kbd "M-j") 'company-complete-selection)
+     ;;(define-key company-mode-map (kbd "C-j") (kbd "RET"))
+     (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
+     (global-set-key "\C-xu" 'nil)     
+     (global-set-key "\C-xl" 'nil)     
+     (global-set-key "\C-@" 'nil)     	
+     (global-set-key "\M-j" 'pop-to-mark-command) 
+     (global-set-key "\M-i" 'nil)     	
+     (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
+     (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
+     (global-set-key "\C-@" 'nil)     	
+     
    #+end_src
 
+
    #+RESULTS:
-   : company-complete-selection
+   : pop-to-mark-command
 
 ** emacs-application-framework.git
 #+BEGIN_SRC emacs-lisp
@@ -668,6 +751,7 @@ rainbow cursor
   (global-set-key "\M-0" 'awesome-pair-unwrap)
   
   (global-set-key "\M-p" 'awesome-pair-jump-left)
+  (global-set-key "\C-\M-n" 'awesome-pair-jump-right)
   (global-set-key "\M-n" 'awesome-pair-jump-right)
   
   ;;I want to start a newline acts like this in global mode like o in vim
@@ -720,10 +804,16 @@ rainbow cursor
    #+END_SRC
 ** register
    #+BEGIN_SRC emacs-lisp
-(setq register-preview-delay nil)
+     (setq register-preview-delay nil
+	   bookmark-save-flag 1
+	   bookmark-search-size 50)
+     (global-set-key "\C-z" 'jump-to-register)
+     (global-set-key "\C-xr" 'point-to-register)
+     
    #+END_SRC
 
    #+RESULTS:
+   : point-to-register
 
 ** line
   #+BEGIN_SRC emacs-lisp
@@ -758,19 +848,6 @@ rainbow cursor
       ;; (global-set-key "\C-w" 'youdao-dictionary-search)
     #+end_src
 
-*** multiple-cursors
-slow down speed not good
-    #+begin_src emacs-lisp
-	    ;; (use-package multiple-cursors)
-	    
-	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-    #+end_src    
-
-    #+RESULTS:
-    : mc/mark-all-like-this
 *** popup killring
     #+begin_src emacs-lisp
       (use-package popup-kill-ring)
@@ -847,11 +924,6 @@ let's pray that no missing will happen till we set up the auto save.
    )
 
  #+END_SRC
-
-** revert buffer
-   #+BEGIN_SRC emacs-lisp
-     ;; (global-set-key (kbd "<f5>") 'revert-buffer)
-   #+END_SRC
 
 
 
