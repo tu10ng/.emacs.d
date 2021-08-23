@@ -1,0 +1,27 @@
+* support
+May not support for Windows and Mac.  support for arch linux.
+
+* site lisp
+site lisp are not commited.  Please try to get them on [[https://github.com/manateelazycat][ManateelazyCat]]'s homepage.
+** EAF
+[[https://github.com/emacs-eaf/emacs-application-framework][emacs-application-framework]] is highly recommended.  
+
+** awesome-pair
+not neccesary needed.
+
+
+* other things need to notice
+** company-tabnine
+The use of company-tabnine needs extra commands to work. please access the [[https://github.com/TommyX12/company-tabnine][homepage]] for details.
+and I haven't added any other language server yet.
+** some other tools maybe needed
+maybe ripgrep?
+
+* emacs
+#+begin_src 
+  ___ _ __ ___   __ _  ___ ___ 
+ / _ \ '_ ` _ \ / _` |/ __/ __|
+|  __/ | | | | | (_| | (__\__ \
+ \___|_| |_| |_|\__,_|\___|___/
+
+#+end_src                               
