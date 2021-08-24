@@ -91,6 +91,26 @@
 
    #+RESULTS:
    : [nil 0 30 0 t garbage-collect nil idle 0]
+*** sound
+ #+BEGIN_SRC emacs-lisp
+(setq ring-bell-function 'ignore)
+#+END_SRC  
+**** rainbow-fart
+   #+begin_src emacs-lisp
+     
+	;; (use-package rainbow-fart
+	;;   :ensure t
+	;;   :init (rainbow-fart-mode 1))
+     
+     ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/rainbow-fart.el")
+     ;; (require 'rainbow-fart)
+     ;; (rainbow-fart-mode 1)
+     
+     
+   #+end_src
+
+   #+RESULTS:
+
 ** frame
 *** startup
 **** maximize frame on startup and set title
@@ -125,15 +145,61 @@
     #+end_src
 
 *** theme
+**** lazycat-theme
   #+BEGIN_SRC emacs-lisp
-    (use-package tangotango-theme
-      :ensure t
-      )
+    ;; (use-package tangotango-theme
+    ;;   :ensure t
+    ;;   )
+    
+    ;; (enable-theme 'tangotango)
+    
+    (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
+    (require 'lazycat-theme)
+    (lazycat-theme-load-dark)
+    
+  #+END_SRC
 
-    (enable-theme 'tangotango)
+  #+RESULTS:
+  : lazycat-theme
+
+**** rainbow parentheses
+  #+BEGIN_SRC emacs-lisp
+    (use-package paren
+      :ensure nil
+      :hook (after-init . show-paren-mode)
+      :init (setq show-paren-when-point-inside-paren t
+		  show-paren-when-point-in-periphery t
+		  show-paren-highlight-openparen t))
+
+    (use-package rainbow-delimiters 
+      :ensure t 
+      :config
+      ;; 设置每一级括号的颜色
+      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
+      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
+      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
+      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
+      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
+      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
+      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
 
   #+END_SRC
-*** cursor
+
+  #+RESULTS:
+  : t
+**** cursor
 rainbow cursor
     #+begin_src emacs-lisp
 
@@ -175,7 +241,7 @@ rainbow cursor
     #+end_src    
 
     #+RESULTS:
-    : [nil 24865 54197 858529 0.038461538461538464 cursor-color-change nil nil 659000]
+    : [nil 24869 1981 996153 0.038461538461538464 cursor-color-change nil nil 598000]
 
 *** modeline
 **** battery
@@ -207,10 +273,6 @@ rainbow cursor
 
   #+END_SRC
 
-*** sound
- #+BEGIN_SRC emacs-lisp
-(setq ring-bell-function 'ignore)
-#+END_SRC  
 ** buffer relative
 *** startup
  #+BEGIN_SRC emacs-lisp
@@ -251,7 +313,6 @@ rainbow cursor
    #+begin_src emacs-lisp
      (set-default 'truncate-lines t)
    #+end_src
-
 ** Window
  #+BEGIN_SRC emacs-lisp
    (setq split-width-threshold 80)
@@ -525,33 +586,35 @@ rainbow cursor
 
 ** emacs-application-framework.git
 #+BEGIN_SRC emacs-lisp
-(add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
-(require 'eaf)
-  (use-package eaf
-    :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
-    :custom
-    (eaf-browser-continue-where-left-off t)
-    :config
-    (require 'eaf-jupyter)
-    (require 'eaf-pdf-viewer)
-;;    (require 'eaf-mermaid)
-    (require 'eaf-system-monitor)
-    (require 'eaf-video-player)
-    (require 'eaf-terminal)
-    (require 'eaf-vue-demo)
-    (require 'eaf-org-previewer)
-    (require 'eaf-file-browser)
-    (require 'eaf-image-viewer)
-    (require 'eaf-file-sender)
-    (require 'eaf-browser)
-    (require 'eaf-demo)
-    (require 'eaf-file-manager)
-    (setq eaf-browser-enable-adblocker t)
-    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-    (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
+  (require 'eaf)
+    (use-package eaf
+      :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
+      :custom
+      (eaf-browser-continue-where-left-off t)
+      :config
+      (require 'eaf-jupyter)
+      (require 'eaf-pdf-viewer)
+      ;;    (require 'eaf-mermaid)
+      (require 'eaf-system-monitor)
+      (require 'eaf-video-player)
+      (require 'eaf-terminal)
+      (require 'eaf-vue-demo)
+      (require 'eaf-org-previewer)
+      (require 'eaf-file-browser)
+      (require 'eaf-image-viewer)
+      (require 'eaf-file-sender)
+      (require 'eaf-browser)
+      (require 'eaf-demo)
+      (require 'eaf-file-manager)
+      (setq eaf-browser-enable-adblocker t)
+      (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+      (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+      (eaf-bind-key nil "M-q" eaf-browser-keybinding))
   
+  (setq eaf-kill-process-after-last-buffer-closed t
+	eaf-start-python-process-when-require t)
 #+END_SRC
 
 #+RESULTS:
@@ -562,40 +625,6 @@ rainbow cursor
     #+begin_src emacs-lisp
 
     #+end_src
-*** rainbow parentheses
-  #+BEGIN_SRC emacs-lisp
-    (use-package paren
-      :ensure nil
-      :hook (after-init . show-paren-mode)
-      :init (setq show-paren-when-point-inside-paren t
-		  show-paren-when-point-in-periphery t
-		  show-paren-highlight-openparen t))
-
-    (use-package rainbow-delimiters 
-      :ensure t 
-      :config
-      ;; 设置每一级括号的颜色
-      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
-      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
-      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
-      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
-      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
-      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
-      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
-      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
-      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
-  #+END_SRC
 *** awesome-pair
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/site-lisp/awesome-pair")
