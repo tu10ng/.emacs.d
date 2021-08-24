@@ -1,5 +1,5 @@
 * support
-May not support for Windows and Mac.  support for arch linux.
+May not support for Windows(due to poor performance and version) and Mac(didn't have the money:).  support for arch linux.
 
 * site lisp
 site lisp are not commited.  Please try to get them on [[https://github.com/manateelazycat][ManateelazyCat]]'s homepage.
@@ -8,11 +8,15 @@ site lisp are not commited.  Please try to get them on [[https://github.com/mana
 
 ** awesome-pair
 not neccesary needed.
-
+** lazycat-theme
+theme
+** awesome-tray
+modeline
 
 * other things need to notice
 ** company-tabnine
 The use of company-tabnine needs extra commands to work. please access the [[https://github.com/TommyX12/company-tabnine][homepage]] for details.
+** other language servers
 and I haven't added any other language server yet.
 ** some other tools maybe needed
 maybe ripgrep?

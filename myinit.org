@@ -77,7 +77,7 @@
 ** in total
 *** message and gc
    #+begin_src emacs-lisp
-     (setq garbage-collection-messages t
+     (setq garbage-collection-messages nil
 	   large-file-warning-threshold nil)
      (setq inhibit-compacting-font-caches t)
      (setq confirm-kill-processes nil)
@@ -131,10 +131,15 @@
 	   "")))
     #+end_src
 *** bars
-   #+BEGIN_SRC emacs-lisp
-(tool-bar-mode -1)
-(scroll-bar-mode -1)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (tool-bar-mode -1)
+  (scroll-bar-mode -1)
+  (menu-bar-mode -1)
+(set-frame-parameter nil 'undecorated t)  
+#+END_SRC
+
+#+RESULTS:
+
 *** tranparent
 #+BEGIN_SRC emacs-lisp
 ;; (set-frame-parameter nil 'alpha 75)
@@ -146,6 +151,7 @@
 
 *** theme
 **** lazycat-theme
+can modeline change its color overtime if it doesnot have any other functionalies?
   #+BEGIN_SRC emacs-lisp
     ;; (use-package tangotango-theme
     ;;   :ensure t
@@ -156,11 +162,15 @@
     (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/lazycat-theme"))
     (require 'lazycat-theme)
     (lazycat-theme-load-dark)
-    
+    (setq  lazycat-dark-brighter-modeline t)
+    (setq
+     lazycat-dark-brighter-comments t
+     lazycat-dark-comment-bg t
+     lazycat-dark-padded-modeline t)
   #+END_SRC
 
   #+RESULTS:
-  : lazycat-theme
+  : t
 
 **** rainbow parentheses
   #+BEGIN_SRC emacs-lisp
@@ -170,7 +180,7 @@
       :init (setq show-paren-when-point-inside-paren t
 		  show-paren-when-point-in-periphery t
 		  show-paren-highlight-openparen t))
-
+    
     (use-package rainbow-delimiters 
       :ensure t 
       :config
@@ -193,8 +203,8 @@
       (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
       (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
       (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode))
-
+      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
+      (add-hook 'org-mode-hook 'rainbow-delimiters-mode))
   #+END_SRC
 
   #+RESULTS:
@@ -244,34 +254,21 @@ rainbow cursor
     : [nil 24869 1981 996153 0.038461538461538464 cursor-color-change nil nil 598000]
 
 *** modeline
-**** battery
+**** awesome-tray(modeline)
 #+BEGIN_SRC emacs-lisp
-  (display-battery-mode)
+  (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
+  (require 'awesome-tray)
+  (awesome-tray-mode 1)
   
-  (setq  battery-load-critical 25
-	 battery-load-low 50
-	 battery-mode-line-format "  [%p%% %m]  "
-	 battery-update-interval 30)
-#+END_SRC
-**** average load
-#+BEGIN_SRC emacs-lisp
-  ;;  (setq display-time-load-average-threshold 100)
-  (setq display-time-default-load-average nil)
-#+END_SRC
-**** which-function
-#+BEGIN_SRC emacs-lisp
-  (setq which-function-mode 1)
+  (setq awesome-tray-active-modules
+	'("parent-dir" "buffer-name"
+	 "git" "battery"
+	 "date" 
+  ))
 #+END_SRC
 
-**** Time
-  #+BEGIN_SRC emacs-lisp
-    (display-time-mode)
-
-    (setq display-time-24hr-format t
-	  display-time-day-and-date t
-	  display-time-format "%H:%M %m-%d %a")
-
-  #+END_SRC
+#+RESULTS:
+| parent-dir | buffer-name | git | battery | date |
 
 ** buffer relative
 *** startup
@@ -305,8 +302,11 @@ rainbow cursor
 *** relative-line number
   #+BEGIN_SRC emacs-lisp
     (use-package linum-relative)
-    (line-number-mode -1)
+    (line-number-mode nil)
   #+END_SRC
+
+  #+RESULTS:
+  : t
 
 ** word-relative
 *** line wrap
@@ -325,10 +325,10 @@ rainbow cursor
      (global-set-key "\M-." 'end-of-buffer)
      (global-set-key "\M->" 'xref-find-definitions-other-window)
      (require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
-
+     
      (global-set-key "\C-xu" 'nil)     
      (global-set-key "\C-xl" 'nil)     
-     (global-set-key "\C-@" 'nil)     	
+     (global-set-key "\C-@" 'nil)
      (global-set-key "\M-j" 'pop-to-mark-command) 
      (global-set-key "\M-i" 'nil)     	
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
@@ -360,6 +360,10 @@ rainbow cursor
    (setq org-hide-block-startup t)
 
  #+END_SRC
+
+ #+RESULTS:
+ : t
+
 **** table font
   (let ((emacs-font-size 14)
 	(emacs-font-name "WenQuanYi Micro Hei Mono"))
@@ -900,7 +904,7 @@ slow down speed not good
 ** auto-save 
  #+BEGIN_SRC emacs-lisp
    (setq auto-save-default nil)
-   (setq auto-save-idle 4)
+   (setq auto-save-idle 1)
    (defun auto-save-buffers ()
      (interactive)
      (let ((auto-save-buffer-list))
@@ -921,7 +925,7 @@ slow down speed not good
  #+END_SRC
 
  #+RESULTS:
- : [nil 0 4 0 t auto-save-buffers nil idle 0]
+ : [nil 0 1 0 t auto-save-buffers nil idle 0]
  
 ** Restart Emacs
  #+BEGIN_SRC emacs-lisp
@@ -933,66 +937,6 @@ slow down speed not good
 
 
 * MAYBE USEFUL AREA
-gif-screencast
-
-  #+begin_src emacs-lisp
-    ;; (defun setup-ac-for-html ()
-    ;;   ;; Require ac-html since we are setup html auto completion
-    ;;   (require 'ac-html)
-    ;;   ;; Require default data provider if you want to use
-    ;;   (require 'ac-html-default-data-provider)
-    ;;   ;; Enable data providers,
-    ;;   ;; currently only default data provider available
-    ;;   (ac-html-enable-data-provider 'ac-html-default-data-provider)
-    ;;   ;; Let ac-html do some setup
-    ;;   (ac-html-setup)
-    ;;   ;; Set your ac-source
-    ;;   (setq ac-sources '(ac-source-html-tag
-    ;; 		     ac-source-html-attr
-    ;; 		     ac-source-html-attrv))
-    ;;   ;; Enable auto complete mode
-    ;;   (auto-complete-mode))
-
-    ;; (add-hook 'html-mode-hook 'setup-ac-for-html)
-
-  #+end_src
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

@@ -48,13 +48,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(blink-cursor-mode nil)
- '(display-battery-mode t)
- '(display-time-mode t)
  '(electric-indent-mode t)
  '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
  '(flycheck-disabled-checkers '(python-pycompile))
- '(line-number-mode nil)
  '(linum-relative-current-symbol "")
  '(linum-relative-global-mode t)
  '(org-adapt-indentation nil)
@@ -69,7 +65,6 @@
  '(pong-right-key "2")
  '(pong-up-key "0")
  '(show-paren-mode t)
- '(tool-bar-mode nil)
  '(truncate-lines nil)
  '(word-wrap t))
 
@@ -89,15 +84,8 @@
 
 ;; (set-font "Source Code Pro" "黑体" 20 17)
 
-
-
 (set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
 (set-fontset-font t 'han "黑体:pixelsize=20")
-
-
-
-
-
 
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
