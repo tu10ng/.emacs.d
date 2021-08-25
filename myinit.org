@@ -203,12 +203,19 @@ can modeline change its color overtime if it doesnot have any other functionalie
       (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
       (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
       (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      (add-hook 'prog-mode-hook 'rainbow-delimiters-mode)
-      (add-hook 'org-mode-hook 'rainbow-delimiters-mode))
+      :hook
+      ((prog-mode . rainbow-delimiters-mode)
+       (conf-mode . rainbow-delimiters-mode)
+       (shell-mode . rainbow-delimiters-mode)
+       (text-mode . rainbow-delimiters-mode)
+       (org-mode . rainbow-delimiters-mode)
+       (help-mode . rainbow-delimiters-mode)
+       ))
+    
   #+END_SRC
 
   #+RESULTS:
-  : t
+  | rainbow-delimiters-mode |
 **** cursor
 rainbow cursor
     #+begin_src emacs-lisp
@@ -335,11 +342,59 @@ rainbow cursor
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
      (global-set-key "\C-@" 'nil)     	
      
+     
+     
+     (defun move-to-window-line-top-bottom-relative (&optional arg)
+       "Position point relative to window.
+     
+     With a prefix argument ARG, move ARG lines down relative to your position.
+     
+     With no argument, if pos is below half of window got to top;
+     otherwise, goto bottom. 
+     Successive calls position point at positions defined
+     by `recenter-positions'."
+       (interactive "P")
+       (cond
+	(arg (move-to-window-line (+ arg (- (line-number-at-pos)
+				     (save-excursion
+				       (move-to-window-line 1)
+				       (line-number-at-pos))))))	; Always respect ARG.
+	(t
+	 (setq recenter-last-op
+	       (if (eq this-command last-command)
+		   (car (or (cdr (member recenter-last-op recenter-positions))
+			    recenter-positions))
+		 (if (< (line-number-at-pos)
+			   (save-excursion
+			     (move-to-window-line (/ (window-height) 2))
+			     (line-number-at-pos)))
+		     'bottom
+		   'top)))
+	 (let ((this-scroll-margin
+		(min (max 0 scroll-margin)
+		     (truncate (/ (window-body-height) 4.0)))))
+	   (cond ((eq recenter-last-op 'middle)
+		  (call-interactively 'move-to-window-line))
+		 ((eq recenter-last-op 'top)
+		  (move-to-window-line this-scroll-margin))
+		 ((eq recenter-last-op 'bottom)
+		  (move-to-window-line (- -1 this-scroll-margin)))
+		 ((integerp recenter-last-op)
+		  (move-to-window-line recenter-last-op))
+		 ((floatp recenter-last-op)
+		  (move-to-window-line (round (* recenter-last-op (window-height))))))))))
+     
+     (global-set-key "\M-r" 'move-to-window-line-top-bottom-relative)
+     
+     
+     
+     
+     
    #+end_src
 
 
    #+RESULTS:
-   : pop-to-mark-command
+   : move-to-window-line-top-bottom-relative
 
 * static form of codes
 ** ORG mode
@@ -354,7 +409,7 @@ rainbow cursor
 	  org-ellipsis " ▼")
   #+END_SRC
 
-**** block
+**** hide block
  #+BEGIN_SRC emacs-lisp
    ;; hide src blocks
    (setq org-hide-block-startup t)
@@ -390,6 +445,15 @@ rainbow cursor
 	 )
 
  #+END_SRC
+**** cycle
+ #+BEGIN_SRC emacs-lisp
+(require 'org-tempo)
+
+ #+END_SRC
+
+ #+RESULTS:
+ : org-tempo
+
 *** actions
 **** keybinds
   #+BEGIN_SRC emacs-lisp
@@ -571,7 +635,6 @@ rainbow cursor
       ;;(use-package jedi)
       ;;(use-package jedi-direx)
     #+end_src
-
 ** vue
     #+begin_src emacs-lisp
       (use-package lsp-mode
@@ -644,13 +707,16 @@ rainbow cursor
   (global-set-key "\M-'" 'awesome-pair-wrap-double-quote)
   (global-set-key "\M-[" 'awesome-pair-wrap-bracket)
   (global-set-key "\M-{" 'awesome-pair-wrap-curly)
-  (global-set-key "\M-9" 'awesome-pair-wrap-round)
-  (global-set-key "\M-0" 'awesome-pair-unwrap)
+;;  (global-set-key "\M-9" 'awesome-pair-wrap-round)
+;;  (global-set-key "\M-0" 'awesome-pair-unwrap)
   
   (global-set-key "\M-p" 'awesome-pair-jump-left)
   (global-set-key "\C-\M-n" 'awesome-pair-jump-right)
   (global-set-key "\M-n" 'awesome-pair-jump-right)
 #+END_SRC
+
+#+RESULTS:
+: awesome-pair-jump-right
 
 *** info help
   #+BEGIN_SRC emacs-lisp
@@ -660,30 +726,8 @@ rainbow cursor
       :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
   #+END_SRC
-*** open newline above and below 
-#+BEGIN_SRC emacs-lisp
-  ;;I want to start a newline acts like this in global mode like o in vim
-  ;;(global-set-key "\M-:") 'awesome-pair-jump-out-pair-and-newline)
-  (defun open-newline-below()
-    (interactive)
-    (move-end-of-line 1)
-    (newline-and-indent))
-  
-  (global-set-key "\C-o" 'open-newline-below)
-  
-  (defun open-newline-above()
-    (interactive)
-    (line-move -1)
-    (move-end-of-line 1)
-    (newline-and-indent))
-  
-  (global-set-key "\M-o" 'open-newline-above)
-#+END_SRC
-
-#+RESULTS:
-: open-newline-above
-
-* deforming the structure of code block
+* TODO deforming the structure of code block
+can learn from lazy-cat's thing-edit and move-text
 ** IO
    #+BEGIN_SRC emacs-lisp
      (setq process-adaptive-read-buffering nil
@@ -803,10 +847,49 @@ slow down speed not good
    : point-to-register
 
 ** line
+*** line move
   #+BEGIN_SRC emacs-lisp
     (setq  line-move-ignore-invisible t
 	   next-line-add-newlines t)
   #+END_SRC
+*** open newline above and below 
+#+BEGIN_SRC emacs-lisp
+  ;;I want to start a newline acts like this in global mode like o in vim
+  ;; new code referenced to lazycat's open-newline.el
+  (defun open-newline-below()
+    (interactive)
+    (end-of-line)
+    (open-line 1)
+    (call-interactively 'next-line 1)
+    (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+	(indent-according-to-mode)
+      (beginning-of-line)))
+  ;;  (move-end-of-line 1)
+  ;;  (newline-and-indent))
+  
+  (global-set-key "\C-o" 'open-newline-below)
+  
+  (defun open-newline-above()
+    (interactive)
+    (beginning-of-line)
+    (open-line 1)
+    (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+	(indent-according-to-mode)
+      (beginning-of-line)))
+    ;; (line-move -1)
+    ;; (move-end-of-line 1)
+    ;; (newline-and-indent))
+  
+  (global-set-key "\M-o" 'open-newline-above)
+  
+  
+  
+  
+  
+#+END_SRC
+
+#+RESULTS:
+: open-newline-above
 ** fill collomn
   #+BEGIN_SRC emacs-lisp
     (setq-default fill-column 78)
@@ -841,8 +924,9 @@ slow down speed not good
 	  ad-do-it))))
   
   (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
-  (define-key company-mode-map (kbd "C-n") 'nil)
-  (define-key company-mode-map (kbd "C-p") 'nil)
+  (define-key company-active-map (kbd "C-n") 'nil)
+  (define-key company-active-map (kbd "C-p") 'nil)
+  
   
   #+END_SRC
 
