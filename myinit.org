@@ -54,8 +54,9 @@
     #+end_src
 *** youdao-dictionary
     #+begin_src emacs-lisp
-      ;; (use-package youdao-dictionary)
-      ;; (global-set-key "\C-w" 'youdao-dictionary-search)
+       (use-package youdao-dictionary)
+       (global-set-key "\C-cw" 'youdao-dictionary-search)
+       (global-set-key "\C-c\C-w" 'youdao-dictionary-search)
     #+end_src
 *** jump to definition
     #+begin_src emacs-lisp
@@ -277,6 +278,24 @@ rainbow cursor
 #+RESULTS:
 | parent-dir | buffer-name | git | battery | date |
 
+*** posframe
+#+BEGIN_SRC emacs-lisp
+  (use-package posframe)
+  
+  ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/sdcv/"))
+  ;; (require 'sdcv)
+  
+  ;; (setq sdcv-say-word-p t)
+  ;; (setq sdcv-dictionary-data-dir "/usr/bin/stardict")
+  
+  ;; (setq sdcv-dictionary-simple-list ;setup dictionary list for simple search
+  ;;       '("懒虫简明英汉词典" "懒虫简明汉英词典" "KDic11万英汉词典"))
+  ;; (setq sdcv-dictionary-complete-list ;setup dictionary list for complete search
+  ;;       '( "懒虫简明英汉词典" "英汉汉英专业词典" "XDICT英汉辞典" "stardict1.3英汉辞典" "WordNet" "XDICT汉英辞典" "Jargon" "懒虫简明汉英词典" "FOLDOC" "新世纪英汉科技大词典" "KDic11万英汉词典" "朗道汉英字典5.0" "CDICT5英汉辞典" "新世纪汉英科技大词典" "牛津英汉双解美化版"   )) 
+#+END_SRC
+
+#+RESULTS:
+
 ** buffer relative
 *** startup
  #+BEGIN_SRC emacs-lisp
@@ -341,33 +360,34 @@ rainbow cursor
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
      (global-set-key "\C-@" 'nil)     	
-     
+     (global-set-key "\C-x\C-h" 'mark-whole-buffer)     
+     (global-set-key "\C-xo" 'nil)
      
      
      (defun move-to-window-line-top-bottom-relative (&optional arg)
        "Position point relative to window.
      
-     With a prefix argument ARG, move ARG lines down relative to your position.
+	  With a prefix argument ARG, move ARG lines down relative to your position.
      
-     With no argument, if pos is below half of window got to top;
-     otherwise, goto bottom. 
-     Successive calls position point at positions defined
-     by `recenter-positions'."
+	  With no argument, if pos is below half of window got to top;
+	  otherwise, goto bottom. 
+	  Successive calls position point at positions defined
+	  by `recenter-positions'."
        (interactive "P")
        (cond
 	(arg (move-to-window-line (+ arg (- (line-number-at-pos)
-				     (save-excursion
-				       (move-to-window-line 1)
-				       (line-number-at-pos))))))	; Always respect ARG.
+					    (save-excursion
+					      (move-to-window-line 1)
+					      (line-number-at-pos))))))	; Always respect ARG.
 	(t
 	 (setq recenter-last-op
 	       (if (eq this-command last-command)
 		   (car (or (cdr (member recenter-last-op recenter-positions))
 			    recenter-positions))
 		 (if (< (line-number-at-pos)
-			   (save-excursion
-			     (move-to-window-line (/ (window-height) 2))
-			     (line-number-at-pos)))
+			(save-excursion
+			  (move-to-window-line (/ (window-height) 2))
+			  (line-number-at-pos)))
 		     'bottom
 		   'top)))
 	 (let ((this-scroll-margin
@@ -388,17 +408,90 @@ rainbow cursor
      
      
      
+     (defun other-window (count &optional all-frames)
+       "Select another window in cyclic ordering of windows.
+     COUNT specifies the number of windows to skip, starting with the
+     selected window, before making the selection.  If COUNT is
+     positive, skip COUNT windows forwards.  If COUNT is negative,
+     skip -COUNT windows backwards.  COUNT zero means do not skip any
+     window, so select the selected window.  In an interactive call,
+     COUNT is the numeric prefix argument.  Return nil.
      
+     If the `other-window' parameter of the selected window is a
+     function and `ignore-window-parameters' is nil, call that
+     function with the arguments COUNT and ALL-FRAMES.
      
+     This function does not select a window whose `no-other-window'
+     window parameter is non-nil.
+     
+     This function uses `next-window' for finding the window to
+     select.  The argument ALL-FRAMES has the same meaning as in
+     `next-window', but the MINIBUF argument of `next-window' is
+     always effectively nil."
+       (interactive "p")
+       (let* ((window (selected-window))
+	      (original-window window)
+	      (function (and (not ignore-window-parameters)
+			     (window-parameter window 'other-window)))
+	      old-window old-count)
+	 (if (functionp function)
+	     (funcall function count all-frames)
+	   ;; `next-window' and `previous-window' may return a window we are
+	   ;; not allowed to select.  Hence we need an exit strategy in case
+	   ;; all windows are non-selectable.
+	   (catch 'exit
+	     (while (> count 0)
+	       (setq window (next-window window nil all-frames))
+	       (cond
+		((eq window old-window)
+		 (when (= count old-count)
+		   ;; Keep out of infinite loops.  When COUNT has not changed
+		   ;; since we last looked at `window' we're probably in pone.
+		   (throw 'exit nil)))
+		((window-parameter window 'no-other-window)
+		 (unless old-window
+		   ;; The first non-selectable window `next-window' got us:
+		   ;; Remember it and the current value of COUNT.
+		   (setq old-window window)
+		   (setq old-count count)))
+		(t
+		 (setq count (1- count)))))
+	     (while (< count 0)
+	       (setq window (previous-window window nil all-frames))
+	       (cond
+		((eq window old-window)
+		 (when (= count old-count)
+		   ;; Keep out of infinite loops.  When COUNT has not changed
+		   ;; since we last looked at `window' we're probably in one.
+		   (throw 'exit nil)))
+		((window-parameter window 'no-other-window)
+		 (unless old-window
+		   ;; The first non-selectable window `previous-window' got
+		   ;; us: Remember it and the current value of COUNT.
+		   (setq old-window window)
+		   (setq old-count count)))
+		(t
+		 (setq count (1+ count)))))
+     
+	     (when (and (eq window original-window)
+			(called-interactively-p 'interactive))
+	       (counsel-switch-buffer-other-window))
+     
+	     (select-window window)
+	     ;; Always return nil.
+	     nil))))
+     
+     (global-set-key "\M-m" 'other-window)
    #+end_src
 
 
    #+RESULTS:
-   : move-to-window-line-top-bottom-relative
+   : other-window
 
 * static form of codes
 ** ORG mode
 *** outfit
+
 **** org bullets
   #+BEGIN_SRC emacs-lisp
     (use-package org-bullets
@@ -435,7 +528,13 @@ rainbow cursor
 
     (add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
 
+*** global-org
+#+begin_src elisp
+(setq org-agenda-files '("~/org/gtd.org" "~/.emacs.d/myinit.org"))
+#+end_src
 
+#+RESULTS:
+| ~/org/gtd.org | ~/.emacs.d/myinit.org |
 
 *** structure's behavior
 **** cycle
@@ -465,7 +564,7 @@ rainbow cursor
 ***** capture configurations
 #+begin_src emacs-lisp
   (global-set-key "\C-cc" 'org-capture)
-  (setq org-default-notes-file "~/ORG/gtd.org"
+  (setq org-default-notes-file "~/org/gtd.org"
 	org-capture-templates nil)
 
   ;; '(key   description  type         target                        template                 )
@@ -494,7 +593,7 @@ rainbow cursor
   #+begin_src emacs-lisp
   (add-to-list 'org-capture-templates
 	       '("d" "diary" entry
-		 (file+weektree "~/ORG/diary.org")
+		 (file+weektree "~/org/diary.org")
 		 "* %U - %^{heading}\n  %?"
 		 ))
   #+end_src
@@ -505,19 +604,19 @@ rainbow cursor
 	       '("g" "GTD"))
   (add-to-list 'org-capture-templates
 	       '("gd" "daily things" entry
-		 (file+headline "~/ORG/gtd.org" "daily things(intelectual)")
+		 (file+headline "~/org/gtd.org" "daily things(intelectual)")
 		 "* %^{What?}\n%^{description}\n%?"
 		 :empty-lines 1
 		 ))
   (add-to-list 'org-capture-templates
 	       '("gp" "period things" entry
-		 (file+headline "~/ORG/gtd.org" "period things")
+		 (file+headline "~/org/gtd.org" "period things")
 		 "* %^{What?}\n%^{description}\n%?"
 		 :empty-lines 1
 		 ))
   (add-to-list 'org-capture-templates
 	       '("gs" "school things" entry
-		 (file+headline "~/ORG/gtd.org" "学校活动")
+		 (file+headline "~/org/gtd.org" "学校活动")
 		 "* %^{What?}\n%^{description}\n%?"
 		 :empty-lines 1
 		 ))
@@ -553,7 +652,7 @@ rainbow cursor
 
   (add-to-list 'org-capture-templates
 	       '("b" "billing" plain
-		 (file+function "~/ORG/billing.org" find-month-tree)
+		 (file+function "~/org/billing.org" find-month-tree)
 		 " | %U | %^{类别} | %^{what?} | %^{金额} |"
 		 :kill-buffer t
 		 ))
@@ -563,7 +662,7 @@ rainbow cursor
 #+begin_src emacs-lisp
   (add-to-list 'org-capture-templates
 	       '("c" "Contacs" entry
-		 (file "~/ORG/contacts.org")
+		 (file "~/org/contacts.org")
 		 "* %^{姓名} %^{手机号}p %^{mail}p %^{住址}p\n\n  %?"
 		 :empty-lines 1
 		 ))
@@ -743,9 +842,8 @@ can learn from lazy-cat's thing-edit and move-text
      (defun kill-word-at-point () 
        "Kill characters at point or forward"
        (interactive)
-       (save-excursion
-	 (forward-word)
-	 (kill-word -1)))
+       (forward-word)
+       (kill-word -1))
      
      (global-set-key "\M-d" 'kill-word-at-point)
    #+END_SRC
@@ -979,6 +1077,33 @@ slow down speed not good
 
     #+RESULTS:
     : popup-kill-ring-current
+*** chinese py input method
+**** rime's match is awful
+#+begin_src elisp
+  ;; (use-package rime)
+  ;; (setq rime-show-candidate 'popup
+  ;;       rime-popup-style 'vertical)
+#+end_src
+
+#+RESULTS:
+**** pyim
+#+begin_src elisp
+  (use-package pyim)
+  (pyim-default-scheme 'quanpin)
+  (if (posframe-workable-p)
+      (setq pyim-page-tooltip 'posframe)
+    (setq pyim-page-tooltip 'popup))
+  
+  (setq pyim-page-length 9)
+  
+  
+  (use-package pyim-basedict)
+  (pyim-basedict-enable)
+#+end_src
+
+#+RESULTS:
+: t
+
 * about leaving
 ** backup
  #+BEGIN_SRC emacs-lisp

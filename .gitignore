@@ -1,0 +1,16 @@
+/.cache/
+/.mc-lists.el
+/auto-save-list/
+/bookmarks
+/eaf/
+/elpa/
+/games/
+/myinit.el
+/recentf
+/recentf~
+/site-lisp/
+/smex-items
+/transient/
+/url/
+/pyim/
+/rime/
