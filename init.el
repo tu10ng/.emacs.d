@@ -54,6 +54,7 @@
  '(linum-relative-current-symbol "")
  '(linum-relative-global-mode t)
  '(org-adapt-indentation nil)
+ '(org-agenda-files '("/home/qb/.emacs.d/myinit.org" "/home/qb/org/"))
  '(org-confirm-babel-evaluate nil)
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-startup-truncated nil)

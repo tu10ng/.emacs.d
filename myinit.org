@@ -530,7 +530,7 @@ rainbow cursor
 
 *** global-org
 #+begin_src elisp
-(setq org-agenda-files '("~/org/gtd.org" "~/.emacs.d/myinit.org"))
+  ;; (setq org-agenda-files '("~/org/gtd.org" "~/.emacs.d/myinit.org")) do it in custmz group
 #+end_src
 
 #+RESULTS:
@@ -936,13 +936,13 @@ slow down speed not good
      (setq register-preview-delay nil
 	   bookmark-save-flag 1
 	   bookmark-search-size 50)
-     (global-set-key "\C-z" 'jump-to-register)
-     (global-set-key "\C-xr" 'point-to-register)
+     ;; (global-set-key "\C-z" 'jump-to-register)
+     ;; (global-set-key "\C-xr" 'point-to-register)
      
    #+END_SRC
 
    #+RESULTS:
-   : point-to-register
+   : 50
 
 ** line
 *** line move
@@ -1067,16 +1067,6 @@ slow down speed not good
 
     #+RESULTS:
 
-*** popup killring
-    #+begin_src emacs-lisp
-      (use-package popup-kill-ring)
-      (global-set-key "\M-y" 'popup-kill-ring)
-(define-key popup-kill-ring-keymap (kbd "M-j") 'popup-kill-ring-select)      
-(define-key popup-kill-ring-keymap (kbd "C-j") 'popup-kill-ring-select)
-#+end_src    
-
-    #+RESULTS:
-    : popup-kill-ring-current
 *** chinese py input method
 **** rime's match is awful
 #+begin_src elisp
@@ -1095,10 +1085,16 @@ slow down speed not good
     (setq pyim-page-tooltip 'popup))
   
   (setq pyim-page-length 9)
+  (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
   
   
   (use-package pyim-basedict)
   (pyim-basedict-enable)
+  
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
+  (require 'pyim-greatdict)
+  (pyim-greatdict-enable)
+  
 #+end_src
 
 #+RESULTS:
