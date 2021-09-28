@@ -112,6 +112,13 @@
 
    #+RESULTS:
 
+** server
+#+begin_src emacs-lisp
+  (server-start)
+#+end_src
+
+#+RESULTS:
+
 ** frame
 *** startup
 **** maximize frame on startup and set title
@@ -787,6 +794,13 @@ rainbow cursor
 : t
 
 ** UTILS
+*** crontab mode
+#+begin_src emacs-lisp
+  (use-package crontab-mode)
+#+end_src
+
+#+RESULTS:
+
 *** projectile
     #+begin_src emacs-lisp
 
