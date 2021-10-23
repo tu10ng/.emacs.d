@@ -48,18 +48,22 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(c-cleanup-list
+   '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator space-before-funcall compact-empty-funcall comment-close-slash))
  '(electric-indent-mode t)
  '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
  '(flycheck-disabled-checkers '(python-pycompile))
  '(linum-relative-current-symbol "")
  '(linum-relative-global-mode t)
  '(org-adapt-indentation nil)
- '(org-agenda-files '("/home/qb/.emacs.d/myinit.org" "/home/qb/org/"))
+ '(org-agenda-files
+   '("~/Documents/cloud/gtd.org" "/home/qb/Documents/cloud/homework.org" "/home/qb/.emacs.d/myinit.org"))
+ '(org-agenda-span 8)
  '(org-confirm-babel-evaluate nil)
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-startup-truncated nil)
  '(package-selected-packages
-   '(crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(pong-down-key "9")
  '(pong-left-key "1")
  '(pong-right-key "2")

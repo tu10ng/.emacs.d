@@ -1,4 +1,4 @@
-/.cache/
+auto/.cache/
 /.mc-lists.el
 /auto-save-list/
 /bookmarks
@@ -14,3 +14,8 @@
 /url/
 /pyim/
 /rime/
+/tramp
+/.cache/
+/notes
+/type-break
+/speed-type/
