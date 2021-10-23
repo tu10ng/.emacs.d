@@ -121,10 +121,13 @@
 
 ** server
 #+begin_src emacs-lisp
-  (server-start)
+  (require 'server)
+  (or (eq (server-running-p) t)
+      (server-start))
 #+end_src
 
 #+RESULTS:
+: t
 
 ** frame
 *** startup
