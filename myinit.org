@@ -115,19 +115,18 @@
 #+END_SRC  
 **** rainbow-fart
    #+begin_src emacs-lisp
+     (add-to-list 'load-path "~/.emacs.d/site-lisp/")
      
-	;; (use-package rainbow-fart
-	;;   :ensure t
-	;;   :init (rainbow-fart-mode 1))
-     
-     ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/rainbow-fart.el")
-     ;; (require 'rainbow-fart)
-     ;; (rainbow-fart-mode 1)
+     (use-package rainbow-fart
+       :ensure t
+       :init (rainbow-fart-mode 1))
+     (setq rainbow-fart-keyword-interval 0)
      
      
    #+end_src
 
    #+RESULTS:
+   : t
 
 ** server
 #+begin_src emacs-lisp
@@ -567,6 +566,12 @@ rainbow cursor
    #+RESULTS:
    : c-context-line-break
 
+
+** css
+#+begin_src emacs-lisp
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
+  (require 'css-sort-buffer)
+#+end_src
 ** emacs-application-framework
 #+BEGIN_SRC emacs-lisp
   (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
