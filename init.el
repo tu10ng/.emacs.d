@@ -49,7 +49,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(c-cleanup-list
-   '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator space-before-funcall compact-empty-funcall comment-close-slash))
+   '(brace-else-brace brace-elseif-brace brace-catch-brace one-liner-defun defun-close-semi list-close-comma scope-operator space-before-funcall compact-empty-funcall comment-close-slash))
  '(electric-indent-mode t)
  '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
  '(flycheck-disabled-checkers '(python-pycompile))

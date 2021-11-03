@@ -35,8 +35,12 @@
 	(ivy-mode 1)
 	(setq ivy-use-virtual-buffers t)
 	(setq ivy-display-style 'fancy)))
-
+    
   #+END_SRC
+
+  #+RESULTS:
+  : counsel-find-file
+
 ** Try
   #+BEGIN_SRC emacs-lisp
   (use-package try
@@ -162,10 +166,6 @@
 #+BEGIN_SRC emacs-lisp
 ;; (set-frame-parameter nil 'alpha 75)
 #+END_SRC
-*** title
-    #+begin_src emacs-lisp
-      ;;(setq frame-title-format "Emacs@GNU_Project")
-    #+end_src
 
 *** theme
 **** lazycat-theme
@@ -299,19 +299,7 @@ rainbow cursor
 #+BEGIN_SRC emacs-lisp
   (use-package posframe)
   
-  ;; (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/sdcv/"))
-  ;; (require 'sdcv)
-  
-  ;; (setq sdcv-say-word-p t)
-  ;; (setq sdcv-dictionary-data-dir "/usr/bin/stardict")
-  
-  ;; (setq sdcv-dictionary-simple-list ;setup dictionary list for simple search
-  ;;       '("懒虫简明英汉词典" "懒虫简明汉英词典" "KDic11万英汉词典"))
-  ;; (setq sdcv-dictionary-complete-list ;setup dictionary list for complete search
-  ;;       '( "懒虫简明英汉词典" "英汉汉英专业词典" "XDICT英汉辞典" "stardict1.3英汉辞典" "WordNet" "XDICT汉英辞典" "Jargon" "懒虫简明汉英词典" "FOLDOC" "新世纪英汉科技大词典" "KDic11万英汉词典" "朗道汉英字典5.0" "CDICT5英汉辞典" "新世纪汉英科技大词典" "牛津英汉双解美化版"   )) 
-#+END_SRC
-
-#+RESULTS:
+ #+END_SRC
 
 ** buffer relative
 *** startup
@@ -329,17 +317,16 @@ rainbow cursor
   #+END_SRC
 *** zone
    #+begin_src emacs-lisp
-     (setq idle-play-function '(zone)
-	   idle-play-time 500
-	   n 0)
-     (while (< n (length idle-play-function))
-       (run-with-idle-timer idle-play-time t (nth n idle-play-function))
-       (setq n (1+ n)))
-     (setq n 0)
+     ;; (setq idle-play-function '(zone)
+     ;;       idle-play-time 500
+     ;;       n 0)
+     ;; (while (< n (length idle-play-function))
+     ;;   (run-with-idle-timer idle-play-time t (nth n idle-play-function))
+     ;;   (setq n (1+ n)))
+     ;; (setq n 0)
    #+end_src
 
    #+RESULTS:
-   : 0
 
 ** line relative  
 *** relative-line number
@@ -359,73 +346,24 @@ rainbow cursor
 ** Window
  #+BEGIN_SRC emacs-lisp
    (setq split-width-threshold 80)
-   (setq split-height-threshold nil)   
+   (setq split-height-threshold 50)   
 
  #+END_SRC
+
+ #+RESULTS:
+ : 50
+
 ** keybinding (navigation, etc.)
-I forgot using C-u C-n, stupid I...
    #+begin_src emacs-lisp
      (global-set-key "\M-," 'beginning-of-buffer)
      (global-set-key "\M-." 'end-of-buffer)
      (global-set-key "\M->" 'xref-find-definitions-other-window)
      (require 'js)     (define-key js-mode-map (kbd "M-.") 'nil)
      
-     (global-set-key "\C-xu" 'nil)     
-     (global-set-key "\C-xl" 'nil)     
-     (global-set-key "\C-@" 'nil)
-     (global-set-key "\M-gj" 'pop-to-mark-command) 
-     (global-set-key "\M-i" 'nil)     	
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
-     (global-set-key "\C-@" 'nil)     	
      (global-set-key "\C-x\C-h" 'mark-whole-buffer)     
-     (global-set-key "\C-xo" 'nil)
-     (global-set-key "\M-s" '(eww-search-words))
-     
-     
-     (defun move-to-window-line-top-bottom-relative (&optional arg)
-       "Position point relative to window.
-     
-	  With a prefix argument ARG, move ARG lines down relative to your position.
-     
-	  With no argument, if pos is below half of window got to top;
-	  otherwise, goto bottom. 
-	  Successive calls position point at positions defined
-	  by `recenter-positions'."
-       (interactive "P")
-       (cond
-	(arg (move-to-window-line (+ arg (- (line-number-at-pos)
-					    (save-excursion
-					      (move-to-window-line 1)
-					      (line-number-at-pos))))))	; Always respect ARG.
-	(t
-	 (setq recenter-last-op
-	       (if (eq this-command last-command)
-		   (car (or (cdr (member recenter-last-op recenter-positions))
-			    recenter-positions))
-		 (if (< (line-number-at-pos)
-			(save-excursion
-			  (move-to-window-line (/ (window-height) 2))
-			  (line-number-at-pos)))
-		     'bottom
-		   'top)))
-	 (let ((this-scroll-margin
-		(min (max 0 scroll-margin)
-		     (truncate (/ (window-body-height) 4.0)))))
-	   (cond ((eq recenter-last-op 'middle)
-		  (call-interactively 'move-to-window-line))
-		 ((eq recenter-last-op 'top)
-		  (move-to-window-line this-scroll-margin))
-		 ((eq recenter-last-op 'bottom)
-		  (move-to-window-line (- -1 this-scroll-margin)))
-		 ((integerp recenter-last-op)
-		  (move-to-window-line recenter-last-op))
-		 ((floatp recenter-last-op)
-		  (move-to-window-line (round (* recenter-last-op (window-height))))))))))
-     
-     (global-set-key "\M-r" 'move-to-window-line-top-bottom-relative)
-     
-     
+     (global-set-key "\M-s" 'youdao-dictionary-search-at-point+)
      
      (defun other-window (count &optional all-frames)
        "Select another window in cyclic ordering of windows.
@@ -501,6 +439,9 @@ I forgot using C-u C-n, stupid I...
 	     nil))))
      
      (global-set-key "\M-m" 'other-window)
+     (global-set-key "\C-xo" 'other-window)
+	  
+     
    #+end_src
 
 
@@ -611,12 +552,10 @@ I forgot using C-u C-n, stupid I...
    #+begin_src emacs-lisp
      (use-package cc-mode)
      (add-hook 'c-mode-hook 'c-toggle-auto-hungry-state)
+     (add-hook 'c++-mode-hook 'c-toggle-auto-hungry-state)
      
      (define-key c-mode-base-map "\C-m" 'c-context-line-break)
      
-     ;; (defun my-c-initialization-hook ()
-     ;;   (define-key c-mode-base-map "\C-m" 'c-context-line-break))
-     ;; (add-hook 'c-initialization-hook 'my-c-initialization-hook)
    #+end_src
 
    #+RESULTS:
@@ -679,7 +618,7 @@ I forgot using C-u C-n, stupid I...
   
   (global-set-key "\M-p" 'awesome-pair-jump-left)
   (global-set-key "\M-n" 'awesome-pair-jump-right)
-;;  (global-set-key "\C-\M-n" 'awesome-pair-jump-right)
+
 #+END_SRC
 
 #+RESULTS:
@@ -752,20 +691,6 @@ too hard to activate
 
 #+RESULTS:
 
-*** multiple-cursors
-slow down speed not good
-    #+begin_src emacs-lisp
-	    ;; (use-package multiple-cursors)
-	    
-	    ;; 	  (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines)
-	    ;; 	  (global-set-key (kbd "C->") 'mc/mark-next-like-this)
-	    ;; 	  (global-set-key (kbd "C-<") 'mc/mark-previous-like-this)
-      ;;	  (global-set-key (kbd "C-c C-<") 'mc/mark-all-like-this)
-    #+end_src    
-
-    #+RESULTS:
-    : mc/mark-all-like-this
-
 *** visible mark
     #+begin_src emacs-lisp
       (defface visible-mark-face1
@@ -827,8 +752,6 @@ slow down speed not good
      (setq register-preview-delay nil
 	   bookmark-save-flag 1
 	   bookmark-search-size 50)
-     ;; (global-set-key "\C-z" 'jump-to-register)
-     ;; (global-set-key "\C-xr" 'point-to-register)
      
    #+END_SRC
 
@@ -886,10 +809,6 @@ acts like o in vim, code refered to lazycat's open-newline.el
 *** Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
-    ;; :hook
-    ;; ((prog-mode . company-mode)
-    ;;  (conf-mode . company-mode)
-    ;;  (shell-mode . company-mode))
     )
   (add-hook 'after-init-hook 'global-company-mode)
   
@@ -899,7 +818,7 @@ acts like o in vim, code refered to lazycat's open-newline.el
   
   (add-to-list 'company-backends #'company-tabnine)
   (setq company-idle-delay 0)
-  (setq company-show-numbers t)
+  ;; (setq company-show-numbers t)
   
   ;; The free version of TabNine is good enough,
   ;; and below code is recommended that TabNine not always
@@ -911,33 +830,37 @@ acts like o in vim, code refered to lazycat's open-newline.el
 	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
 	  ad-do-it))))
   
-  (define-key company-mode-map (kbd "C-j") 'company-complete-selection)
-  (define-key company-active-map (kbd "C-n") 'nil)
-  (define-key company-active-map (kbd "C-p") 'nil)
-  
+  (define-key company-active-map (kbd "C-j") 'company-complete-selection)
   
   #+END_SRC
 
   #+RESULTS:
+  : company-complete-selection
 *** magit
     #+begin_src emacs-lisp
-	    (use-package magit
-	          :defer t
-)
-	      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
-	      ;;   (use-package diff-hl)
+      (use-package magit
+	:defer t
+	)
+      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
+      ;;   (use-package diff-hl)
       
     #+end_src
 
     #+RESULTS:
 *** quickrun
     #+begin_src emacs-lisp
-	     (use-package quickrun
-	           :defer t
-)
+      (use-package quickrun
+	:defer t
+	)
       
+      (define-key c++-mode-map (kbd "C-c r") 'quickrun)
+      (define-key c-mode-map (kbd "C-c r") 'quickrun)
       
     #+end_src
+
+    #+RESULTS:
+    : quickrun
+
 *** flycheck
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck
@@ -950,9 +873,9 @@ acts like o in vim, code refered to lazycat's open-newline.el
 
 *** figlet
     #+begin_src emacs-lisp
-	    (use-package figlet
-	          :defer t
-)
+      (use-package figlet
+	:defer t
+	)
     #+end_src
 
     #+RESULTS:
