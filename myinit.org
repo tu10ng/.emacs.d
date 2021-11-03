@@ -1,5 +1,11 @@
 
 
+* BENCHMARK
+#+begin_src emacs-lisp
+  (use-package benchmark-init)
+  (benchmark-init/activate)
+#+end_src
+
 
 
 * finding 
