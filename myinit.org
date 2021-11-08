@@ -506,7 +506,9 @@ rainbow cursor
      #+begin_src emacs-lisp
        (setq-default org-agenda-include-diary nil)
      #+end_src
-*** ox-reveal
+*** export
+
+
  #+BEGIN_SRC emacs-lisp
    ;; (use-package ox-reveal
    ;;   :commands (org-reveal)
@@ -517,6 +519,13 @@ rainbow cursor
    ;;    org-reveal-theme "moon"
    ;;    org-reveal-plugins '(classList markdown zoom notes)
    ;;    ))
+   
+   (setq org-export-headline-levels 1
+	 org-export-with-broken-links 'mark
+	 org-export-with-section-numbers nil
+	 org-html-checkbox-type 'html
+	 org-html-doctype "html5"
+	 org-html-html5-fancy t)
    
    ;; colors for blocks
    (use-package htmlize
