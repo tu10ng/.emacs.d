@@ -60,6 +60,13 @@
    '("~/Documents/cloud/gtd.org" "/home/qb/Documents/cloud/homework.org" "/home/qb/.emacs.d/myinit.org"))
  '(org-agenda-span 8)
  '(org-confirm-babel-evaluate nil)
+ '(org-export-headline-levels 1)
+ '(org-export-with-broken-links 'mark)
+ '(org-export-with-section-numbers nil)
+ '(org-html-checkbox-type 'html)
+ '(org-html-doctype "html5")
+ '(org-html-html5-fancy t)
+ '(org-html-indent t)
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-startup-truncated nil)
  '(package-selected-packages
