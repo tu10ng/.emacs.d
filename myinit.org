@@ -634,35 +634,35 @@ rainbow cursor
 #+end_src
 ** emacs-application-framework
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
-  (require 'eaf)
-    (use-package eaf
-      :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
-      :custom
-      (eaf-browser-continue-where-left-off t)
-      :config
-      (require 'eaf-jupyter)
-      (require 'eaf-pdf-viewer)
-      ;;    (require 'eaf-mermaid)
-      (require 'eaf-system-monitor)
-      (require 'eaf-video-player)
-      (require 'eaf-terminal)
-      (require 'eaf-vue-demo)
-      (require 'eaf-org-previewer)
-      (require 'eaf-file-browser)
-      (require 'eaf-image-viewer)
-      (require 'eaf-file-sender)
-      (require 'eaf-browser)
-      (require 'eaf-demo)
-      (require 'eaf-file-manager)
-      (setq eaf-browser-enable-adblocker t)
-      (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-      (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-      (eaf-bind-key nil "M-q" eaf-browser-keybinding))
+  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
+  ;; (require 'eaf)
+  ;;   (use-package eaf
+  ;;     :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
+  ;;     :custom
+  ;;     (eaf-browser-continue-where-left-off t)
+  ;;     :config
+  ;;     (require 'eaf-jupyter)
+  ;;     (require 'eaf-pdf-viewer)
+  ;;     ;;    (require 'eaf-mermaid)
+  ;;     (require 'eaf-system-monitor)
+  ;;     (require 'eaf-video-player)
+  ;;     (require 'eaf-terminal)
+  ;;     (require 'eaf-vue-demo)
+  ;;     (require 'eaf-org-previewer)
+  ;;     (require 'eaf-file-browser)
+  ;;     (require 'eaf-image-viewer)
+  ;;     (require 'eaf-file-sender)
+  ;;     (require 'eaf-browser)
+  ;;     (require 'eaf-demo)
+  ;;     (require 'eaf-file-manager)
+  ;;     (setq eaf-browser-enable-adblocker t)
+  ;;     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+  ;;     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+  ;; ;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+  ;;     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
   
-  (setq eaf-kill-process-after-last-buffer-closed t
-	eaf-start-python-process-when-require t)
+  ;; (setq eaf-kill-process-after-last-buffer-closed t
+  ;;       eaf-start-python-process-when-require t)
 #+END_SRC
 
 #+RESULTS:
@@ -706,7 +706,7 @@ rainbow cursor
 ** projectile
   #+BEGIN_SRC emacs-lisp
     (use-package projectile
-      :config (projectile-mode)
+      :config (projectile-mode 1)
       :custom ((projectile-completion-system 'ivy))
       :bind-keymap
       ("C-c p" . projectile-command-map)
@@ -755,16 +755,24 @@ rainbow cursor
 *** Company
 #+BEGIN_SRC emacs-lisp
   (use-package company
+    :after lsp-mode
+    :bind
+    (:map company-active-map
+	  ("<tab>" . company-complete-selection)
+	  ("C-j" .  company-complete-selection))
+    (:map lsp-mode-map
+	  ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0)
     )
   (add-hook 'after-init-hook 'global-company-mode)
+  ;; (setq company-show-numbers t)
   
   (use-package company-tabnine
     )
-  
   (add-to-list 'company-backends #'company-tabnine)
   
-  (setq company-idle-delay 0)
-  ;; (setq company-show-numbers t)
   
   ;; The free version of TabNine is good enough,
   ;; and below code is recommended that TabNine not always
@@ -776,12 +784,12 @@ rainbow cursor
 	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
 	  ad-do-it))))
   
-  (define-key company-active-map (kbd "C-j") 'company-complete-selection)
+  
   
   #+END_SRC
 
   #+RESULTS:
-  : company-complete-selection
+  : company-echo-show
 *** magit
     #+begin_src emacs-lisp
       (use-package magit
@@ -796,11 +804,8 @@ rainbow cursor
 *** quickrun
     #+begin_src emacs-lisp
       (use-package quickrun
-	:defer t
+	:bind ("C-c r" . quickrun)
 	)
-      
-      (define-key c++-mode-map (kbd "C-c r") 'quickrun)
-      (define-key c-mode-map (kbd "C-c r") 'quickrun)
       
     #+end_src
 
@@ -810,12 +815,13 @@ rainbow cursor
 *** flycheck
   #+BEGIN_SRC emacs-lisp
     (use-package flycheck
-          :defer t
-
-      :hook
-      (prog-mode . flycheck-mode))
+      :init (global-flycheck-mode))
+    
     (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
   #+END_SRC
+
+  #+RESULTS:
+  : ~/node_modules/.bin/eslint
 
 *** figlet
     #+begin_src emacs-lisp
@@ -1015,21 +1021,46 @@ acts like o in vim, code refered to lazycat's open-newline.el
   (use-package yasnippet
     :config (yas-global-mode))
   (use-package lsp-mode
-    :hook ((lsp-mode . lsp-enable-which-key-integration))
-    :config (setq lsp-completion-enable-additional-text-edit nil))
+    :commands (lsp lsp-deferred)
+    :hook ((lsp-mode . lsp-enable-which-key-integration)
+	   (java-mode . #'lsp-deferred))
+    :init (setq lsp-keymap-prefix "C-c l"
+		lsp-enable-file-watchers nil
+		read-process-output-max (* 100 1024 1024) ;100 mb
+		lsp-completion-provider :capf
+		lsp-idle-delay 0.500
+		lsp-enable-indentation nil
+		)
+    :config (setq lsp-intelephense-multi-root nil)
+    (with-eval-after-load 'lsp-intelephense
+      (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
+    (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+    )
+  ;;	   lsp-completion-enable-additional-text-edit nil))
+  
+  
   (use-package hydra)
   (use-package lsp-ui)
-  (use-package lsp-java
-    :config (add-hook 'java-mode-hook 'lsp))
+  (use-package lsp-java)
+  ;;  :hook (java-mode . lsp))
+  (add-hook 'java-mode-hook #'lsp)
   (use-package dap-mode
     :after lsp-mode
     :config (dap-auto-configure-mode))
   (use-package dap-java
     :ensure nil)
-  (use-package helm-lsp)
   (use-package helm
     :config (helm-mode))
+  (use-package helm-lsp
+    :after (lsp-mode)
+    :commands (helm-lsp-workspace-symbol)
+    :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+  
   (use-package lsp-treemacs)
+  
+  
+  
+  
 #+end_src
 
 #+RESULTS:
