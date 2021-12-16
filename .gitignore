@@ -24,3 +24,5 @@ auto/.cache/
 /eclipse.jdt.ls/
 /request/
 /workspace/
+/.dir-locals.el
+/projectile-bookmarks.eld
