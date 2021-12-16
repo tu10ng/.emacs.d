@@ -103,21 +103,21 @@
     #+end_src
 ** youdao-dictionary
     #+begin_src emacs-lisp
-       (use-package youdao-dictionary)
-       (global-set-key "\C-cw" 'youdao-dictionary-search)
-       (global-set-key "\C-c\C-w" 'youdao-dictionary-search)
+      (use-package youdao-dictionary
+	:bind (("M-s" . youdao-dictionary-search-at-point+)))
+      
     #+end_src
 ** jump to definition
     #+begin_src emacs-lisp
-		  (use-package dumb-jump
-			:defer t
-      )
-		  
-		  (use-package xref
-		        :defer t
-)
-		  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-		  (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
+      (use-package dumb-jump
+	:defer t
+	)
+      
+      (use-package xref
+	:defer t
+	)
+      (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+      (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
     #+end_src
 
     #+RESULTS:
@@ -399,7 +399,6 @@ rainbow cursor
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
      (global-set-key "\C-x\C-h" 'mark-whole-buffer)     
-     (global-set-key "\M-s" 'youdao-dictionary-search-at-point+)
      
      (setq w32-pass-lwindow-to-system nil
 	   w32-lwindow-modifier 'super
@@ -493,7 +492,7 @@ rainbow cursor
    #+RESULTS:
    : other-window
 
-* structures 
+* forming
 ** ORG mode
 *** outfit
 **** org bullets
@@ -613,38 +612,9 @@ rainbow cursor
 
    #+RESULTS:
    : c-context-line-break
-** lsp
-#+begin_src emacs-lisp
-  (use-package projectile)
-  (use-package flycheck)
-  (use-package yasnippet
-    :config (yas-global-mode))
-  (use-package lsp-mode
-    :hook ((lsp-mode . lsp-enable-which-key-integration))
-    :config (setq lsp-completion-enable-additional-text-edit nil))
-  (use-package hydra)
-  (use-package company)
-  (use-package lsp-ui)
-  (use-package which-key
-    :config (which-key-mode))
-  (use-package lsp-java
-    :config (add-hook 'java-mode-hook 'lsp))
-  (use-package dap-mode
-    :after lsp-mode
-    :config (dap-auto-configure-mode))
-  (use-package dap-java
-    :ensure nil)
-  (use-package helm-lsp)
-  (use-package helm
-    :config (helm-mode))
-  (use-package lsp-treemacs)
-#+end_src
-
-#+RESULTS:
-
 ** java
 #+begin_src emacs-lisp
-  (use-package lsp-java)
+
 #+end_src
 
 #+RESULTS:
@@ -733,6 +703,26 @@ rainbow cursor
       :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
   #+END_SRC
+** projectile
+  #+BEGIN_SRC emacs-lisp
+    (use-package projectile
+      :config (projectile-mode)
+      :custom ((projectile-completion-system 'ivy))
+      :bind-keymap
+      ("C-c p" . projectile-command-map)
+      :init
+      (when (file-directory-p "~/Projects")
+	(setq projectile-project-search-path '("~/Projects/")))
+      (setq projectile-switch-project-action #'projectile-dired)
+      )
+    
+    (use-package counsel-projectile
+      :config (counsel-projectile-mode))
+  #+END_SRC
+
+  #+RESULTS:
+  : t
+
 ** game and zone
 *** typing game
 #+begin_src emacs-lisp
@@ -760,7 +750,121 @@ rainbow cursor
 
 #+RESULTS:
 
-* deforming the structure of code block
+* deforming
+** UTILS
+*** Company
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    )
+  (add-hook 'after-init-hook 'global-company-mode)
+  
+  (use-package company-tabnine
+    )
+  
+  (add-to-list 'company-backends #'company-tabnine)
+  
+  (setq company-idle-delay 0)
+  ;; (setq company-show-numbers t)
+  
+  ;; The free version of TabNine is good enough,
+  ;; and below code is recommended that TabNine not always
+  ;; prompt me to purchase a paid version in a large project.
+  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+    (let ((company-message-func (ad-get-arg 0)))
+      (when (and company-message-func
+		 (stringp (funcall company-message-func)))
+	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+	  ad-do-it))))
+  
+  (define-key company-active-map (kbd "C-j") 'company-complete-selection)
+  
+  #+END_SRC
+
+  #+RESULTS:
+  : company-complete-selection
+*** magit
+    #+begin_src emacs-lisp
+      (use-package magit
+	:defer t
+	)
+      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
+      ;;   (use-package diff-hl)
+      
+    #+end_src
+
+    #+RESULTS:
+*** quickrun
+    #+begin_src emacs-lisp
+      (use-package quickrun
+	:defer t
+	)
+      
+      (define-key c++-mode-map (kbd "C-c r") 'quickrun)
+      (define-key c-mode-map (kbd "C-c r") 'quickrun)
+      
+    #+end_src
+
+    #+RESULTS:
+    : quickrun
+
+*** flycheck
+  #+BEGIN_SRC emacs-lisp
+    (use-package flycheck
+          :defer t
+
+      :hook
+      (prog-mode . flycheck-mode))
+    (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
+  #+END_SRC
+
+*** figlet
+    #+begin_src emacs-lisp
+      (use-package figlet
+	:defer t
+	)
+    #+end_src
+
+    #+RESULTS:
+*** ripgrep
+    #+begin_src emacs-lisp
+      (use-package ripgrep
+	:defer t
+	)
+    #+end_src
+
+    #+RESULTS:
+*** chinese py input method
+**** rime's match is awful
+#+begin_src elisp
+  ;; (use-package rime)
+  ;; (setq rime-show-candidate 'popup
+  ;;       rime-popup-style 'vertical)
+#+end_src
+
+#+RESULTS:
+**** pyim
+#+begin_src elisp
+  (use-package pyim)
+  (pyim-default-scheme 'quanpin)
+  (if (posframe-workable-p)
+      (setq pyim-page-tooltip 'posframe)
+    (setq pyim-page-tooltip 'popup))
+  
+  (setq pyim-page-length 9)
+  (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
+  
+  
+  (use-package pyim-basedict)
+  (pyim-basedict-enable)
+  
+  (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
+  (require 'pyim-greatdict)
+  (pyim-greatdict-enable)
+  
+#+end_src
+
+#+RESULTS:
+: t
 ** TODO learn from lazy-cat's thing-edit and move-text
 ** IO
    #+BEGIN_SRC emacs-lisp
@@ -906,115 +1010,32 @@ acts like o in vim, code refered to lazycat's open-newline.el
   #+BEGIN_SRC emacs-lisp
     (setq-default fill-column 78)
   #+END_SRC
-** UTILS
-*** Company
-#+BEGIN_SRC emacs-lisp
-  (use-package company
-    )
-  (add-hook 'after-init-hook 'global-company-mode)
-  
-  (use-package company-tabnine
-    )
-  
-  (add-to-list 'company-backends #'company-tabnine)
-  
-  (setq company-idle-delay 0)
-  ;; (setq company-show-numbers t)
-  
-  ;; The free version of TabNine is good enough,
-  ;; and below code is recommended that TabNine not always
-  ;; prompt me to purchase a paid version in a large project.
-  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-    (let ((company-message-func (ad-get-arg 0)))
-      (when (and company-message-func
-		 (stringp (funcall company-message-func)))
-	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-	  ad-do-it))))
-  
-  (define-key company-active-map (kbd "C-j") 'company-complete-selection)
-  
-  #+END_SRC
-
-  #+RESULTS:
-  : company-complete-selection
-*** magit
-    #+begin_src emacs-lisp
-      (use-package magit
-	:defer t
-	)
-      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
-      ;;   (use-package diff-hl)
-      
-    #+end_src
-
-    #+RESULTS:
-*** quickrun
-    #+begin_src emacs-lisp
-      (use-package quickrun
-	:defer t
-	)
-      
-      (define-key c++-mode-map (kbd "C-c r") 'quickrun)
-      (define-key c-mode-map (kbd "C-c r") 'quickrun)
-      
-    #+end_src
-
-    #+RESULTS:
-    : quickrun
-
-*** flycheck
-  #+BEGIN_SRC emacs-lisp
-    (use-package flycheck
-          :defer t
-
-      :hook
-      (prog-mode . flycheck-mode))
-    (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
-  #+END_SRC
-
-*** figlet
-    #+begin_src emacs-lisp
-      (use-package figlet
-	:defer t
-	)
-    #+end_src
-
-    #+RESULTS:
-
-*** chinese py input method
-**** rime's match is awful
-#+begin_src elisp
-  ;; (use-package rime)
-  ;; (setq rime-show-candidate 'popup
-  ;;       rime-popup-style 'vertical)
+** lsp
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :config (yas-global-mode))
+  (use-package lsp-mode
+    :hook ((lsp-mode . lsp-enable-which-key-integration))
+    :config (setq lsp-completion-enable-additional-text-edit nil))
+  (use-package hydra)
+  (use-package lsp-ui)
+  (use-package lsp-java
+    :config (add-hook 'java-mode-hook 'lsp))
+  (use-package dap-mode
+    :after lsp-mode
+    :config (dap-auto-configure-mode))
+  (use-package dap-java
+    :ensure nil)
+  (use-package helm-lsp)
+  (use-package helm
+    :config (helm-mode))
+  (use-package lsp-treemacs)
 #+end_src
 
 #+RESULTS:
-**** pyim
-#+begin_src elisp
-  (use-package pyim)
-  (pyim-default-scheme 'quanpin)
-  (if (posframe-workable-p)
-      (setq pyim-page-tooltip 'posframe)
-    (setq pyim-page-tooltip 'popup))
-  
-  (setq pyim-page-length 9)
-  (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
-  
-  
-  (use-package pyim-basedict)
-  (pyim-basedict-enable)
-  
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
-  (require 'pyim-greatdict)
-  (pyim-greatdict-enable)
-  
-#+end_src
 
-#+RESULTS:
-: t
 
-* about leaving
+* leaving
 ** no backup
  #+BEGIN_SRC emacs-lisp
  (setq make-backup-files nil)
