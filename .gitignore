@@ -19,3 +19,8 @@ auto/.cache/
 /notes
 /type-break
 /speed-type/
+/.dap-breakpoints
+/.lsp-session-v1
+/eclipse.jdt.ls/
+/request/
+/workspace/
