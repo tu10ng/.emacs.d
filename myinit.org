@@ -370,10 +370,16 @@ rainbow cursor
   #+BEGIN_SRC emacs-lisp
     (use-package linum-relative)
     (line-number-mode nil)
+    
+    ;; its not working
+    ;; (dolist (mode '(term-mode-hook
+    ;; 		shell-mode-hook
+    ;; 		treemacs-mode-hook
+    ;; 		eshell-mode-hook))
+    ;;   (add-hook mode (lambda () (linum-relative-toggle))))
   #+END_SRC
 
   #+RESULTS:
-  : t
 
 ** word-relative
 *** line wrap
@@ -771,7 +777,35 @@ rainbow cursor
   
   (use-package company-tabnine
     )
-  (add-to-list 'company-backends #'company-tabnine)
+  ;;(add-to-list 'company-backends #'company-tabnine)
+  
+  (defun company//sort-by-tabnine (candidates)
+    (if (or (functionp company-backend)
+	    (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+	candidates
+      (let ((candidates-table (make-hash-table :test #'equal))
+	    candidates-1
+	    candidates-2)
+	(dolist (candidate candidates)
+	  (if (eq (get-text-property 0 'company-backend candidate)
+		  'company-tabnine)
+	      (unless (gethash candidate candidates-table)
+		(push candidate candidates-2))
+	    (push candidate candidates-1)
+	    (puthash candidate t candidates-table)))
+	(setq candidates-1 (nreverse candidates-1))
+	(setq candidates-2 (nreverse candidates-2))
+	(nconc (seq-take candidates-1 2)
+	       (seq-take candidates-2 2)
+	       (seq-drop candidates-1 2)
+	       (seq-drop candidates-2 2)))))
+  
+  (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+  ;; `:separate`  使得不同 backend 分开排序
+  (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
+  
+  
+  
   
   
   ;; The free version of TabNine is good enough,
@@ -1034,13 +1068,35 @@ acts like o in vim, code refered to lazycat's open-newline.el
     :config (setq lsp-intelephense-multi-root nil)
     (with-eval-after-load 'lsp-intelephense
       (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
-    (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+    ;; (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+    :custom
+    (lsp-headerline-breadcrumb-enable nil)
+    (lsp-restart 'auto-restart)
     )
+  
+  
+  ;; Don't ping LSP lanaguage server too frequently.
+  (defvar lsp-on-touch-time 0)
+  (defadvice lsp-on-change (around lsp-on-change-hack activate)
+    ;; don't run `lsp-on-change' too frequently
+    (when (> (- (float-time (current-time))
+		lsp-on-touch-time) 30) ;; 30 seconds
+      (setq lsp-on-touch-time (float-time (current-time)))
+      ad-do-it))
+  
+  
+  
+  
+  
+  
   ;;	   lsp-completion-enable-additional-text-edit nil))
   
   
   (use-package hydra)
-  (use-package lsp-ui)
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-doc-position 'top))
+  
   (use-package lsp-java)
   ;;  :hook (java-mode . lsp))
   (add-hook 'java-mode-hook #'lsp)
@@ -1053,10 +1109,10 @@ acts like o in vim, code refered to lazycat's open-newline.el
     :config (helm-mode))
   (use-package helm-lsp
     :after (lsp-mode)
-    :commands (helm-lsp-workspace-symbol)
-    :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+    :commands (helm-lsp-workspace-symbol))
+  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
   
-  (use-package lsp-treemacs)
+  ;; (use-package lsp-treemacs)
   
   
   

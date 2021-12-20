@@ -26,3 +26,4 @@ auto/.cache/
 /workspace/
 /.dir-locals.el
 /projectile-bookmarks.eld
+/projectile.cache
