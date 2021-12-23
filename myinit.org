@@ -398,17 +398,32 @@ rainbow cursor
 
 ** keybinding (navigation, etc.)
    #+begin_src emacs-lisp
-     ;;     (global-set-key "\M-," 'beginning-of-buffer)
-     ;;     (global-set-key "\M-." 'end-of-buffer)
      (global-set-key "\M-." 'xref-find-definitions-other-window)
      
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
-     (global-set-key "\C-x\C-h" 'mark-whole-buffer)     
      
-     (setq w32-pass-lwindow-to-system nil
-	   w32-lwindow-modifier 'super
-	   w32-register-hot-key [s-])
+     (defun tl/upcase-word (ARG)
+       "backward upcasing"
+       (interactive "p")
+       (upcase-word (- ARG)))
+     
+     (defun tl/downcase-word (ARG)
+       "backward upcasing"
+       (interactive "p")
+       (downcase-word (- ARG)))
+     
+     (defun tl/capitalize-word (ARG)
+       "backward upcasing"
+       (interactive "p")
+       (capitalize-word (- ARG)))
+     
+     (global-set-key (kbd "M-l") 'tl/downcase-word)
+     (global-set-key (kbd "M-u") 'tl/upcase-word)
+     (global-set-key (kbd "M-c") 'tl/capitalize-word)
+     ;; (setq w32-pass-lwindow-to-system nil
+     ;;       w32-lwindow-modifier 'super
+     ;;       w32-register-hot-key [s-])
      
      
      
@@ -423,14 +438,14 @@ rainbow cursor
 	  skip -COUNT windows backwards.  COUNT zero means do not skip any
 	  window, so select the selected window.  In an interactive call,
 	  COUNT is the numeric prefix argument.  Return nil.
-	  
+     
 	  If the `other-window' parameter of the selected window is a
 	  function and `ignore-window-parameters' is nil, call that
 	  function with the arguments COUNT and ALL-FRAMES.
-	  
+     
 	  This function does not select a window whose `no-other-window'
 	  window parameter is non-nil.
-	  
+     
 	  This function uses `next-window' for finding the window to
 	  select.  The argument ALL-FRAMES has the same meaning as in
 	  `next-window', but the MINIBUF argument of `next-window' is
@@ -479,11 +494,11 @@ rainbow cursor
 		   (setq old-count count)))
 		(t
 		 (setq count (1+ count)))))
-	     
+     
 	     (when (and (eq window original-window)
 			(called-interactively-p 'interactive))
 	       (counsel-switch-buffer-other-window))
-	     
+     
 	     (select-window window)
 	     ;; Always return nil.
 	     nil))))
@@ -598,9 +613,9 @@ rainbow cursor
 
 *** keybinds
   #+BEGIN_SRC emacs-lisp
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-iswitchb)
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cb" 'org-iswitchb)
   #+END_SRC
   
 *** mouse
@@ -1062,27 +1077,19 @@ acts like o in vim, code refered to lazycat's open-newline.el
 		lsp-enable-file-watchers nil
 		read-process-output-max (* 100 1024 1024) ;100 mb
 		lsp-completion-provider :capf
-		lsp-idle-delay 0.500
 		lsp-enable-indentation nil
+		lsp-enable-on-type-formatting nil
 		)
     :config (setq lsp-intelephense-multi-root nil)
-    (with-eval-after-load 'lsp-intelephense
-      (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
-    ;; (define-key lsp-mode-map (kbd "C-c l") lsp-command-map)
+  ;;  (with-eval-after-load 'lsp-intelephense
+  ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
     :custom
     (lsp-headerline-breadcrumb-enable nil)
     (lsp-restart 'auto-restart)
     )
   
   
-  ;; Don't ping LSP lanaguage server too frequently.
-  (defvar lsp-on-touch-time 0)
-  (defadvice lsp-on-change (around lsp-on-change-hack activate)
-    ;; don't run `lsp-on-change' too frequently
-    (when (> (- (float-time (current-time))
-		lsp-on-touch-time) 30) ;; 30 seconds
-      (setq lsp-on-touch-time (float-time (current-time)))
-      ad-do-it))
+  
   
   
   

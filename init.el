@@ -55,6 +55,7 @@
  '(flycheck-disabled-checkers '(python-pycompile))
  '(linum-relative-current-symbol "")
  '(linum-relative-global-mode t)
+ '(lsp-ui-flycheck-list-position 'right)
  '(org-adapt-indentation nil)
  '(org-agenda-files
    '("~/Documents/cloud/gtd.org" "/home/qb/Documents/cloud/homework.org" "/home/qb/.emacs.d/myinit.org"))
