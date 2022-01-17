@@ -398,6 +398,7 @@ rainbow cursor
 
 ** keybinding (navigation, etc.)
    #+begin_src emacs-lisp
+     (global-set-key "\M-," 'lsp-find-references)
      (global-set-key "\M-." 'xref-find-definitions-other-window)
      
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
@@ -421,6 +422,34 @@ rainbow cursor
      (global-set-key (kbd "M-l") 'tl/downcase-word)
      (global-set-key (kbd "M-u") 'tl/upcase-word)
      (global-set-key (kbd "M-c") 'tl/capitalize-word)
+     
+     (defun tl/exchange-keys ()
+       "exchange some keys' behaviour, like '1' will ouput '!', '!' output '1'"
+       (interactive)
+       (global-set-key (kbd "1") (lambda () (interactive) (insert "!")))
+       (global-set-key (kbd "2") (lambda () (interactive) (insert "@")))
+       (global-set-key (kbd "3") (lambda () (interactive) (insert "#")))
+       (global-set-key (kbd "4") (lambda () (interactive) (insert "$")))
+       (global-set-key (kbd "5") (lambda () (interactive) (insert "%")))
+       (global-set-key (kbd "6") (lambda () (interactive) (insert "^")))
+       (global-set-key (kbd "7") (lambda () (interactive) (insert "&")))
+       (global-set-key (kbd "8") (lambda () (interactive) (insert "*")))
+       ;;       (global-set-key (kbd "9") (lambda () (interactive) (insert "(")))
+       ;;       (global-set-key (kbd "0") (lambda () (interactive) (insert ")")))
+       (global-set-key (kbd "!") (lambda () (interactive) (insert "1")))
+       (global-set-key (kbd "@") (lambda () (interactive) (insert "2")))
+       (global-set-key (kbd "#") (lambda () (interactive) (insert "3")))
+       (global-set-key (kbd "$") (lambda () (interactive) (insert "4")))
+       (global-set-key (kbd "%") (lambda () (interactive) (insert "5")))
+       (global-set-key (kbd "^") (lambda () (interactive) (insert "6")))
+       (global-set-key (kbd "&") (lambda () (interactive) (insert "7")))
+       (global-set-key (kbd "*") (lambda () (interactive) (insert "8")))
+       ;;       (global-set-key (kbd "(") (lambda () (interactive) (insert "9")))
+       ;;       (global-set-key (kbd ")") (lambda () (interactive) (insert "0")))
+     
+       )
+     
+     (add-hook 'after-init-hook 'tl/exchange-keys)
      ;; (setq w32-pass-lwindow-to-system nil
      ;;       w32-lwindow-modifier 'super
      ;;       w32-register-hot-key [s-])
@@ -432,24 +461,24 @@ rainbow cursor
      
      (defun other-window (count &optional all-frames)
        "Select another window in cyclic ordering of windows.
-	  COUNT specifies the number of windows to skip, starting with the
-	  selected window, before making the selection.  If COUNT is
-	  positive, skip COUNT windows forwards.  If COUNT is negative,
-	  skip -COUNT windows backwards.  COUNT zero means do not skip any
-	  window, so select the selected window.  In an interactive call,
-	  COUNT is the numeric prefix argument.  Return nil.
+	       COUNT specifies the number of windows to skip, starting with the
+	       selected window, before making the selection.  If COUNT is
+	       positive, skip COUNT windows forwards.  If COUNT is negative,
+	       skip -COUNT windows backwards.  COUNT zero means do not skip any
+	       window, so select the selected window.  In an interactive call,
+	       COUNT is the numeric prefix argument.  Return nil.
      
-	  If the `other-window' parameter of the selected window is a
-	  function and `ignore-window-parameters' is nil, call that
-	  function with the arguments COUNT and ALL-FRAMES.
+	       If the `other-window' parameter of the selected window is a
+	       function and `ignore-window-parameters' is nil, call that
+	       function with the arguments COUNT and ALL-FRAMES.
      
-	  This function does not select a window whose `no-other-window'
-	  window parameter is non-nil.
+	       This function does not select a window whose `no-other-window'
+	       window parameter is non-nil.
      
-	  This function uses `next-window' for finding the window to
-	  select.  The argument ALL-FRAMES has the same meaning as in
-	  `next-window', but the MINIBUF argument of `next-window' is
-	  always effectively nil."
+	       This function uses `next-window' for finding the window to
+	       select.  The argument ALL-FRAMES has the same meaning as in
+	       `next-window', but the MINIBUF argument of `next-window' is
+	       always effectively nil."
        (interactive "p")
        (let* ((window (selected-window))
 	      (original-window window)
@@ -616,7 +645,11 @@ rainbow cursor
     (global-set-key "\C-cl" 'org-store-link)
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cb" 'org-iswitchb)
+    (global-set-key "\C-cc" 'org-capture)
   #+END_SRC
+
+  #+RESULTS:
+  : org-capture
   
 *** mouse
      #+begin_src emacs-lisp
@@ -628,22 +661,17 @@ rainbow cursor
      (add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
      
      (define-key c-mode-base-map "\C-m" 'c-context-line-break)
+;;     (define-key c-mode-base-map "9" (kbd "("))
+;;     (define-key c-mode-base-map "0" (kbd ")"))
      
    #+end_src
 
    #+RESULTS:
-   : c-context-line-break
-** java
-#+begin_src emacs-lisp
-
-#+end_src
-
-#+RESULTS:
-
-** fish mode
+** some modes
 #+begin_src emacs-lisp
   (use-package fish-mode)
-  
+  (use-package lox-mode)
+  (use-package pdf-tools)
 #+end_src
 
 #+RESULTS:
@@ -745,11 +773,14 @@ rainbow cursor
   : t
 
 ** game and zone
-*** typing game
+*** speed-type
 #+begin_src emacs-lisp
-  (use-package typing-game)
+  (use-package speed-type)
   
 #+end_src
+
+#+RESULTS:
+
 *** zone-nyan
 #+begin_src emacs-lisp
   (use-package zone-nyan)
@@ -810,10 +841,10 @@ rainbow cursor
 	    (puthash candidate t candidates-table)))
 	(setq candidates-1 (nreverse candidates-1))
 	(setq candidates-2 (nreverse candidates-2))
-	(nconc (seq-take candidates-1 2)
-	       (seq-take candidates-2 2)
-	       (seq-drop candidates-1 2)
-	       (seq-drop candidates-2 2)))))
+	(nconc (seq-take candidates-1 1)	; number of items tabnine shows
+	       (seq-take candidates-2 1)
+	       (seq-drop candidates-1 1)
+	       (seq-drop candidates-2 1)))))
   
   (add-to-list 'company-transformers 'company//sort-by-tabnine t)
   ;; `:separate`  使得不同 backend 分开排序
@@ -845,11 +876,12 @@ rainbow cursor
 	:defer t
 	)
       ;; :init (setq magit-completing-read-function 'ivy-completing-read))
-      ;;   (use-package diff-hl)
-      
+      (use-package diff-hl)
+      (global-set-key (kbd "C-c g") 'magit-file-dispatch)
     #+end_src
 
     #+RESULTS:
+    : magit-file-dispatch
 *** quickrun
     #+begin_src emacs-lisp
       (use-package quickrun
@@ -1081,8 +1113,8 @@ acts like o in vim, code refered to lazycat's open-newline.el
 		lsp-enable-on-type-formatting nil
 		)
     :config (setq lsp-intelephense-multi-root nil)
-  ;;  (with-eval-after-load 'lsp-intelephense
-  ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
+    ;;  (with-eval-after-load 'lsp-intelephense
+    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
     :custom
     (lsp-headerline-breadcrumb-enable nil)
     (lsp-restart 'auto-restart)
@@ -1107,13 +1139,14 @@ acts like o in vim, code refered to lazycat's open-newline.el
   (use-package lsp-java)
   ;;  :hook (java-mode . lsp))
   (add-hook 'java-mode-hook #'lsp)
+  ;;(setq lsp-java-workspace-dir
   (use-package dap-mode
     :after lsp-mode
     :config (dap-auto-configure-mode))
   (use-package dap-java
     :ensure nil)
-  (use-package helm
-    :config (helm-mode))
+  (use-package helm)
+  ;;    :config (helm-mode))
   (use-package helm-lsp
     :after (lsp-mode)
     :commands (helm-lsp-workspace-symbol))

@@ -27,3 +27,4 @@ auto/.cache/
 /.dir-locals.el
 /projectile-bookmarks.eld
 /projectile.cache
+/image-dired/
