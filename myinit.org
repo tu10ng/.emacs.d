@@ -147,14 +147,14 @@
 #+END_SRC  
 **** rainbow-fart
    #+begin_src emacs-lisp
-     (add-to-list 'load-path "~/.emacs.d/site-lisp/")
-     
-     (use-package rainbow-fart
-       
-       :init (rainbow-fart-mode 1))
-     (setq rainbow-fart-keyword-interval 0)
-     
-     
+     ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/")
+
+     ;; (use-package rainbow-fart
+
+     ;;   :init (rainbow-fart-mode 1))
+     ;; (setq rainbow-fart-keyword-interval 0)
+
+
    #+end_src
 
    #+RESULTS:
@@ -671,15 +671,15 @@ rainbow cursor
 #+begin_src emacs-lisp
   (use-package fish-mode)
   (use-package lox-mode)
-  (use-package pdf-tools)
+;;  (use-package pdf-tools)
 #+end_src
 
 #+RESULTS:
 
 ** css
 #+begin_src emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
-  (require 'css-sort-buffer)
+;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
+;;  (require 'css-sort-buffer)
 #+end_src
 ** emacs-application-framework
 #+BEGIN_SRC emacs-lisp
@@ -726,18 +726,18 @@ rainbow cursor
 
 ** awesome-pair
 #+BEGIN_SRC emacs-lisp
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/awesome-pair")
-  (require 'awesome-pair)
+  ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/awesome-pair")
+    ;; (require 'awesome-pair)
   
-  (dolist (hook (list
-		 'emacs-lisp-mode-hook
-		 'lisp-mode-hook
-		 'lisp-interaction-mode-hook
-		 ))
-    (add-hook hook '(lambda () (awesome-pair-mode 1))))
+    ;; (dolist (hook (list
+    ;; 		 'emacs-lisp-mode-hook
+    ;; 		 'lisp-mode-hook
+    ;; 		 'lisp-interaction-mode-hook
+    ;; 		 ))
+    ;;   (add-hook hook '(lambda () (awesome-pair-mode 1))))
   
-  (global-set-key "\M-p" 'awesome-pair-jump-left)
-  (global-set-key "\M-n" 'awesome-pair-jump-right)
+    ;; (global-set-key "\M-p" 'awesome-pair-jump-left)
+    ;; (global-set-key "\M-n" 'awesome-pair-jump-right)
 
 #+END_SRC
 
@@ -797,7 +797,7 @@ rainbow cursor
 
 *** flames of freedom
 #+begin_src emacs-lisp
-  (use-package flames-of-freedom)
+;;  (use-package flames-of-freedom)
 #+end_src
 
 #+RESULTS:
@@ -936,17 +936,17 @@ rainbow cursor
   (if (posframe-workable-p)
       (setq pyim-page-tooltip 'posframe)
     (setq pyim-page-tooltip 'popup))
-  
+
   (setq pyim-page-length 9)
   (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
-  
-  
+
+
   (use-package pyim-basedict)
   (pyim-basedict-enable)
-  
-  (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
-  (require 'pyim-greatdict)
-  (pyim-greatdict-enable)
+
+  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
+  ;; (require 'pyim-greatdict)
+  ;; (pyim-greatdict-enable)
   
 #+end_src
 
@@ -1162,7 +1162,19 @@ acts like o in vim, code refered to lazycat's open-newline.el
 #+RESULTS:
 
 
-* leaving
+* coming and leaving
+
+** native compilation
+#+begin_src emacs-lisp
+  (setq comp-deferred-compilation t
+	package-native-compile t
+  )
+
+#+end_src
+
+#+RESULTS:
+: t
+
 ** no backup
  #+BEGIN_SRC emacs-lisp
  (setq make-backup-files nil)

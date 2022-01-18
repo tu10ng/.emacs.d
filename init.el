@@ -63,11 +63,11 @@
  '(markdown-fontify-code-blocks-natively t)
  '(org-adapt-indentation nil)
  '(org-agenda-files
-   '("~/Documents/cloud/gtd.org" "/home/qb/Documents/cloud/homework.org" "/home/qb/.emacs.d/myinit.org"))
+   '("~/org/homework.org" "/home/qb/org/gtd.org" "/home/qb/org/diary.org" "/home/qb/.emacs.d/myinit.org"))
  '(org-agenda-span 8)
  '(org-capture-templates
    '(("d" "diary" entry
-      (file+olp+datetree "~/Documents/cloud/diary.org")
+      (file+olp+datetree "~/org/diary.org")
       "* %^{heading|记录|回忆} %U
 %?" :tree-type week)))
  '(org-confirm-babel-evaluate nil)
