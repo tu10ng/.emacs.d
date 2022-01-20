@@ -29,3 +29,4 @@ auto/.cache/
 /projectile.cache
 /image-dired/
 /install
+/lsp-cache/

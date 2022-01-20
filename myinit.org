@@ -400,29 +400,29 @@ rainbow cursor
    #+begin_src emacs-lisp
      (global-set-key "\M-," 'lsp-find-references)
      (global-set-key "\M-." 'xref-find-definitions-other-window)
-     
+
      (global-set-key (kbd "<f5>") 'apply-macro-to-region-lines)
      (global-set-key (kbd "<f6>") 'kmacro-edit-macro)
-     
+
      (defun tl/upcase-word (ARG)
        "backward upcasing"
        (interactive "p")
        (upcase-word (- ARG)))
-     
+
      (defun tl/downcase-word (ARG)
        "backward upcasing"
        (interactive "p")
        (downcase-word (- ARG)))
-     
+
      (defun tl/capitalize-word (ARG)
        "backward upcasing"
        (interactive "p")
        (capitalize-word (- ARG)))
-     
+
      (global-set-key (kbd "M-l") 'tl/downcase-word)
      (global-set-key (kbd "M-u") 'tl/upcase-word)
      (global-set-key (kbd "M-c") 'tl/capitalize-word)
-     
+
      (defun tl/exchange-keys ()
        "exchange some keys' behaviour, like '1' will ouput '!', '!' output '1'"
        (interactive)
@@ -446,39 +446,42 @@ rainbow cursor
        (global-set-key (kbd "*") (lambda () (interactive) (insert "8")))
        ;;       (global-set-key (kbd "(") (lambda () (interactive) (insert "9")))
        ;;       (global-set-key (kbd ")") (lambda () (interactive) (insert "0")))
-     
+  
        )
-     
-     (add-hook 'after-init-hook 'tl/exchange-keys)
+
+     ;; 这样的键盘布局对于人类来说为时尚早……
+     ;;     (add-hook 'after-init-hook 'tl/exchange-keys)
+
+
      ;; (setq w32-pass-lwindow-to-system nil
      ;;       w32-lwindow-modifier 'super
      ;;       w32-register-hot-key [s-])
-     
-     
-     
-     
-     
-     
+
+
+
+
+
+
      (defun other-window (count &optional all-frames)
        "Select another window in cyclic ordering of windows.
-	       COUNT specifies the number of windows to skip, starting with the
-	       selected window, before making the selection.  If COUNT is
-	       positive, skip COUNT windows forwards.  If COUNT is negative,
-	       skip -COUNT windows backwards.  COUNT zero means do not skip any
-	       window, so select the selected window.  In an interactive call,
-	       COUNT is the numeric prefix argument.  Return nil.
+		    COUNT specifies the number of windows to skip, starting with the
+		    selected window, before making the selection.  If COUNT is
+		    positive, skip COUNT windows forwards.  If COUNT is negative,
+		    skip -COUNT windows backwards.  COUNT zero means do not skip any
+		    window, so select the selected window.  In an interactive call,
+		    COUNT is the numeric prefix argument.  Return nil.
      
-	       If the `other-window' parameter of the selected window is a
-	       function and `ignore-window-parameters' is nil, call that
-	       function with the arguments COUNT and ALL-FRAMES.
+		    If the `other-window' parameter of the selected window is a
+		    function and `ignore-window-parameters' is nil, call that
+		    function with the arguments COUNT and ALL-FRAMES.
      
-	       This function does not select a window whose `no-other-window'
-	       window parameter is non-nil.
+		    This function does not select a window whose `no-other-window'
+		    window parameter is non-nil.
      
-	       This function uses `next-window' for finding the window to
-	       select.  The argument ALL-FRAMES has the same meaning as in
-	       `next-window', but the MINIBUF argument of `next-window' is
-	       always effectively nil."
+		    This function uses `next-window' for finding the window to
+		    select.  The argument ALL-FRAMES has the same meaning as in
+		    `next-window', but the MINIBUF argument of `next-window' is
+		    always effectively nil."
        (interactive "p")
        (let* ((window (selected-window))
 	      (original-window window)
@@ -523,19 +526,19 @@ rainbow cursor
 		   (setq old-count count)))
 		(t
 		 (setq count (1+ count)))))
-     
+	
 	     (when (and (eq window original-window)
 			(called-interactively-p 'interactive))
 	       (counsel-switch-buffer-other-window))
-     
+	
 	     (select-window window)
 	     ;; Always return nil.
 	     nil))))
-     
+
      (global-set-key "\M-i" 'other-window)
      (global-set-key "\C-xo" 'other-window)
-     
-     
+
+
    #+end_src
 
 
@@ -543,6 +546,61 @@ rainbow cursor
    : other-window
 
 * forming
+** lsp
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :config (yas-global-mode))
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :hook ((lsp-mode . lsp-enable-which-key-integration)
+	   (java-mode . #'lsp-deferred))
+    :init (setq lsp-keymap-prefix "C-c l"
+		lsp-enable-file-watchers nil
+		read-process-output-max (* 100 1024 1024) ;100 mb
+		lsp-completion-provider :capf
+		lsp-enable-indentation nil
+		lsp-enable-on-type-formatting nil
+		)
+    :config (setq lsp-intelephense-multi-root nil)
+    ;;  (with-eval-after-load 'lsp-intelephense
+    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
+    :custom
+    (lsp-headerline-breadcrumb-enable nil)
+    (lsp-restart 'auto-restart)
+    )
+  
+  ;;	   lsp-completion-enable-additional-text-edit nil))
+  
+  (use-package hydra)
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-doc-position 'top))
+  
+  (use-package lsp-java)
+  ;;  :hook (java-mode . lsp))
+  (add-hook 'java-mode-hook #'lsp)
+  ;;(setq lsp-java-workspace-dir
+  (use-package dap-mode
+    :after lsp-mode
+    :config (dap-auto-configure-mode))
+  (use-package dap-java
+    :ensure nil)
+  (use-package helm)
+  ;;    :config (helm-mode))
+  (use-package helm-lsp
+    :after (lsp-mode)
+    :commands (helm-lsp-workspace-symbol))
+  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+  
+  ;; (use-package lsp-treemacs)
+  
+  
+  
+  
+#+end_src
+
+#+RESULTS:
+
 ** ORG mode
 *** outfit
 **** org bullets
@@ -642,7 +700,7 @@ rainbow cursor
 
 *** keybinds
   #+BEGIN_SRC emacs-lisp
-    (global-set-key "\C-cl" 'org-store-link)
+;;    (global-set-key "\C-cl" 'org-store-link)
     (global-set-key "\C-ca" 'org-agenda)
     (global-set-key "\C-cb" 'org-iswitchb)
     (global-set-key "\C-cc" 'org-capture)
@@ -671,10 +729,21 @@ rainbow cursor
 #+begin_src emacs-lisp
   (use-package fish-mode)
   (use-package lox-mode)
+  (use-package php-mode)
 ;;  (use-package pdf-tools)
 #+end_src
 
 #+RESULTS:
+** python
+#+begin_src emacs-lisp
+  (use-package lsp-pyright
+    :hook (python-mode . (lambda ()
+			   (require 'lsp-pyright)
+			   (lsp-deferred))))
+#+end_src
+
+#+RESULTS:
+| lambda | nil | (require 'lsp-pyright) | (lsp-deferred) |
 
 ** css
 #+begin_src emacs-lisp
@@ -1097,70 +1166,6 @@ acts like o in vim, code refered to lazycat's open-newline.el
   #+BEGIN_SRC emacs-lisp
     (setq-default fill-column 78)
   #+END_SRC
-** lsp
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :config (yas-global-mode))
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook ((lsp-mode . lsp-enable-which-key-integration)
-	   (java-mode . #'lsp-deferred))
-    :init (setq lsp-keymap-prefix "C-c l"
-		lsp-enable-file-watchers nil
-		read-process-output-max (* 100 1024 1024) ;100 mb
-		lsp-completion-provider :capf
-		lsp-enable-indentation nil
-		lsp-enable-on-type-formatting nil
-		)
-    :config (setq lsp-intelephense-multi-root nil)
-    ;;  (with-eval-after-load 'lsp-intelephense
-    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
-    :custom
-    (lsp-headerline-breadcrumb-enable nil)
-    (lsp-restart 'auto-restart)
-    )
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  ;;	   lsp-completion-enable-additional-text-edit nil))
-  
-  
-  (use-package hydra)
-  (use-package lsp-ui
-    :custom
-    (lsp-ui-doc-position 'top))
-  
-  (use-package lsp-java)
-  ;;  :hook (java-mode . lsp))
-  (add-hook 'java-mode-hook #'lsp)
-  ;;(setq lsp-java-workspace-dir
-  (use-package dap-mode
-    :after lsp-mode
-    :config (dap-auto-configure-mode))
-  (use-package dap-java
-    :ensure nil)
-  (use-package helm)
-  ;;    :config (helm-mode))
-  (use-package helm-lsp
-    :after (lsp-mode)
-    :commands (helm-lsp-workspace-symbol))
-  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
-  
-  ;; (use-package lsp-treemacs)
-  
-  
-  
-  
-#+end_src
-
-#+RESULTS:
-
 
 * coming and leaving
 

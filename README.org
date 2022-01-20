@@ -1,5 +1,8 @@
-[[file:myinit.org][file:~/.emacs.d/myinit.org]]
 * emacs
+this is my personal emacs configuration directory.
+
+[[file:myinit.org][file:myinit.org]]
+
 #+begin_src 
   ___ _ __ ___   __ _  ___ ___ 
  / _ \ '_ ` _ \ / _` |/ __/ __|
@@ -7,3 +10,20 @@
  \___|_| |_| |_|\__,_|\___|___/
 
 #+end_src                               
+
+* installation
+need manually download [[https://github.com/manateelazycat/lazycat-theme.git][lazycat-theme]] and [[https://github.com/manateelazycat/awesome-tray.git][awesome-tray]].
+(I'm lazy enough not adding auto installation for this.)
+(actually I'm afraid the slow connection of github will introduce bugs)
+
+* usage
+some keybindings have been changed:
+M-i = C-x o since M-i isn't bound on any key.
+M-u, M-l, M-c will take effect backwards instead of forwards.
+M-o open line above, etc.
+
+* todo
+this configuration is basicly just a set of `use-package's, bear my poor programming skill.
+
+
+

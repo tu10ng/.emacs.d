@@ -52,6 +52,8 @@
    '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator space-before-funcall compact-empty-funcall comment-close-slash))
  '(c-hanging-braces-alist 'set-from-style)
  '(electric-indent-mode t)
+ '(exec-path
+   '("/usr/local/bin" "/usr/bin" "/usr/local/sbin" "/usr/bin/site_perl" "/usr/bin/vendor_perl" "/usr/bin/core_perl" "/usr/lib/emacs/29.0.50/x86_64-pc-linux-gnu" "/home/qb/.local/bin"))
  '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
  '(flycheck-disabled-checkers '(python-pycompile))
  '(linum-relative-current-symbol "")
@@ -74,7 +76,7 @@
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-startup-truncated nil)
  '(package-selected-packages
-   '(diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(show-paren-mode t)
  '(truncate-lines nil)
  '(word-wrap t))
