@@ -30,3 +30,5 @@ auto/.cache/
 /image-dired/
 /install
 /lsp-cache/
+/straight/
+/var/

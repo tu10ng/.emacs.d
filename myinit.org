@@ -2,8 +2,8 @@
 
 * BENCHMARK
 #+begin_src emacs-lisp
-  (use-package benchmark-init)
-  (benchmark-init/activate)
+;;  (use-package benchmark-init)
+;;  (benchmark-init/activate)
 #+end_src
 
 
@@ -1213,11 +1213,19 @@ acts like o in vim, code refered to lazycat's open-newline.el
  
 ** Restart Emacs
  #+BEGIN_SRC emacs-lisp
- (use-package restart-emacs
-    :defer t
-   )
+   (use-package restart-emacs
+     :defer t
+     )
 
+   (defun restart-emacs-reopen-current-file ()
+     (interactive)
+     (if (buffer-file-name)
+	 (restart-emacs (split-string (buffer-file-name)))
+       (restart-emacs)))
  #+END_SRC
+
+ #+RESULTS:
+ : restart-emacs-reopen-current-file
 
 
 
