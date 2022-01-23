@@ -1,8 +1,9 @@
+
 * FEEL the magic elements
 ** BENCHMARK
 #+begin_src emacs-lisp
-;;  (use-package benchmark-init)
-;;  (benchmark-init/activate)
+  (use-package benchmark-init)
+  (benchmark-init/activate)
 #+end_src
 
 ** native compilation
@@ -201,6 +202,17 @@
 
 #+END_SRC  
 
+** dired
+#+begin_src emacs-lisp
+(use-package all-the-icons)
+
+;; too ugly
+;; (use-package dirvish)
+
+#+end_src
+
+#+RESULTS:
+
 ** buffer
 *** startup
  #+BEGIN_SRC emacs-lisp
@@ -241,12 +253,12 @@
 ;; should use macro
 (defface visible-mark-face1
   '((((type tty) (class mono)))
-    (t (:background "gold")))
+    (t (:background "gray")))
   "Example face which can be customized and added to subsequent face lists."
   :group 'visible-mark)
 (defface visible-mark-face2
   '((((type tty) (class mono)))
-    (t (:background "DodgerBlue1")))
+    (t (:background "gray60"))) ;;"DodgerBlue1"
   "Example face which can be customized and added to subsequent face lists."
   :group 'visible-mark)
 (defface visible-mark-face3
@@ -274,13 +286,16 @@
 (global-visible-mark-mode 1) ;; or add (visible-mark-mode) to specific hooks
 (setq visible-mark-max 2)
 (setq visible-mark-faces `(visible-mark-face1
-			   visible-mark-face2
-			   visible-mark-face3
-			   visible-mark-face4
-			   visible-mark-face5
-			   visible-mark-face6      
-			   ))
+			               visible-mark-face2
+			               visible-mark-face3
+			               visible-mark-face4
+			               visible-mark-face5
+			               visible-mark-face6      
+			               ))
 #+end_src
+
+#+RESULTS:
+| visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
 
 ** line 
   #+BEGIN_SRC emacs-lisp
@@ -365,7 +380,7 @@
     #+begin_src emacs-lisp
      ;; we don't want the cursor vanish
      (blink-cursor-mode -1)
-     (setq rainbow-color-list '("#FF0000";red
+     (setq rainbow-cursor-color-list '("#FF0000";red
 				"#FF5000"
 				"#FF9F00";orange
 				"#FFFF00";yellow
@@ -379,22 +394,22 @@
 				"#CF00FF"
 				"#FF0088"
 				))
-     (setq cursor-color-pointer 1)
+     (setq rainbow-cursor-color-pointer 1)
      (defun cursor-color-change ()
        "Take a color from `rainbow-color-list' by the pointer.  
      The pointer moves by +1, and restore by taking mod.  "
-       (setq cursor-color-pointer (% (1+ cursor-color-pointer)
-				     (length rainbow-color-list)))
-       (set-cursor-color (nth cursor-color-pointer
-			  rainbow-color-list)))
+       (setq rainbow-cursor-color-pointer (% (1+ rainbow-cursor-color-pointer)
+				     (length rainbow-cursor-color-list)))
+       (set-cursor-color (nth rainbow-cursor-color-pointer
+			  rainbow-cursor-color-list)))
      
      (run-with-timer ()
-		     (/ .5 (length rainbow-color-list))
+		     (/ .5 (length rainbow-cursor-color-list))
 		     'cursor-color-change)
     #+end_src    
 
     #+RESULTS:
-    : [nil 24869 1981 996153 0.038461538461538464 cursor-color-change nil nil 598000]
+    : [nil 25069 53142 334581 0.038461538461538464 cursor-color-change nil nil 54000 nil]
 
 ** scroll with mouse
 #+BEGIN_SRC emacs-lisp
@@ -412,9 +427,6 @@
 ** keybinding (navigation, etc.)
 #+begin_src emacs-lisp
 ;;learn from lazy-cat's thing-edit and move-text
-
-;;(global-set-key "\M-," 'lsp-find-references)
-(global-set-key "\M-." 'xref-find-definitions-other-window)
 (global-set-key "\M-i" 'other-window)
 (global-set-key "\C-r" 'query-replace)
 (global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
@@ -534,6 +546,7 @@ if the buffer isn't a file, simply restart emacs."
   :bind (("M-s" . youdao-dictionary-search-at-point+)))
 
 #+end_src
+
 
 * preparing our magic array
 ** ORG mode
@@ -868,9 +881,8 @@ if the buffer isn't a file, simply restart emacs."
 #+begin_src emacs-lisp
 (use-package citre
   :init (require 'citre-config)
-  (global-set-key (kbd "M-.") 'citre-jump)
-  (global-set-key (kbd "C-M-.") 'citre-jump-back)
-  (global-set-key (kbd "M-,") 'citre-ace-peek)
+  (global-set-key (kbd "M-.") 'citre-ace-peek)
+  (global-set-key (kbd "M-,") 'citre-peek-restore)
 ;;  (global-set-key (kbd "M-.") 'citre-update-this-tags-file)
   :config
   (setq
@@ -881,13 +893,17 @@ if the buffer isn't a file, simply restart emacs."
    )
   )
    
-  
-
+(defun citre-jump+ ()
+  (interactive)
+  (condition-case _
+      (citre-jump)
+    (error (let* ((xref-prompt-for-identifier nil))
+             (call-interactively #'xref-find-definitions)))))
 
 #+end_src
 
 #+RESULTS:
-: t
+: citre-jump+
 
 *** lsp 鬼才用lsp
   (use-package yasnippet
@@ -911,7 +927,7 @@ if the buffer isn't a file, simply restart emacs."
     (lsp-restart 'auto-restart)
     )
   
-  ;;	   lsp-completion-enable-additional-text-edit nil))
+  ;;	   lsp-completion-enable-additional-text-edit nil
   
   (use-package hydra)
   (use-package lsp-ui
@@ -919,7 +935,7 @@ if the buffer isn't a file, simply restart emacs."
     (lsp-ui-doc-position 'top))
   
   (use-package lsp-java)
-  ;;  :hook (java-mode . lsp))
+  ;;  :hook (java-mode . lsp)
   (add-hook 'java-mode-hook #'lsp)
   ;;(setq lsp-java-workspace-dir
   (use-package dap-mode
@@ -932,22 +948,19 @@ if the buffer isn't a file, simply restart emacs."
   (use-package helm-lsp
     :after (lsp-mode)
     :commands (helm-lsp-workspace-symbol))
-  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
   
   ;; (use-package lsp-treemacs)
 ** step by step we strengthen our spell
 *** magit
-    #+begin_src emacs-lisp
-      (use-package magit
-	:defer t
-	)
-      ;; :init (setq magit-completing-read-function 'ivy-completing-read))
-      (use-package diff-hl)
-      (global-set-key (kbd "C-c g") 'magit-file-dispatch)
-    #+end_src
+#+begin_src emacs-lisp
+(use-package magit
+  :defer t
+  )
+(use-package diff-hl)
+(global-set-key (kbd "C-c g") 'magit-file-dispatch)
+#+end_src
 
-    #+RESULTS:
-    : magit-file-dispatch
 ** see the power of spell
 *** quickrun
 #+begin_src emacs-lisp
@@ -964,6 +977,10 @@ if the buffer isn't a file, simply restart emacs."
 
 (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
   #+END_SRC
+
+  #+RESULTS:
+  : ~/node_modules/.bin/eslint
+
 
 
 
