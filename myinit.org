@@ -1,4 +1,3 @@
-
 * FEEL the magic elements
 ** BENCHMARK
 #+begin_src emacs-lisp
@@ -13,6 +12,131 @@
 )
 
 #+end_src
+** find magic
+*** general
+#+BEGIN_SRC emacs-lisp
+(use-package info-colors 
+  :hook ('Info-selection-hook . 'info-colors-fontify-node))
+
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
+
+(use-package which-key
+  :config
+  (which-key-mode)
+  (setq which-key-idle-delay 0.6
+	which-key-idle-secondary-delay 0
+	which-key-sort-order 'which-key-prefix-then-key-order
+	))
+
+#+END_SRC
+
+*** swiper counsel
+;; (use-package swiper
+;;   :ensure try
+;;   :bind (("C-s"  . swiper))
+;;   )
+;; (use-package counsel
+;;   :bind
+;;   ("M-x"  . counsel-M-x)
+;;   ("C-x C-f"  . counsel-find-file)
+;;   :config
+;;   (progn
+;;     (ivy-mode 1)
+;;     (setq ivy-use-virtual-buffers t)
+;;     (setq ivy-display-style 'fancy))      
+;;   )
+;; (use-package ivy-rich
+;;   :init (ivy-rich-mode 1))
+
+*** consult vertico orderless
+#+begin_src emacs-lisp
+(setq enable-recursive-minibuffers t)
+
+(use-package vertico
+  :config
+  (setq vertico-count 8)
+  (face-spec-set 'vertico-current
+                 '((((background light))
+                    :background "#d8d8d8" :extend t)
+                   (t
+                    :background "#454545" :extend t))
+                 'face-defface-spec)
+  (vertico-mode))
+
+(use-package orderless
+  :config
+  (setq
+   completion-styles '(orderless)
+   completion-category-defaults nil
+   completion-category-overrides '((file (styles partial-completion)))))
+
+(global-unset-key (kbd "C-s"))
+(use-package consult
+  ;; Replace bindings. Lazily loaded due by `use-package'.
+  :bind (;; C-c bindings (mode-specific-map)
+         ("C-c h" . consult-history)
+         ("C-c m" . consult-mode-command)
+         ("C-c k" . consult-kmacro)
+         ;; C-x bindings (ctl-x-map)
+         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+         ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ;; Custom M-# bindings for fast register access
+         ;;         ("M-#" . consult-register-load)
+         ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+         ("C-M-'" . consult-register)
+         ;; Other custom bindings
+         ("M-y" . consult-yank-pop)                ;; orig. yank-pop
+         ("<help> a" . consult-apropos)            ;; orig. apropos-command
+         ;; M-g bindings (goto-map)
+         ("M-g e" . consult-compile-error)
+         ("M-g f" . consult-flymake)               ;; Alternative: consult-flycheck
+         ("M-g g" . consult-goto-line)             ;; orig. goto-line
+         ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("M-g o" . consult-outline)               ;; Alternative: consult-org-heading
+         ("M-g m" . consult-mark)
+         ("M-g k" . consult-global-mark)
+         ("M-g i" . consult-imenu)
+         ("M-g I" . consult-imenu-multi)
+         ;; C-s bindings (search-map)
+         ("C-s d" . consult-find)
+         ("C-s D" . consult-locate)
+         ("C-s g" . consult-grep)
+         ("C-s G" . consult-git-grep)
+         ("C-s r" . consult-ripgrep)
+         ("C-s l" . consult-line)
+         ("C-s L" . consult-line-multi)
+         ("C-s m" . consult-multi-occur)
+         ("C-s k" . consult-keep-lines)
+         ("C-s u" . consult-focus-lines))
+
+  :hook (completion-list-mode . consult-preview-at-point-mode)
+  :init
+  (setq register-preview-delay 0
+        register-preview-function #'consult-register-format)
+  (advice-add #'register-preview :override #'consult-register-window)
+  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+  (setq xref-show-xrefs-function #'consult-xref
+        xref-show-definitions-function #'consult-xref)
+  )
+
+(setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
+(add-hook 'minibuffer-set-up-hook #'cursor-intangible-mode)
+#+end_src
+
+#+RESULTS:
+| cursor-intangible-mode |
+
 ** outfit of magic
 #+begin_src emacs-lisp
 (toggle-frame-maximized)
@@ -49,13 +173,20 @@
       large-file-warning-threshold nil
       inhibit-compacting-font-caches t
       confirm-kill-processes nil
-      shift-select-mode nil)
+      shift-select-mode nil
+      shell-command-prompt-show-cwd 1)
 (put 'upcase-region 'disabled nil)
 (put 'downcase-region 'disabled nil)
 (put 'narrow-to-region 'disabled nil)
 (fset 'yes-or-no-p 'y-or-n-p)
 (setq process-adaptive-read-buffering nil
       read-process-output-max (* 1024 1024))
+(setq-default
+ fill-column 79
+ indent-tabs-mode nil
+ tab-width 4
+ truncate-partial-width-windows nil
+ sentence-end-double-space nil)
 
 ;; (run-with-idle-timer 500 t 'zone) this is TOO MUCH fun for human eyes
 ;; (run-with-idle-timer 30 t 'garbage-collect);; why did i manually set garbage collect rate in the first place?
@@ -70,120 +201,6 @@
 
 #+END_SRC  
 
-** Swiper
-#+BEGIN_SRC emacs-lisp
-(use-package swiper
-  :ensure try
-  :bind (("C-s"  . swiper))
-  )
-
-#+END_SRC
-** Counsel
-#+BEGIN_SRC emacs-lisp
-(use-package counsel
-  :bind
-  ("M-x"  . counsel-M-x)
-  ("C-x C-f"  . counsel-find-file)
-  :config
-  (progn
-    (ivy-mode 1)
-    (setq ivy-use-virtual-buffers t)
-    (setq ivy-display-style 'fancy))      
-)
-  #+END_SRC
-
-  #+RESULTS:
-  : counsel-find-file
-** Try
-#+BEGIN_SRC emacs-lisp
-(use-package try
-  :defer t
-  )
-
-  #+END_SRC
-** rainbow parentheses
-  #+BEGIN_SRC emacs-lisp
-    (use-package paren
-      :ensure nil
-      :hook (after-init . show-paren-mode)
-      :init (setq show-paren-when-point-inside-paren t
-		  show-paren-when-point-in-periphery t
-		  show-paren-highlight-openparen t))
-    ;; don't you think it's a little to shine?
-    (use-package rainbow-delimiters 
-      :config
-      ;; 设置每一级括号的颜色
-      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
-      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
-      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
-      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
-      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
-      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
-      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
-      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
-      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      :hook
-      ((prog-mode . rainbow-delimiters-mode)
-       (conf-mode . rainbow-delimiters-mode)
-       (shell-mode . rainbow-delimiters-mode)
-       (text-mode . rainbow-delimiters-mode)
-       (org-mode . rainbow-delimiters-mode)
-       (help-mode . rainbow-delimiters-mode)
-       ))
-
-  #+END_SRC
-
-  #+RESULTS:
-  | rainbow-delimiters-mode |
-** rainbow cursor
-    #+begin_src emacs-lisp
-     ;; we don't want the cursor vanish
-     (blink-cursor-mode -1)
-     (setq rainbow-color-list '("#FF0000";red
-				"#FF5000"
-				"#FF9F00";orange
-				"#FFFF00";yellow
-				"#BFFF00"
-				"#00FF00";green
-				"#00FFFF";
-				"#0088FF"
-				"#0000FF";blue
-				"#5F00FF"
-				"#8B00FF";purple
-				"#CF00FF"
-				"#FF0088"
-				))
-     (setq cursor-color-pointer 1)
-     (defun cursor-color-change ()
-       "Take a color from `rainbow-color-list' by the pointer.  
-     The pointer moves by +1, and restore by taking mod.  "
-       (setq cursor-color-pointer (% (1+ cursor-color-pointer)
-				     (length rainbow-color-list)))
-       (set-cursor-color (nth cursor-color-pointer
-			  rainbow-color-list)))
-     
-     (run-with-timer ()
-		     (/ .5 (length rainbow-color-list))
-		     'cursor-color-change)
-    #+end_src    
-
-    #+RESULTS:
-    : [nil 24869 1981 996153 0.038461538461538464 cursor-color-change nil nil 598000]
-
-** posframe
-#+BEGIN_SRC emacs-lisp
-  (use-package posframe)
-  
- #+END_SRC
 ** buffer
 *** startup
  #+BEGIN_SRC emacs-lisp
@@ -211,43 +228,15 @@
 
    #+RESULTS:
 
-** line 
-  #+BEGIN_SRC emacs-lisp
-    (line-number-mode nil)
-    (use-package linum-relative)
-    (setq  line-move-ignore-invisible t
-	   next-line-add-newlines t)
-    (set-default 'truncate-lines t)
-    (defun open-newline-below()
-      (interactive)
-      (end-of-line)
-      (open-line 1)
-      (call-interactively 'next-line 1)
-      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
-	  (indent-according-to-mode)
-	(beginning-of-line)))
-
-    (defun open-newline-above()
-      (interactive)
-      (beginning-of-line)
-      (open-line 1)
-      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
-	  (indent-according-to-mode)
-	(beginning-of-line)))
-
-    (global-set-key "\C-o" 'open-newline-below)
-    (global-set-key "\M-o" 'open-newline-above)
-#+END_SRC
-
-#+RESULTS:
-: open-newline-above
-
-** word
+** mark
+*** delsel
 #+begin_src emacs-lisp
-     (global-subword-mode 1)
+;; Delete selection when we type or paste.
+(use-package delsel
+  :config
+  (delete-selection-mode))
 #+end_src
-
-** visible mark
+*** visible mark
 #+begin_src emacs-lisp
 ;; should use macro
 (defface visible-mark-face1
@@ -291,13 +280,121 @@
 			   visible-mark-face5
 			   visible-mark-face6      
 			   ))
+#+end_src
 
+** line 
+  #+BEGIN_SRC emacs-lisp
+    (line-number-mode nil)
+    (use-package linum-relative)
+    (setq  line-move-ignore-invisible t
+	   next-line-add-newlines t)
+    (set-default 'truncate-lines t)
+    (defun open-newline-below()
+      (interactive)
+      (end-of-line)
+      (open-line 1)
+      (call-interactively 'next-line 1)
+      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+	  (indent-according-to-mode)
+	(beginning-of-line)))
 
+    (defun open-newline-above()
+      (interactive)
+      (beginning-of-line)
+      (open-line 1)
+      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+	  (indent-according-to-mode)
+	(beginning-of-line)))
 
-    #+end_src
+    (global-set-key "\C-o" 'open-newline-below)
+    (global-set-key "\M-o" 'open-newline-above)
+#+END_SRC
+
+#+RESULTS:
+: open-newline-above
+
+** rainbow parentheses
+  #+BEGIN_SRC emacs-lisp
+    (use-package paren
+      :ensure nil
+      :hook (after-init . show-paren-mode)
+      :init (setq show-paren-when-point-inside-paren t
+		  show-paren-when-point-in-periphery t
+		  show-paren-highlight-openparen t))
+    ;; don't you think it's a little to shine?
+    (use-package rainbow-delimiters 
+      :config
+      ;; 设置每一级括号的颜色
+      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
+      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
+      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
+      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
+      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
+      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
+      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
+      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
+      :hook
+      ((prog-mode . rainbow-delimiters-mode)
+       (conf-mode . rainbow-delimiters-mode)
+       (shell-mode . rainbow-delimiters-mode)
+       (text-mode . rainbow-delimiters-mode)
+       (org-mode . rainbow-delimiters-mode)
+       (help-mode . rainbow-delimiters-mode)
+       ))
+
+  #+END_SRC
+
+  #+RESULTS:
+  | rainbow-delimiters-mode |
+** word
+#+begin_src emacs-lisp
+     (global-subword-mode 1)
+#+end_src
+
+** rainbow cursor
+    #+begin_src emacs-lisp
+     ;; we don't want the cursor vanish
+     (blink-cursor-mode -1)
+     (setq rainbow-color-list '("#FF0000";red
+				"#FF5000"
+				"#FF9F00";orange
+				"#FFFF00";yellow
+				"#BFFF00"
+				"#00FF00";green
+				"#00FFFF";
+				"#0088FF"
+				"#0000FF";blue
+				"#5F00FF"
+				"#8B00FF";purple
+				"#CF00FF"
+				"#FF0088"
+				))
+     (setq cursor-color-pointer 1)
+     (defun cursor-color-change ()
+       "Take a color from `rainbow-color-list' by the pointer.  
+     The pointer moves by +1, and restore by taking mod.  "
+       (setq cursor-color-pointer (% (1+ cursor-color-pointer)
+				     (length rainbow-color-list)))
+       (set-cursor-color (nth cursor-color-pointer
+			  rainbow-color-list)))
+     
+     (run-with-timer ()
+		     (/ .5 (length rainbow-color-list))
+		     'cursor-color-change)
+    #+end_src    
 
     #+RESULTS:
-    | visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
+    : [nil 24869 1981 996153 0.038461538461538464 cursor-color-change nil nil 598000]
 
 ** scroll with mouse
 #+BEGIN_SRC emacs-lisp
@@ -306,7 +403,11 @@
        scroll-conservatively 101
        scroll-up-aggressively 0.01
        scroll-down-aggressively 0.01)
+;;       mouse-wheel-progressive-speed nil)
 #+END_SRC
+
+#+RESULTS:
+: 0.01
 
 ** keybinding (navigation, etc.)
 #+begin_src emacs-lisp
@@ -319,6 +420,10 @@
 (global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
 (global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
 (global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
+;;(global-set-key "\C-cl" 'org-store-link)
+(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-cb" 'org-iswitchb)
+(global-set-key "\C-cc" 'org-capture)
 
 ;; 这样的键盘布局对于人类来说为时尚早……
 ;; (defun tl/exchange-keys ()
@@ -384,6 +489,26 @@
 (auto-save-enable)
 #+END_SRC
 
+
+* prepare the truck to magic world
+** use-package
+#+begin_src emacs-lisp
+(use-package use-package)
+
+#+end_src
+** Try
+#+BEGIN_SRC emacs-lisp
+(use-package try
+  :defer t
+  )
+
+  #+END_SRC
+
+** posframe
+#+BEGIN_SRC emacs-lisp
+  (use-package posframe)
+  
+ #+END_SRC
 ** Restart Emacs
 #+BEGIN_SRC emacs-lisp
 (use-package restart-emacs
@@ -403,6 +528,12 @@ if the buffer isn't a file, simply restart emacs."
 : restart-emacs-reopen-current-file
 
 
+** youdao-dictionary
+#+begin_src emacs-lisp
+(use-package youdao-dictionary
+  :bind (("M-s" . youdao-dictionary-search-at-point+)))
+
+#+end_src
 
 * preparing our magic array
 ** ORG mode
@@ -416,16 +547,6 @@ if the buffer isn't a file, simply restart emacs."
     (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭")
 	  org-ellipsis " ▼")
   #+END_SRC
-
-**** hide block
- #+BEGIN_SRC emacs-lisp
-   ;; hide src blocks
-   (setq org-hide-block-startup t)
-
- #+END_SRC
-
- #+RESULTS:
- : t
 
 **** table font
   (let ((emacs-font-size 14)
@@ -444,79 +565,66 @@ if the buffer isn't a file, simply restart emacs."
     (add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
 **** cycle
  #+BEGIN_SRC emacs-lisp
-   (setq org-cycle-emulate-tab t
-	 org-cycle-global-at-bob t
-	 )
+(setq org-cycle-emulate-tab t
+  org-cycle-global-at-bob t
+  )
 
 (require 'org-tempo)
 
  #+END_SRC
 
 *** agenda
-     #+begin_src emacs-lisp
-       (setq-default org-agenda-include-diary nil)
-     #+end_src
+#+begin_src emacs-lisp
+(setq-default org-agenda-include-diary nil)
+#+end_src
 *** export
+#+BEGIN_SRC emacs-lisp
+;; (use-package ox-reveal
+;;   :commands (org-reveal)
+;;   :init
+;;   (add-hook 'after-init-hook #'org-reveal)
+;;   :config
+;;   (setq org-reveal-root "~/.reveal.js"
+;;    org-reveal-theme "moon"
+;;    org-reveal-plugins '(classList markdown zoom notes)
+;;    ))
 
+(setq org-export-headline-levels 1
+      org-export-with-broken-links 'mark
+      org-export-with-section-numbers nil
+      org-html-checkbox-type 'html
+      org-html-doctype "html5"
+      org-html-html5-fancy t)
 
- #+BEGIN_SRC emacs-lisp
-   ;; (use-package ox-reveal
-   ;;   :commands (org-reveal)
-   ;;   :init
-   ;;   (add-hook 'after-init-hook #'org-reveal)
-   ;;   :config
-   ;;   (setq org-reveal-root "~/.reveal.js"
-   ;;    org-reveal-theme "moon"
-   ;;    org-reveal-plugins '(classList markdown zoom notes)
-   ;;    ))
-   
-   (setq org-export-headline-levels 1
-	 org-export-with-broken-links 'mark
-	 org-export-with-section-numbers nil
-	 org-html-checkbox-type 'html
-	 org-html-doctype "html5"
-	 org-html-html5-fancy t)
-   
-   ;; colors for blocks
-   (use-package htmlize
-     :defer t
-     )
+;; colors for blocks
+(use-package htmlize
+  :defer t
+  )
  #+END_SRC
 
  #+RESULTS:
 *** babel
- #+BEGIN_SRC emacs-lisp
- (setq org-edit-src-content-indentation 0)
- (org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t)
-    (C . t)
-    (java . t)
-    (js . t)
-    (ruby . t)
-    (ditaa . t)
-    (python . t)
-    (shell . t)
-    (latex . t)
-    (plantuml . t)
-    (R . t)))
+#+BEGIN_SRC emacs-lisp
+(setq org-edit-src-content-indentation 0)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (C . t)
+   (java . t)
+   (js . t)
+   (ruby . t)
+   (ditaa . t)
+   (python . t)
+   (shell . t)
+   (latex . t)
+   (plantuml . t)
+   (R . t)))
  #+END_SRC
 
-*** keybinds
-  #+BEGIN_SRC emacs-lisp
-;;    (global-set-key "\C-cl" 'org-store-link)
-    (global-set-key "\C-ca" 'org-agenda)
-    (global-set-key "\C-cb" 'org-iswitchb)
-    (global-set-key "\C-cc" 'org-capture)
-  #+END_SRC
-
-  #+RESULTS:
-  : org-capture
-  
 *** mouse
-     #+begin_src emacs-lisp
-       (setq org-mouse-features '(activate-checkboxes))
-     #+end_src
+#+begin_src emacs-lisp
+(setq org-mouse-features '(activate-checkboxes))
+#+end_src
 ** project and file's magic
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
@@ -530,32 +638,26 @@ if the buffer isn't a file, simply restart emacs."
   (setq projectile-switch-project-action #'projectile-dired)
   )
 
-(use-package counsel-projectile
-  :config (counsel-projectile-mode))
-
 (use-package ripgrep
   :defer t)
 
-  #+END_SRC
-
-  #+RESULTS:
-  : t
+#+END_SRC
 
 ** cc mode
 #+begin_src emacs-lisp
 (use-package cc-mode)
 (add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
 
-(define-key c-mode-base-map "\C-m" 'c-context-line-break)
+;;(define-key c-mode-base-map "\C-m" 'c-context-line-break)
 
    #+end_src
 
    #+RESULTS:
 ** python
-  (use-package lsp-pyright
-    :hook (python-mode . (lambda ()
-			   (require 'lsp-pyright)
-			   (lsp-deferred))))
+  # (use-package lsp-pyright
+  #   :hook (python-mode . (lambda ()
+  #   		   (require 'lsp-pyright)
+  #   		   (lsp-deferred))))
 
 ** other modes
 #+begin_src emacs-lisp
@@ -606,17 +708,7 @@ if the buffer isn't a file, simply restart emacs."
 #+RESULTS:
 : t
 
-** shell
-#+begin_src emacs-lisp
-(setq shell-command-prompt-show-cwd 1)
-#+end_src
-** youdao-dictionary
-#+begin_src emacs-lisp
-(use-package youdao-dictionary
-  :bind (("M-s" . youdao-dictionary-search-at-point+)))
-
-#+end_src
-** game and zone
+** games
 #+begin_src emacs-lisp
 (use-package figlet
   :defer t)
@@ -636,76 +728,25 @@ if the buffer isn't a file, simply restart emacs."
 * casting magic
 ** our loyal assistent carrying all our books
 #+begin_src emacs-lisp
-(use-package info-colors 
-  :hook ('Info-selection-hook . 'info-colors-fontify-node))
-
-(use-package ivy-rich
-  :init (ivy-rich-mode 1))
-
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
-
-(use-package which-key
-  :config (which-key-mode)
+(use-package dumb-jump
   )
-  #+END_SRC
 
+(use-package xref
+  )
+
+(use-package marginalia
+  :config
+  (marginalia-mode))
+
+;; persist history over emacs restarts.
+(use-package savehist
+  :init (savehist-mode))
+
+
+;; (add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
+;; (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
 #+end_src
 
-** composing our chanting
-*** lsp 鬼才用lsp
-  (use-package yasnippet
-    :config (yas-global-mode))
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook ((lsp-mode . lsp-enable-which-key-integration)
-	   (java-mode . #'lsp-deferred))
-    :init (setq lsp-keymap-prefix "C-c l"
-		lsp-enable-file-watchers nil
-		read-process-output-max (* 100 1024 1024) ;100 mb
-		lsp-completion-provider :capf
-		lsp-enable-indentation nil
-		lsp-enable-on-type-formatting nil
-		)
-    :config (setq lsp-intelephense-multi-root nil)
-    ;;  (with-eval-after-load 'lsp-intelephense
-    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
-    :custom
-    (lsp-headerline-breadcrumb-enable nil)
-    (lsp-restart 'auto-restart)
-    )
-  
-  ;;	   lsp-completion-enable-additional-text-edit nil))
-  
-  (use-package hydra)
-  (use-package lsp-ui
-    :custom
-    (lsp-ui-doc-position 'top))
-  
-  (use-package lsp-java)
-  ;;  :hook (java-mode . lsp))
-  (add-hook 'java-mode-hook #'lsp)
-  ;;(setq lsp-java-workspace-dir
-  (use-package dap-mode
-    :after lsp-mode
-    :config (dap-auto-configure-mode))
-  (use-package dap-java
-    :ensure nil)
-  (use-package helm)
-  ;;    :config (helm-mode))
-  (use-package helm-lsp
-    :after (lsp-mode)
-    :commands (helm-lsp-workspace-symbol))
-  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
-  
-  ;; (use-package lsp-treemacs)
 ** choosing your lyrics
 *** Company
   (use-package company
@@ -752,10 +793,6 @@ if the buffer isn't a file, simply restart emacs."
   ;; `:separate`  使得不同 backend 分开排序
   (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
   
-  
-  
-  
-  
   ;; The free version of TabNine is good enough,
   ;; and below code is recommended that TabNine not always
   ;; prompt me to purchase a paid version in a large project.
@@ -765,20 +802,139 @@ if the buffer isn't a file, simply restart emacs."
 		 (stringp (funcall company-message-func)))
 	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
 	  ad-do-it))))
-*** show definition
+*** corfu
 #+begin_src emacs-lisp
-(use-package dumb-jump
-  :defer t
+(use-package corfu
+  ;; TAB-and-Go customizations
+  :custom
+  (corfu-auto t)
+  (corfu-quit-at-boundary t)
+  (corfu-cycle t)             ;; Enable cycling for `corfu-next/previous'
+  (corfu-preselect-first nil) ;; Disable candidate preselection
+  (corfu-auto-prefix 1)
+  (corfu-auto-delay 0.01)
+  ;; Use TAB for cycling, default is `corfu-complete'.
+  :bind
+  (:map corfu-map
+        ("TAB" . corfu-next)
+        ([tab] . corfu-next)
+        ("S-TAB" . corfu-previous)
+        ([backtab] . corfu-previous))
+
+  :init
+  (corfu-global-mode))
+
+;; Use dabbrev with Corfu!
+(use-package dabbrev
+  ;; Swap M-/ and C-M-/
+  :bind (("M-/" . dabbrev-completion)
+         ("C-M-/" . dabbrev-expand)))
+
+(defun corfu-enable-in-minibuffer ()
+  "Enable Corfu in the minibuffer if `completion-at-point' is bound."
+  (when (where-is-internal #'completion-at-point (list (current-local-map)))
+    ;; (setq-local corfu-auto nil) Enable/disable auto completion
+    (corfu-mode 1)))
+(add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
+
+
+#+end_src
+
+#+RESULTS:
+| corfu-enable-in-minibuffer | savehist-minibuffer-hook | marginalia--minibuffer-setup | rfn-eshadow-setup-minibuffer | minibuffer-error-initialize | minibuffer-history-isearch-setup | minibuffer-history-initialize |
+*** backends
+#+begin_src emacs-lisp
+(use-package cape
+  :init
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-tex)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
+  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
+  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
+  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
+  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
+  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
+  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+)
+
+#+end_src
+
+#+RESULTS:
+
+** composing our chanting
+*** citre
+#+begin_src emacs-lisp
+(use-package citre
+  :init (require 'citre-config)
+  (global-set-key (kbd "M-.") 'citre-jump)
+  (global-set-key (kbd "C-M-.") 'citre-jump-back)
+  (global-set-key (kbd "M-,") 'citre-ace-peek)
+;;  (global-set-key (kbd "M-.") 'citre-update-this-tags-file)
+  :config
+  (setq
+   citre-project-root-function #'projectile-project-root
+   citre-default-create-tags-file-location 'global-cache
+   citre-use-project-root-when-creating-tags t
+   citre-prompt-language-for-ctags-command t
+   )
   )
-
-(use-package xref
-  :defer t
-  )
-(add-hook 'xref-backend-functions #'dumb-jump-xref-activate)
-(setq xref-show-definitions-function #'xref-show-definitions-completing-read)
-    #+end_src
+   
+  
 
 
+#+end_src
+
+#+RESULTS:
+: t
+
+*** lsp 鬼才用lsp
+  (use-package yasnippet
+    :config (yas-global-mode))
+  (use-package lsp-mode
+    :commands (lsp lsp-deferred)
+    :hook ((lsp-mode . lsp-enable-which-key-integration)
+	   (java-mode . #'lsp-deferred))
+    :init (setq lsp-keymap-prefix "C-c l"
+		lsp-enable-file-watchers nil
+		read-process-output-max (* 100 1024 1024) ;100 mb
+		lsp-completion-provider :capf
+		lsp-enable-indentation nil
+		lsp-enable-on-type-formatting nil
+		)
+    :config (setq lsp-intelephense-multi-root nil)
+    ;;  (with-eval-after-load 'lsp-intelephense
+    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
+    :custom
+    (lsp-headerline-breadcrumb-enable nil)
+    (lsp-restart 'auto-restart)
+    )
+  
+  ;;	   lsp-completion-enable-additional-text-edit nil))
+  
+  (use-package hydra)
+  (use-package lsp-ui
+    :custom
+    (lsp-ui-doc-position 'top))
+  
+  (use-package lsp-java)
+  ;;  :hook (java-mode . lsp))
+  (add-hook 'java-mode-hook #'lsp)
+  ;;(setq lsp-java-workspace-dir
+  (use-package dap-mode
+    :after lsp-mode
+    :config (dap-auto-configure-mode))
+  (use-package dap-java
+    :ensure nil)
+  (use-package helm)
+  ;;    :config (helm-mode))
+  (use-package helm-lsp
+    :after (lsp-mode)
+    :commands (helm-lsp-workspace-symbol))
+  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol))
+  
+  ;; (use-package lsp-treemacs)
 ** step by step we strengthen our spell
 *** magit
     #+begin_src emacs-lisp
@@ -809,6 +965,5 @@ if the buffer isn't a file, simply restart emacs."
 (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
   #+END_SRC
 
-  #+RESULTS:
-  : ~/node_modules/.bin/eslint
+
 
