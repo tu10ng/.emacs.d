@@ -1,43 +1,28 @@
-
-
-
 ;; startup adjustments
 (setq debug-on-error t
       gc-cons-threshold (* 512 1024 1024)
       inhibit-compacting-font-caches t)
-
-
-
 ;; Bootstrap config
 (require 'package)
 (setq package-enable-at-startup nil
       use-package-always-ensure t
       use-pfackage-expand-minimally t
       use-package-enable-imenu-support t)
-
 (setq package-archives
       '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
 	("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
 (package-initialize)
-
 ;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
 
+(set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
+(set-fontset-font t 'han "黑体:pixelsize=20")
+
 ;; Bootstrap
 (org-babel-load-file "~/.emacs.d/myinit.org")
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -74,7 +59,68 @@
 %?" :tree-type week)))
  '(org-confirm-babel-evaluate nil)
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
+ '(org-speed-commands
+   '(("Outline Navigation")
+     ("n" org-speed-move-safe 'org-next-visible-heading)
+     ("p" org-speed-move-safe 'org-previous-visible-heading)
+     ("f" org-speed-move-safe 'org-forward-heading-same-level)
+     ("b" org-speed-move-safe 'org-backward-heading-same-level)
+     ("F" . org-next-block)
+     ("B" . org-previous-block)
+     ("j" . org-goto)
+     ("g" org-refile
+      '(4))
+     ("Outline Visibility")
+     ("c" . org-cycle)
+     ("C" . org-shifttab)
+     (" " . org-display-outline-path)
+     ("s" . org-toggle-narrow-to-subtree)
+     ("k" . org-cut-subtree)
+     ("=" . org-columns)
+     ("Outline Structure Editing")
+     ("u" . org-metaup)
+     ("d" . org-metadown)
+     ("r" . org-metaright)
+     ("l" . org-metaleft)
+     ("R" . org-shiftmetaright)
+     ("L" . org-shiftmetaleft)
+     ("i" progn
+      (forward-char 1)
+      (call-interactively 'org-insert-heading-respect-content))
+     ("^" . org-sort)
+     ("w" . org-refile)
+     ("v" . org-archive-subtree-default-with-confirmation)
+     ("@" . org-mark-subtree)
+     ("#" . org-toggle-comment)
+     ("Clock Commands")
+     ("I" . org-clock-in)
+     ("O" . org-clock-out)
+     ("Meta Data Editing")
+     ("t" . org-todo)
+     ("," org-priority)
+     ("0" org-priority 32)
+     ("1" org-priority 65)
+     ("2" org-priority 66)
+     ("3" org-priority 67)
+     (":" . org-set-tags-command)
+     ("e" . org-set-effort)
+     ("E" . org-inc-effort)
+     ("W" lambda
+      (m)
+      (interactive "sMinutes before warning: ")
+      (org-entry-put
+       (point)
+       "APPT_WARNTIME" m))
+     ("Agenda Views etc")
+     ("a" . org-agenda)
+     ("/" . org-sparse-tree)
+     ("Misc")
+     ("o" . org-open-at-point)
+     ("?" . org-speed-command-help)
+     ("<" org-agenda-set-restriction-lock 'subtree)
+     (">" org-agenda-remove-restriction-lock)))
  '(org-startup-truncated nil)
+ '(org-use-speed-commands t)
  '(package-selected-packages
    '(php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(show-paren-mode t)
@@ -97,9 +143,3 @@
 
 ;; (set-font "Source Code Pro" "黑体" 20 17)
 
-(set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
-(set-fontset-font t 'han "黑体:pixelsize=20")
-
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
-(put 'narrow-to-region 'disabled nil)
