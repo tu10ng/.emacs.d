@@ -103,7 +103,7 @@ if the buffer isn't a file, simply restart emacs."
   :bind (("M-s" . youdao-dictionary-search-at-point+)))
 #+end_src
 
-** TODO misc
+** misc
 #+begin_src emacs-lisp
 (setq garbage-collection-messages t
       large-file-warning-threshold nil
@@ -568,6 +568,82 @@ The pointer moves by +1, and restore by taking mod.  "
 
 * RECALL the structure of our magic array
 ** ORG mode
+
+*** org
+#+begin_src emacs-lisp
+(use-package org
+  :hook (org-mode . visual-line-mode)
+  :custom
+  (org-directory "~/org/")
+  (org-default-notes-file (expand-file-name "notes.org" org-directory))
+  ;; prettify
+  (org-startup-indented t)
+  (org-fontify-todo-headline t)
+  (org-fontify-done-headline t)
+  (org-fontify-whole-heading-line t)
+  (org-fontify-quote-and-verse-blocks t)
+  (org-list-demote-modify-bullet '(("+" . "-") ("1." . "a.") ("-" . "+")))
+  ;; image
+  (org-image-actual-width nil)
+  (org-display-remote-inline-images 'cache)
+  ;; more user-friendly
+  (org-clone-delete-id t)
+  (org-use-sub-superscripts '{})
+  (org-yank-adjusted-subtrees t)
+  (org-catch-invisible-edits 'smart)
+  (org-insert-heading-respect-content t)
+  ;; call C-c C-o explicitly
+  (org-return-follows-link nil)
+  ;; todo
+  (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
+                       (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
+  (org-todo-keyword-faces '(("TODO"       :foreground "#7c7c75" :weight bold)
+                            ("HOLD"       :foreground "#feb24c" :weight bold)
+                            ("WIP"        :foreground "#0098dd" :weight bold)
+                            ("WAIT"       :foreground "#9f7efe" :weight bold)
+                            ("DONE"       :foreground "#50a14f" :weight bold)
+                            ("CANCELLED"  :foreground "#ff6480" :weight bold)
+                            ("REPORT"     :foreground "magenta" :weight bold)
+                            ("BUG"        :foreground "red"     :weight bold)
+                            ("KNOWNCAUSE" :foreground "yellow"  :weight bold)
+                            ("FIXED"      :foreground "green"   :weight bold)))
+  (org-use-fast-todo-selection 'auto)   ;expert
+  (org-enforce-todo-dependencies t)
+  (org-enforce-todo-checkbox-dependencies t)
+  (org-priority-faces '((?A :foreground "red")
+                        (?B :foreground "orange")
+                        (?C :foreground "yellow")))
+  (org-global-properties '(("EFFORT_ALL" . "0:15 0:30 0:45 1:00 2:00 3:00 4:00 5:00 6:00 7:00 8:00")
+                           ("APPT_WARNTIME_ALL" . "0 5 10 15 20 25 30 45 60")
+                           ("STYLE_ALL" . "habit")))
+  (org-columns-default-format "%25ITEM %TODO %SCHEDULED %DEADLINE %3PRIORITY %TAGS %CLOCKSUM %EFFORT{:}")
+  ;; Remove CLOSED: [timestamp] after switching to non-DONE states
+  (org-closed-keep-when-no-todo t)      ;wt
+  ;; log
+  (org-log-repeat 'time)
+  (org-log-into-drawer t)
+  ;; tags, e.g. #+TAGS: keyword in your file
+  (org-use-tag-inheritance nil)
+  ;; (org-use-fast-tag-selection t)        ;wt
+  ;; (org-fast-tag-selection-single-key t)
+  ;; archive
+  ;; (org-archive-location "%s_archive::datetree/")
+  ;; id
+  ;; (org-id-link-to-org-use-id 'create-if-interactive-and-no-custom-id)
+  ;; abbreviation for url
+  (org-link-abbrev-alist '(("GitHub" . "https://github.com/") ;wt
+                           ("GitLab" . "https://gitlab.com/")
+                           ("Google" . "https://google.com/search?q=")
+                           ("RFCs"   . "https://tools.ietf.org/html/")
+                           ("LWN"    . "https://lwn.net/Articles/")
+                           ("WG21"   . "https://wg21.link/"))))
+
+
+#+end_src
+
+#+RESULTS:
+| visual-line-mode | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-tempo-setup | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+
 *** outfit
 **** org bullets
 #+BEGIN_SRC emacs-lisp
@@ -606,8 +682,21 @@ The pointer moves by +1, and restore by taking mod.  "
 
 *** agenda
 #+begin_src emacs-lisp
-(setq-default org-agenda-include-diary nil)
+(setq org-agenda-include-diary nil)
+  ;; (org-agenda-files (list (expand-file-name "tasks.org" org-directory)))
+  ;; (org-agenda-diary-file (expand-file-name "diary.org" org-directory))
+  ;; (org-agenda-insert-diary-extract-time t)
+  ;; (org-agenda-inhibit-startup t)
+  ;; (org-agenda-time-leading-zero t)
+  ;; (org-agenda-remove-tags t)
+  ;; (org-agenda-columns-add-appointments-to-effort-sum t)
+  ;; (org-agenda-restore-windows-after-quit t)
+  ;; (org-agenda-window-setup 'current-window)
+  
 #+end_src
+
+#+RESULTS:
+
 *** export
 #+BEGIN_SRC emacs-lisp
 ;; (use-package ox-reveal
@@ -634,23 +723,22 @@ The pointer moves by +1, and restore by taking mod.  "
  #+END_SRC
 
  #+RESULTS:
-*** babel
+*** org-src
 #+BEGIN_SRC emacs-lisp
-(setq org-edit-src-content-indentation 0)
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((emacs-lisp . t)
-   (C . t)
-   (java . t)
-   (js . t)
-   (ruby . t)
-   (ditaa . t)
-   (python . t)
-   (shell . t)
-   (latex . t)
-   (plantuml . t)
-   (R . t)))
+(define-key org-src-mode-map "\C-c\C-c" 'org-edit-src-exit)
+(setq org-edit-src-content-indentation 0
+      org-confirm-babel-evaluate nil)
+(org-babel-do-load-languages 'org-babel-load-languages
+                             '((emacs-lisp . t)
+                               (C          . t)
+                               (python     . t)
+                               (shell      . t)
+                               (latex      . t)
+                               (dot        . t)
+                               ))
  #+END_SRC
+
+ #+RESULTS:
 
 *** mouse
 #+begin_src emacs-lisp
@@ -800,61 +888,91 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** choosing your lyrics
 *** Company
-  (use-package company
-    :after lsp-mode
-    :bind
-    (:map company-active-map
-	  ("<tab>" . company-complete-selection)
-	  ("C-j" .  company-complete-selection))
-    (:map lsp-mode-map
-	  ("<tab>" . company-indent-or-complete-common))
-    :custom
-    (company-minimum-prefix-length 1)
-    (company-idle-delay 0)
-    )
-  (add-hook 'after-init-hook 'global-company-mode)
-  ;; (setq company-show-numbers t)
-  
-  (use-package company-tabnine
-    )
-  ;;(add-to-list 'company-backends #'company-tabnine)
-  
+#+begin_src emacs-lisp
+(use-package company
+  :hook (prog-mode . company-mode)
+  :bind (:map company-mode-map
+              ([remap completion-at-point] . company-complete)
+              :map company-active-map
+              ([tab]     . company-complete-common-or-cycle)
+              ([backtab] . company-select-previous-or-abort)) ;maybe unbind C-n?
+  :config
+  (define-advice company-capf--candidates (:around (func &rest args))
+    "Try default completion styles."
+    (let ((completion-styles '(basic partial-completion)))
+      (apply func args)))
+  :custom
+  (company-idle-delay 0)
+  ;; Easy navigation to candidates with M-<n>
+  (company-show-quick-access t)
+  (company-require-match nil)
+  (company-minimum-prefix-length 1)
+  (company-tooltip-width-grow-only t)
+  (company-tooltip-align-annotations t)
+  ;; complete `abbrev' only in current buffer and make dabbrev case-sensitive
+  (company-dabbrev-other-buffers nil)
+  (company-dabbrev-ignore-case nil)
+  (company-dabbrev-downcase nil)
+  ;; make dabbrev-code case-sensitive
+  (company-dabbrev-code-ignore-case nil)
+  (company-dabbrev-code-everywhere t)
+  ;; call `tempo-expand-if-complete' after completion
+  (company-tempo-expand t)
+  ;; Ignore uninteresting files. Items end with a slash are recognized as
+  ;; directories.
+  (company-files-exclusions '(".git/" ".DS_Store"))
+  ;; No icons
+  (company-format-margin-function nil)
+  (company-backends '((company-capf :with company-tempo)
+                      company-files
+                      (company-dabbrev-code company-keywords)
+                      company-dabbrev
+                      ;; HACK: prevent `lsp-mode' to add `company-capf' back.
+                      company-capf)))
+
+(use-package company-tabnine
+  :config
   (defun company//sort-by-tabnine (candidates)
     (if (or (functionp company-backend)
-	    (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-	candidates
+	        (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+        candidates
       (let ((candidates-table (make-hash-table :test #'equal))
-	    candidates-1
-	    candidates-2)
-	(dolist (candidate candidates)
-	  (if (eq (get-text-property 0 'company-backend candidate)
-		  'company-tabnine)
-	      (unless (gethash candidate candidates-table)
-		(push candidate candidates-2))
-	    (push candidate candidates-1)
-	    (puthash candidate t candidates-table)))
-	(setq candidates-1 (nreverse candidates-1))
-	(setq candidates-2 (nreverse candidates-2))
-	(nconc (seq-take candidates-1 1)	; number of items tabnine shows
-	       (seq-take candidates-2 1)
-	       (seq-drop candidates-1 1)
-	       (seq-drop candidates-2 1)))))
-  
+	        candidates-1
+	        candidates-2)
+        (dolist (candidate candidates)
+	      (if (eq (get-text-property 0 'company-backend candidate)
+		          'company-tabnine)
+	          (unless (gethash candidate candidates-table)
+	            (push candidate candidates-2))
+	        (push candidate candidates-1)
+	        (puthash candidate t candidates-table)))
+        (setq candidates-1 (nreverse candidates-1))
+        (setq candidates-2 (nreverse candidates-2))
+        (nconc (seq-take candidates-1 1)	; number of items tabnine shows
+	           (seq-take candidates-2 1)
+	           (seq-drop candidates-1 1)
+	           (seq-drop candidates-2 1)))))
+
   (add-to-list 'company-transformers 'company//sort-by-tabnine t)
   ;; `:separate`  使得不同 backend 分开排序
   (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
-  
+
   ;; The free version of TabNine is good enough,
   ;; and below code is recommended that TabNine not always
   ;; prompt me to purchase a paid version in a large project.
   (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
     (let ((company-message-func (ad-get-arg 0)))
       (when (and company-message-func
-		 (stringp (funcall company-message-func)))
-	(unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-	  ad-do-it))))
+	             (stringp (funcall company-message-func)))
+        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+	      ad-do-it))))
+  )
+
+
+
+#+end_src
+
 *** corfu
-#+begin_src emacs-lisp
 (use-package corfu
   ;; TAB-and-Go customizations
   :custom
@@ -888,13 +1006,7 @@ The pointer moves by +1, and restore by taking mod.  "
     (corfu-mode 1)))
 (add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
 
-
-#+end_src
-
-#+RESULTS:
-| corfu-enable-in-minibuffer | savehist-minibuffer-hook | marginalia--minibuffer-setup | rfn-eshadow-setup-minibuffer | minibuffer-error-initialize | minibuffer-history-isearch-setup | minibuffer-history-initialize |
 *** backends
-#+begin_src emacs-lisp
 (use-package cape
   :init
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -910,12 +1022,36 @@ The pointer moves by +1, and restore by taking mod.  "
   (add-to-list 'completion-at-point-functions #'cape-line)
 )
 
-#+end_src
-
-#+RESULTS:
-
 ** composing our chanting
 #+begin_src emacs-lisp
+;; lsp-mode
+(use-package lsp-mode
+  :ensure t
+  :hook (prog-mode . lsp-deferred)
+  :bind (:map lsp-mode-map
+         ("C-c f" . lsp-format-region)
+         ("C-c d" . lsp-describe-thing-at-point)
+         ("C-c a" . lsp-execute-code-action)
+         ("C-c r" . lsp-rename))
+  :custom
+  (lsp-keymap-prefix "C-c l")
+  (lsp-enable-links nil)                 ;; no clickable links
+  (lsp-enable-folding nil)               ;; use `hideshow' instead
+  (lsp-enable-snippet nil)               ;; no snippets, it requires `yasnippet'
+  (lsp-enable-file-watchers nil)         ;; performance matters
+  (lsp-enable-text-document-color nil)   ;; as above
+  (lsp-enable-symbol-highlighting nil)   ;; as above
+  (lsp-enable-on-type-formatting nil)    ;; as above
+  (lsp-enable-indentation nil)           ;; don't change my code without my permission
+  (lsp-headerline-breadcrumb-enable nil) ;; keep headline clean
+  (lsp-modeline-code-actions-enable nil) ;; keep modeline clean
+  (lsp-modeline-diagnostics-enable nil)  ;; as above
+  (lsp-log-io nil)                       ;; debug only
+  (lsp-auto-guess-root t)                ;; auto guess root
+  (lsp-keep-workspace-alive nil)         ;; auto kill lsp server
+  (lsp-eldoc-enable-hover nil))          ;; disable eldoc hover
+
+
 #+end_src
 
 ** step by step we strengthen our spell
@@ -1010,7 +1146,6 @@ The pointer moves by +1, and restore by taking mod.  "
 #+RESULTS:
 | colorize-compilation-buffer |
 
-
 *** quickrun
 #+begin_src emacs-lisp
 (use-package quickrun
@@ -1027,13 +1162,16 @@ The pointer moves by +1, and restore by taking mod.  "
   :custom
   (flycheck-temp-prefix ".flycheck")
   (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-indication-mode 'right-fringe)
+  (flycheck-indication-mode 'left-fringe)
   (flycheck-idle-change-delay 3)
   )
   #+END_SRC
 
   #+RESULTS:
-  | flycheck-mode | spdx-tempo-setup | rainbow-delimiters-mode |
+  | flycheck-mode | lsp-deferred | company-mode | spdx-tempo-setup | rainbow-delimiters-mode |
+
+
+
 
 
 
