@@ -2,8 +2,9 @@
 * FEEL the magic elements
 ** BENCHMARK
 #+begin_src emacs-lisp
-  (use-package benchmark-init)
-  (benchmark-init/activate)
+;; in GNU Emacs 29.0.50, a function used by benchmark turn it's required arguments from 2 to 3, thus need manually change the package source.
+(use-package benchmark-init)
+(benchmark-init/activate)
 #+end_src
 
 ** native compilation
@@ -160,28 +161,64 @@
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (setq awesome-tray-active-modules
-      '("mode-name" "buffer-name" "parent-dir"
-	"battery"
-	"date" 
-	))
+      '("location" "mode-name" "buffer-name" "parent-dir"
+        "circe" "buffer-read-only"
+	    "date" 
+	    ))
 (awesome-tray-mode 1)
 
 #+END_SRC
 
 ** misc
 #+begin_src emacs-lisp
-(setq garbage-collection-messages nil
+(setq garbage-collection-messages t
       large-file-warning-threshold nil
-      inhibit-compacting-font-caches t
       confirm-kill-processes nil
       shift-select-mode nil
       shell-command-prompt-show-cwd 1)
-(put 'upcase-region 'disabled nil)
-(put 'downcase-region 'disabled nil)
+
+(setq initial-scratch-message nil
+      initial-buffer-choice nil)
+(setq inhibit-startup-screen t
+      inhibit-startup-message t
+      inhibit-startup-buffer-menu t)
+(defun startup-echo-area-message ()
+  (if (daemonp)
+      ""
+    (substitute-command-keys
+     "")))
+
+(setq window-resize-pixelwise t
+      frame-resize-pixelwise t)
+
+(setq create-lockfiles nil
+      load-prefer-newer t)
+
+(setq inhibit-compacting-font-caches t)
+
+(set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
+(set-fontset-font t 'han "黑体:pixelsize=20")
+
+(setq display-raw-bytes-as-hex t
+      redisplay-skip-fontification-on-input t)
+
+(setq use-short-answers t)
+
+(fset 'list-buffers 'ibuffer)
+
+(setq y-or-n-p-use-read-key t
+      read-char-choice-use-read-key t)
+
+
+(setq initial-major-mode 'org-mode)
+(put 'upcase-region    'disabled nil)
+(put 'downcase-region  'disabled nil)
+(put 'narrow-to-defun  'disabled nil)
+(put 'narrow-to-page   'disabled nil)
 (put 'narrow-to-region 'disabled nil)
-(fset 'yes-or-no-p 'y-or-n-p)
+
 (setq process-adaptive-read-buffering nil
-      read-process-output-max (* 1024 1024))
+      read-process-output-max (* 10 1024 1024))
 (setq-default
  fill-column 79
  indent-tabs-mode nil
@@ -189,16 +226,10 @@
  truncate-partial-width-windows nil
  sentence-end-double-space nil)
 
-;; (run-with-idle-timer 500 t 'zone) this is TOO MUCH fun for human eyes
-;; (run-with-idle-timer 30 t 'garbage-collect);; why did i manually set garbage collect rate in the first place?
-
 (setq ring-bell-function 'ignore)
-(setq inhibit-startup-message t)
-(defun startup-echo-area-message ()
-  (if (daemonp)
-      ""
-    (substitute-command-keys
-     "")))
+
+(global-subword-mode 1)
+
 
 #+END_SRC  
 
@@ -210,35 +241,6 @@
 ;; (use-package dirvish)
 
 #+end_src
-
-#+RESULTS:
-
-** buffer
-*** startup
- #+BEGIN_SRC emacs-lisp
-   (setq initial-scratch-message nil)
-   (setq initial-buffer-choice nil
-	 inhibit-startup-screen t)
-   (setq initial-major-mode 'org-mode)   
- #+END_SRC
-
- #+RESULTS:
-*** delete
-  #+BEGIN_SRC emacs-lisp
-(setq delete-by-moving-to-trash t)
-  #+END_SRC
-*** zone
-   #+begin_src emacs-lisp
-     ;; (setq idle-play-function '(zone)
-     ;;       idle-play-time 500
-     ;;       n 0)
-     ;; (while (< n (length idle-play-function))
-     ;;   (run-with-idle-timer idle-play-time t (nth n idle-play-function))
-     ;;   (setq n (1+ n)))
-     ;; (setq n 0)
-   #+end_src
-
-   #+RESULTS:
 
 ** mark
 *** delsel
@@ -294,145 +296,133 @@
 			               ))
 #+end_src
 
-#+RESULTS:
-| visible-mark-face1 | visible-mark-face2 | visible-mark-face3 | visible-mark-face4 | visible-mark-face5 | visible-mark-face6 |
-
 ** line 
-  #+BEGIN_SRC emacs-lisp
-    (line-number-mode nil)
-    (use-package linum-relative)
-    (setq  line-move-ignore-invisible t
-	   next-line-add-newlines t)
-    (set-default 'truncate-lines t)
-    (defun open-newline-below()
-      (interactive)
-      (end-of-line)
-      (open-line 1)
-      (call-interactively 'next-line 1)
-      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
-	  (indent-according-to-mode)
-	(beginning-of-line)))
+#+BEGIN_SRC emacs-lisp
+(line-number-mode nil)
+;; (use-package linum-relative
+;;   :custom
+;;   (linum-relative-current-symbol "") 
+;;   (linum-relative-global-mode t))
+(setq  line-move-ignore-invisible t
+       next-line-add-newlines t)
+(set-default 'truncate-lines t)
 
-    (defun open-newline-above()
-      (interactive)
-      (beginning-of-line)
-      (open-line 1)
-      (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
-	  (indent-according-to-mode)
-	(beginning-of-line)))
+(defun open-newline-below()
+  (interactive)
+  (end-of-line)
+  (open-line 1)
+  (call-interactively 'next-line 1)
+  (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+      (indent-according-to-mode)
+    (beginning-of-line)))
 
-    (global-set-key "\C-o" 'open-newline-below)
-    (global-set-key "\M-o" 'open-newline-above)
+(defun open-newline-above()
+  (interactive)
+  (beginning-of-line)
+  (open-line 1)
+  (if (not (member major-mode '(haskell-mode org-mode literate-haskell-mode)))
+      (indent-according-to-mode)
+    (beginning-of-line)))
+
+(global-set-key "\C-o" 'open-newline-below)
+(global-set-key "\M-o" 'open-newline-above)
 #+END_SRC
-
-#+RESULTS:
-: open-newline-above
 
 ** rainbow parentheses
-  #+BEGIN_SRC emacs-lisp
-    (use-package paren
-      :ensure nil
-      :hook (after-init . show-paren-mode)
-      :init (setq show-paren-when-point-inside-paren t
-		  show-paren-when-point-in-periphery t
-		  show-paren-highlight-openparen t))
-    ;; don't you think it's a little to shine?
-    (use-package rainbow-delimiters 
-      :config
-      ;; 设置每一级括号的颜色
-      (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
-      (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
-      (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
-      (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
-      (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-      (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
-      (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
-      (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
-      (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
-      (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-2-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-3-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-4-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-5-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-6-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-7-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-8-face "t") 
-      (set-face-bold 'rainbow-delimiters-depth-9-face "t") 
-      :hook
-      ((prog-mode . rainbow-delimiters-mode)
-       (conf-mode . rainbow-delimiters-mode)
-       (shell-mode . rainbow-delimiters-mode)
-       (text-mode . rainbow-delimiters-mode)
-       (org-mode . rainbow-delimiters-mode)
-       (help-mode . rainbow-delimiters-mode)
-       ))
-
-  #+END_SRC
-
-  #+RESULTS:
-  | rainbow-delimiters-mode |
-** word
+((t
+  (:weight ultra-bold :foreground "#ff6c6b" :background "#1B2229")))
 #+begin_src emacs-lisp
-     (global-subword-mode 1)
+(use-package paren
+  :ensure nil
+  :hook (after-init . show-paren-mode)
+  :init (setq show-paren-when-point-inside-paren t
+              show-paren-when-point-in-periphery t
+              show-paren-highlight-openparen t))
+;; don't you think it's a little to shine?
+(use-package rainbow-delimiters 
+  :config
+  ;; 设置每一级括号的颜色
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
+  (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
+  (set-face-bold 'rainbow-delimiters-depth-2-face "t")
+  :hook
+  ((prog-mode . rainbow-delimiters-mode)
+   (conf-mode . rainbow-delimiters-mode)
+   (shell-mode . rainbow-delimiters-mode)
+   (text-mode . rainbow-delimiters-mode)
+   ;;   (org-mode . rainbow-delimiters-mode)
+   (help-mode . rainbow-delimiters-mode)
+   ))
+;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+;; (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
+;; (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
+;; (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
+;; (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+
+
 #+end_src
 
+#+RESULTS:
+| rainbow-delimiters-mode |
+
+
 ** rainbow cursor
-    #+begin_src emacs-lisp
-     ;; we don't want the cursor vanish
-     (blink-cursor-mode -1)
-     (setq rainbow-cursor-color-list '("#FF0000";red
-				"#FF5000"
-				"#FF9F00";orange
-				"#FFFF00";yellow
-				"#BFFF00"
-				"#00FF00";green
-				"#00FFFF";
-				"#0088FF"
-				"#0000FF";blue
-				"#5F00FF"
-				"#8B00FF";purple
-				"#CF00FF"
-				"#FF0088"
-				))
-     (setq rainbow-cursor-color-pointer 1)
-     (defun cursor-color-change ()
-       "Take a color from `rainbow-color-list' by the pointer.  
-     The pointer moves by +1, and restore by taking mod.  "
-       (setq rainbow-cursor-color-pointer (% (1+ rainbow-cursor-color-pointer)
-				     (length rainbow-cursor-color-list)))
-       (set-cursor-color (nth rainbow-cursor-color-pointer
-			  rainbow-cursor-color-list)))
-     
-     (run-with-timer ()
-		     (/ .5 (length rainbow-cursor-color-list))
-		     'cursor-color-change)
+#+begin_src emacs-lisp
+;; we don't want the cursor vanish
+(blink-cursor-mode -1)
+(setq rainbow-cursor-color-list '("#FF0000";red
+		                          "#FF5000"
+		                          "#FF9F00";orange
+		                          "#FFFF00";yellow
+		                          "#BFFF00"
+		                          "#00FF00";green
+		                          "#00FFFF";
+		                          "#0088FF"
+		                          "#0000FF";blue
+		                          "#5F00FF"
+		                          "#8B00FF";purple
+		                          "#CF00FF"
+		                          "#FF0088"
+		                          ))
+(setq rainbow-cursor-color-pointer 1)
+(defun cursor-color-change ()
+  "Take a color from `rainbow-color-list' by the pointer.  
+The pointer moves by +1, and restore by taking mod.  "
+  (setq rainbow-cursor-color-pointer (% (1+ rainbow-cursor-color-pointer)
+				                        (length rainbow-cursor-color-list)))
+  (set-cursor-color (nth rainbow-cursor-color-pointer
+		                 rainbow-cursor-color-list)))
+
+(run-with-timer ()
+		        (/ .5 (length rainbow-cursor-color-list))
+		        'cursor-color-change)
     #+end_src    
 
-    #+RESULTS:
-    : [nil 25069 53142 334581 0.038461538461538464 cursor-color-change nil nil 54000 nil]
-
-** scroll with mouse
+** scroll
 #+BEGIN_SRC emacs-lisp
-(setq scroll-step 1
-       scroll-margin 2
-       scroll-conservatively 101
-       scroll-up-aggressively 0.01
-       scroll-down-aggressively 0.01)
-;;       mouse-wheel-progressive-speed nil)
+(setq scroll-step 2
+      scroll-margin 2
+      hscroll-step 2
+      hscroll-margin 2
+      scroll-conservatively 101)
+;;      scroll-preserve-screen-position 'always
+      
 #+END_SRC
-
-#+RESULTS:
-: 0.01
 
 ** keybinding (navigation, etc.)
 #+begin_src emacs-lisp
 ;;learn from lazy-cat's thing-edit and move-text
 (global-set-key "\M-i" 'other-window)
 (global-set-key "\C-r" 'query-replace)
+
 (global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
 (global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
 (global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
-;;(global-set-key "\C-cl" 'org-store-link)
+
+(global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda)
 (global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key "\C-cc" 'org-capture)
@@ -463,15 +453,21 @@
 (use-package pyim-basedict)
 (pyim-basedict-enable)
 
+(setq default-input-method "pyim")
+;; slow down pyim init speed.
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
 ;; (require 'pyim-greatdict)
 ;; (pyim-greatdict-enable)
 #+end_src
+
+#+RESULTS:
+: pyim
+
 ** server
 #+begin_src emacs-lisp
-  (require 'server)
-  (or (eq (server-running-p) t)
-      (server-start))
+(require 'server)
+(or (eq (server-running-p) t)
+    (server-start))
 #+end_src
 
 ** backup
@@ -501,25 +497,15 @@
 (auto-save-enable)
 #+END_SRC
 
-
 * prepare the truck to magic world
-** use-package
-#+begin_src emacs-lisp
-(use-package use-package)
-
-#+end_src
 ** Try
 #+BEGIN_SRC emacs-lisp
-(use-package try
-  :defer t
-  )
-
-  #+END_SRC
+(use-package try)
+#+END_SRC
 
 ** posframe
 #+BEGIN_SRC emacs-lisp
   (use-package posframe)
-  
  #+END_SRC
 ** Restart Emacs
 #+BEGIN_SRC emacs-lisp
@@ -536,55 +522,49 @@ if the buffer isn't a file, simply restart emacs."
     (restart-emacs)))
 #+END_SRC
 
-#+RESULTS:
-: restart-emacs-reopen-current-file
-
-
 ** youdao-dictionary
 #+begin_src emacs-lisp
 (use-package youdao-dictionary
   :bind (("M-s" . youdao-dictionary-search-at-point+)))
-
 #+end_src
-
 
 * preparing our magic array
 ** ORG mode
 *** outfit
 **** org bullets
-  #+BEGIN_SRC emacs-lisp
-    (use-package org-bullets
-      
-      :config
-      (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
-    (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭")
-	  org-ellipsis " ▼")
+#+BEGIN_SRC emacs-lisp
+(use-package org-bullets
+  :config
+  (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1)))
+  (setq org-bullets-bullet-list '("☰" "☷" "☯" "☭")
+        org-ellipsis " ▼"))
+
   #+END_SRC
 
 **** table font
-  (let ((emacs-font-size 14)
-	(emacs-font-name "WenQuanYi Micro Hei Mono"))
-    (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
-    (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
+(let ((emacs-font-size 14)
+  (emacs-font-name "WenQuanYi Micro Hei Mono"))
+  (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
+  (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
 
-  (with-eval-after-load 'org
-    (defun org-buffer-face-mode-variable ()
-      (interactive)
-      (make-face 'width-font-face)
-      (set-face-attribute 'width-font-face nil :font "等距更纱黑体 SC 15")
-      (setq buffer-face-mode-face 'width-font-face)
-      (buffer-face-mode))
+(with-eval-after-load 'org
+  (defun org-buffer-face-mode-variable ()
+    (interactive)
+    (make-face 'width-font-face)
+    (set-face-attribute 'width-font-face nil :font "等距更纱黑体 SC 15")
+    (setq buffer-face-mode-face 'width-font-face)
+    (buffer-face-mode))
 
-    (add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
+(add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
 **** cycle
- #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 (setq org-cycle-emulate-tab t
   org-cycle-global-at-bob t
   )
 
 (require 'org-tempo)
 
- #+END_SRC
+#+END_SRC
 
 *** agenda
 #+begin_src emacs-lisp
@@ -651,8 +631,7 @@ if the buffer isn't a file, simply restart emacs."
   (setq projectile-switch-project-action #'projectile-dired)
   )
 
-(use-package ripgrep
-  :defer t)
+(use-package ripgrep)
 
 #+END_SRC
 
@@ -660,66 +639,26 @@ if the buffer isn't a file, simply restart emacs."
 #+begin_src emacs-lisp
 (use-package cc-mode)
 (add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
-
 ;;(define-key c-mode-base-map "\C-m" 'c-context-line-break)
 
    #+end_src
 
    #+RESULTS:
 ** python
-  # (use-package lsp-pyright
-  #   :hook (python-mode . (lambda ()
-  #   		   (require 'lsp-pyright)
-  #   		   (lsp-deferred))))
 
 ** other modes
 #+begin_src emacs-lisp
-  (use-package fish-mode)
-  (use-package lox-mode)
-  (use-package php-mode)
-  (use-package crontab-mode)
+(use-package fish-mode)
+(use-package lox-mode)
+(use-package php-mode)
+(use-package crontab-mode)
+(use-package graphviz-dot-mode)
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 ;;  (require 'css-sort-buffer)
 
 #+end_src
-
-** emacs-application-framework
-#+BEGIN_SRC emacs-lisp
-  ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/emacs-application-framework-master/")
-  ;; (require 'eaf)
-  ;;   (use-package eaf
-  ;;     :load-path "~./emacs.d/site-lisp/emacs-application-framework-master"
-  ;;     :custom
-  ;;     (eaf-browser-continue-where-left-off t)
-  ;;     :config
-  ;;     (require 'eaf-jupyter)
-  ;;     (require 'eaf-pdf-viewer)
-  ;;     ;;    (require 'eaf-mermaid)
-  ;;     (require 'eaf-system-monitor)
-  ;;     (require 'eaf-video-player)
-  ;;     (require 'eaf-terminal)
-  ;;     (require 'eaf-vue-demo)
-  ;;     (require 'eaf-org-previewer)
-  ;;     (require 'eaf-file-browser)
-  ;;     (require 'eaf-image-viewer)
-  ;;     (require 'eaf-file-sender)
-  ;;     (require 'eaf-browser)
-  ;;     (require 'eaf-demo)
-  ;;     (require 'eaf-file-manager)
-  ;;     (setq eaf-browser-enable-adblocker t)
-  ;;     (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-  ;;     (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
-  ;; ;;    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
-  ;;     (eaf-bind-key nil "M-q" eaf-browser-keybinding))
-  
-  ;; (setq eaf-kill-process-after-last-buffer-closed t
-  ;;       eaf-start-python-process-when-require t)
-#+END_SRC
-
-#+RESULTS:
-: t
 
 ** games
 #+begin_src emacs-lisp
@@ -736,7 +675,6 @@ if the buffer isn't a file, simply restart emacs."
 #+end_src
 
 #+RESULTS:
-
 
 * casting magic
 ** our loyal assistent carrying all our books
@@ -863,13 +801,13 @@ if the buffer isn't a file, simply restart emacs."
   (add-to-list 'completion-at-point-functions #'cape-tex)
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
-  ;;(add-to-list 'completion-at-point-functions #'cape-sgml)
-  ;;(add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  ;;(add-to-list 'completion-at-point-functions #'cape-abbrev)
-  ;;(add-to-list 'completion-at-point-functions #'cape-ispell)
-  ;;(add-to-list 'completion-at-point-functions #'cape-dict)
-  ;;(add-to-list 'completion-at-point-functions #'cape-symbol)
-  ;;(add-to-list 'completion-at-point-functions #'cape-line)
+  (add-to-list 'completion-at-point-functions #'cape-sgml)
+  (add-to-list 'completion-at-point-functions #'cape-rfc1345)
+  (add-to-list 'completion-at-point-functions #'cape-abbrev)
+  (add-to-list 'completion-at-point-functions #'cape-ispell)
+  (add-to-list 'completion-at-point-functions #'cape-dict)
+  (add-to-list 'completion-at-point-functions #'cape-symbol)
+  (add-to-list 'completion-at-point-functions #'cape-line)
 )
 
 #+end_src
@@ -905,52 +843,6 @@ if the buffer isn't a file, simply restart emacs."
 #+RESULTS:
 : citre-jump+
 
-*** lsp 鬼才用lsp
-  (use-package yasnippet
-    :config (yas-global-mode))
-  (use-package lsp-mode
-    :commands (lsp lsp-deferred)
-    :hook ((lsp-mode . lsp-enable-which-key-integration)
-	   (java-mode . #'lsp-deferred))
-    :init (setq lsp-keymap-prefix "C-c l"
-		lsp-enable-file-watchers nil
-		read-process-output-max (* 100 1024 1024) ;100 mb
-		lsp-completion-provider :capf
-		lsp-enable-indentation nil
-		lsp-enable-on-type-formatting nil
-		)
-    :config (setq lsp-intelephense-multi-root nil)
-    ;;  (with-eval-after-load 'lsp-intelephense
-    ;;    (setf (lsp--client-multi-root (gethash 'iph lsp-clients)) nil))
-    :custom
-    (lsp-headerline-breadcrumb-enable nil)
-    (lsp-restart 'auto-restart)
-    )
-  
-  ;;	   lsp-completion-enable-additional-text-edit nil
-  
-  (use-package hydra)
-  (use-package lsp-ui
-    :custom
-    (lsp-ui-doc-position 'top))
-  
-  (use-package lsp-java)
-  ;;  :hook (java-mode . lsp)
-  (add-hook 'java-mode-hook #'lsp)
-  ;;(setq lsp-java-workspace-dir
-  (use-package dap-mode
-    :after lsp-mode
-    :config (dap-auto-configure-mode))
-  (use-package dap-java
-    :ensure nil)
-  (use-package helm)
-  ;;    :config (helm-mode))
-  (use-package helm-lsp
-    :after (lsp-mode)
-    :commands (helm-lsp-workspace-symbol))
-  ;; :init (define-key lsp-mode-map [remap xref-find-apropos] #'helm-lsp-workspace-symbol)
-  
-  ;; (use-package lsp-treemacs)
 ** step by step we strengthen our spell
 *** magit
 #+begin_src emacs-lisp
@@ -972,9 +864,10 @@ if the buffer isn't a file, simply restart emacs."
 
 *** flycheck
 #+BEGIN_SRC emacs-lisp
+;; flycheck好烦阿，能不能只显示未使用的变量和未定义的函数？
 (use-package flycheck
   :init (global-flycheck-mode))
-
+(setq flycheck-idle-change-delay 3)
 (setq flycheck-javascript-eslint-executable "~/node_modules/.bin/eslint")
   #+END_SRC
 

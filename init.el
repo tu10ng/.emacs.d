@@ -1,25 +1,29 @@
-;; startup adjustments
-(setq debug-on-error t
-      gc-cons-threshold (* 512 1024 1024)
-      inhibit-compacting-font-caches t)
-;; Bootstrap config
+;;; init.el --- The ma entry for emacs.
+;;; Commentary:
+;;; Code:
+(setq gc-cons-threshold (* 3 1024 1024 1024))
+
 (require 'package)
-(setq package-enable-at-startup nil
-      use-package-always-ensure t
-      use-pfackage-expand-minimally t
-      use-package-enable-imenu-support t)
 (setq package-archives
       '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-	("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+	    ("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
+(setq package-quickstart t)             ;M-x package-quickstart-refresh
 (package-initialize)
+
 ;; Bootstrap `use-package'
 (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
+(eval-and-compile
+  (setq package-enable-at-startup nil     ;what is this?
+        use-package-always-ensure t
+        use-pfackage-expand-minimally t
+        use-package-enable-imenu-support t))
+(eval-when-compile
+  (require 'use-package))
 
-(set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
-(set-fontset-font t 'han "黑体:pixelsize=20")
+(setq debug-on-error t)
 
 ;; Bootstrap
 (org-babel-load-file "~/.emacs.d/myinit.org")
@@ -39,10 +43,11 @@
  '(electric-indent-mode t)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/usr/local/sbin" "/usr/bin/site_perl" "/usr/bin/vendor_perl" "/usr/bin/core_perl" "/usr/lib/emacs/29.0.50/x86_64-pc-linux-gnu" "/home/qb/.local/bin"))
- '(flycheck-check-syntax-automatically '(save idle-buffer-switch mode-enabled))
+ '(flycheck-check-syntax-automatically '(idle-change idle-buffer-switch mode-enabled))
  '(flycheck-disabled-checkers '(python-pycompile))
- '(linum-relative-current-symbol "")
- '(linum-relative-global-mode t)
+ '(flycheck-display-errors-delay 0)
+ '(flycheck-error-list-minimum-level 'error)
+ '(flycheck-navigation-minimum-level 'error)
  '(lsp-ui-flycheck-list-position 'right)
  '(magit-commit-ask-to-stage 'stage)
  '(magit-slow-confirm nil)
@@ -122,7 +127,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(show-paren-mode t)
  '(truncate-lines nil)
  '(word-wrap t))
@@ -132,7 +137,14 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(org-table ((t (:foreground "#a9a1e1" :height 120 :family "Noto Sans Mono CJK SC Regular")))))
+ '(org-table ((t (:foreground "#a9a1e1" :height 120 :family "Noto Sans Mono CJK SC Regular"))))
+ '(rainbow-delimiters-depth-4-face ((t (:foreground "lime green"))))
+ '(rainbow-delimiters-depth-5-face ((t (:foreground "lime green"))))
+ '(rainbow-delimiters-depth-6-face ((t (:foreground "lime green"))))
+ '(rainbow-delimiters-depth-7-face ((t (:foreground "lime green"))))
+ '(rainbow-delimiters-depth-8-face ((t (:foreground "lime green" :inherit rainbow-delimiters-base-face))))
+ '(rainbow-delimiters-depth-9-face ((t (:foreground "#ECBE7B" :inherit rainbow-delimiters-base-face))))
+ '(show-paren-match ((t (:background "#1B2229" :foreground "#ffffff" :underline t :weight ultra-bold)))))
 
 ;; (defun set-font (english chinese english-size chinese-size)
 ;;   (set-face-attribute 'default nil :font

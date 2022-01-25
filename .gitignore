@@ -34,3 +34,6 @@ auto/.cache/
 /var/
 /history
 /myinit.el~
+/autobookmarks
+/package-quickstart.el
+/package-quickstart.elc
