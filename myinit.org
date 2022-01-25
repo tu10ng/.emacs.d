@@ -97,12 +97,6 @@ if the buffer isn't a file, simply restart emacs."
 
 #+END_SRC
 
-** language difference between this world and magic world
-#+begin_src emacs-lisp
-(use-package youdao-dictionary
-  :bind (("M-s" . youdao-dictionary-search-at-point+)))
-#+end_src
-
 ** misc
 #+begin_src emacs-lisp
 (setq garbage-collection-messages t
@@ -168,6 +162,34 @@ if the buffer isn't a file, simply restart emacs."
 
 #+END_SRC  
 
+** language difference(macros! to solve)
+#+begin_src emacs-lisp
+(defmacro set-company-backends-for! (mode &rest backends)
+  "Set `company-backends' for MODE with BACKENDS."
+  `(add-hook (intern (format "%s-hook" ',mode))
+             (lambda ()
+               (company-mode +1)
+               (setq-local company-backends ',backends))))
+
+(defmacro shut-up! (func)
+  "Silence FUNC."
+  `(advice-add ,func :around
+               (defun ,(intern (format "shut-up-%s" func)) (f &rest args)
+                 (let ((inhibit-message t))
+                   (ignore-errors (apply f args))))))
+
+(defmacro lazy! (&rest body)
+  "Delay the evaluation of BODY."
+  `(lambda ()
+     ,@body))
+
+
+
+#+end_src
+
+#+RESULTS:
+: lazy!
+
 * FEEL the magic elements
 ** find magic
 *** general
@@ -218,6 +240,7 @@ if the buffer isn't a file, simply restart emacs."
 (setq enable-recursive-minibuffers t)
 
 (use-package vertico
+  :hook (after-init . vertico-mode)
   :config
   (setq vertico-count 8)
   (face-spec-set 'vertico-current
@@ -225,8 +248,7 @@ if the buffer isn't a file, simply restart emacs."
                     :background "#d8d8d8" :extend t)
                    (t
                     :background "#454545" :extend t))
-                 'face-defface-spec)
-  (vertico-mode))
+                 'face-defface-spec))
 
 (use-package orderless
   :config
@@ -238,12 +260,7 @@ if the buffer isn't a file, simply restart emacs."
 (global-unset-key (kbd "C-s"))
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
-  :bind (;; C-c bindings (mode-specific-map)
-         ("C-c h" . consult-history)
-         ("C-c m" . consult-mode-command)
-         ("C-c k" . consult-kmacro)
-         ;; C-x bindings (ctl-x-map)
-         ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complex-command
+  :bind (;; C-x bindings (ctl-x-map)
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
          ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
@@ -285,6 +302,13 @@ if the buffer isn't a file, simply restart emacs."
   (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
+  :custom
+  (consult-fontify-preserve nil)
+  (consult-async-min-input 2)
+  (consult-async-refresh-delay 0.15)
+  (consult-async-input-throttle 0.2)
+  (consult-async-input-debounce 0.1)
+  (consult-project-root-function #'projectile-project-root)
   )
 
 (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -567,7 +591,7 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 * RECALL the structure of our magic array
-** ORG mode
+** ORG
 
 *** org
 #+begin_src emacs-lisp
@@ -744,6 +768,70 @@ The pointer moves by +1, and restore by taking mod.  "
 #+begin_src emacs-lisp
 (setq org-mouse-features '(activate-checkboxes))
 #+end_src
+** structured text(md, rst)
+#+begin_src emacs-lisp
+;; Pixel alignment for org/markdown tables
+(use-package valign
+  :ensure t
+  :hook ((markdown-mode org-mode) . valign-mode))
+
+;; The markdown mode is awesome! unbeatable
+(use-package markdown-mode
+  :ensure t
+  :init
+  (advice-add #'markdown--command-map-prompt :override #'ignore)
+  (advice-add #'markdown--style-map-prompt   :override #'ignore)
+  :mode ("README\\(?:\\.md\\)?\\'" . gfm-mode)
+  :hook (markdown-mode . visual-line-mode)
+  :bind (:map markdown-mode-style-map
+         ("r" . markdown-insert-ruby-tag)
+         ("d" . markdown-insert-details))
+  :config
+  (defun markdown-insert-ruby-tag (text ruby)
+    "Insert ruby tag with `TEXT' and `RUBY' quickly."
+    (interactive "sText: \nsRuby: \n")
+    (insert (format "<ruby>%s<rp>(</rp><rt>%s</rt><rp>)</rp></ruby>" text ruby)))
+
+  (defun markdown-insert-details (title)
+    "Insert details tag (collapsible) quickly."
+    (interactive "sTitle: ")
+    (insert (format "<details><summary>%s</summary>\n\n</details>" title)))
+  :custom
+  (markdown-header-scaling t)
+  (markdown-enable-wiki-links t)
+  (markdown-italic-underscore t)
+  (markdown-asymmetric-header t)
+  (markdown-gfm-uppercase-checkbox t)
+  (markdown-fontify-code-blocks-natively t))
+
+;; ReStructuredText
+(use-package rst
+  :ensure nil
+  :hook ((rst-mode . visual-line-mode)
+         (rst-adjust . rst-toc-update)))
+
+#+end_src
+
+#+RESULTS:
+| rst-toc-update |
+** dired
+#+begin_src emacs-lisp
+(setq dired-kill-when-opening-new-dired-buffer t
+      dired-auto-revert-buffer #'dired-directory-changed-p
+      dired-hide-details-hide-symlink-targets nil)
+(setq dired-listing-switches "-AFhlv")  ;wt
+
+;; Make dired colorful
+(use-package diredfl
+  :ensure t
+  :hook (dired-mode . diredfl-mode))
+
+
+#+end_src
+
+#+RESULTS:
+| diredfl-mode | diff-hl-dired-mode-unless-remote |
+
 ** project and file's magic
 #+BEGIN_SRC emacs-lisp
 (use-package projectile
@@ -782,12 +870,16 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package php-mode)
 (use-package crontab-mode)
 (use-package graphviz-dot-mode)
+(use-package gnus
+  :ensure nil)
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
 ;;  (require 'css-sort-buffer)
 
 #+end_src
+
+#+RESULTS:
 
 ** games
 #+begin_src emacs-lisp
@@ -871,11 +963,13 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ;; Insert SPDX license header
 (use-package spdx
-  :ensure t
   :hook (prog-mode . spdx-tempo-setup)
   :custom
   (spdx-ignore-deprecated t))
 
+;; tldr man info
+(use-package tldr)
+  
 ;; I would use grep for searching TODO
 
 ;; I will not enable whitespace-mode. I only need a tool that automaticly remove spaces, but keep the spaces around my cursor for about five lines to not disturb typing.
@@ -1023,6 +1117,7 @@ The pointer moves by +1, and restore by taking mod.  "
 )
 
 ** composing our chanting
+*** lsp
 #+begin_src emacs-lisp
 ;; lsp-mode
 (use-package lsp-mode
@@ -1053,11 +1148,108 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 #+end_src
+*** ispell
+#+begin_src emacs-lisp
+;; dictionary needed?
+;; (use-package ispell
+;;   :config
+;;   ;; no spell checking for org special blocks
+;;   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
+;;   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
+;;   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
+;;   :custom
+;;   (ispell-really-hunspell t)
+;;   (ispell-program-name "hunspell")
+;;   (ispell-dictionary "en_US")
+;;   (ispell-following-word t)
+;;   (ispell-personal-dictionary (locate-user-emacs-file "hunspell_dict.txt")))
+
+;; Spell check on-the-fly
+;; (use-package flyspell
+;;   :custom
+;;   ;; Use M-C-i instead if M-TAB is shadowed by your window manager
+;;   (flyspell-use-meta-tab t)
+;;   (flyspell-issue-welcome-flag nil)
+;;   (flyspell-issue-message-flag nil))
+
+
+#+end_src
+
+#+RESULTS:
+*** documentation
+#+begin_src emacs-lisp
+(use-package separedit
+  :ensure t
+  :bind (:map prog-mode-map
+         ("C-c '" . separedit))
+  :custom
+  (separedit-default-mode 'markdown-mode)
+  (separedit-remove-trailing-spaces-in-comment t)
+  (separedit-continue-fill-column t)
+  (separedit-buffer-creation-hook #'auto-fill-mode))
+
+
+#+end_src
+
+#+RESULTS:
+: separedit
+*** pastebin service
+#+begin_src emacs-lisp
+(use-package webpaste
+  :ensure t
+  :commands webpaste-paste-buffer-or-region
+  :custom
+  (webpaste-open-in-browser t)
+  (webpaste-paste-confirmation t)
+  (webpaste-add-to-killring nil)
+  (webpaste-provider-priority '("paste.mozilla.org" "dpaste.org" "ix.io")))
+
+#+end_src
+*** language difference(web search &web translate)
+#+begin_src emacs-lisp
+;; Web search
+(use-package webjump
+  :ensure nil
+  ;; C-c / will be shadowed by `org-sparse-tree' in org-mode
+  :bind ("C-c C-/" . webjump)
+  :custom
+  (webjump-sites '(;; Internet search engines.
+                   ("Google" .
+                    [simple-query "www.google.com"
+                                  "www.google.com/search?q=" ""])
+                   ("Wikipedia" .
+                    [simple-query "wikipedia.org" "wikipedia.org/wiki/" ""])
+                   ("Ludwig Guru" .
+                    [simple-query "ludwig.guru" "ludwig.guru/s/" ""])
+                   ("Stack Overflow" .
+                    [simple-query "stackoverflow.com" "stackoverflow.com/search?q=" ""])
+                   ("Man Search" .
+                    [simple-query "archlinux.org" "man.archlinux.org/search?q=" ""])
+                   ("Man Go" .
+                    [simple-query "archlinux.org" "man.archlinux.org/search?q=" "&go=Go"])
+
+                   ;; Language specific engines.
+                   ("x86 Instructions Reference" .
+                    [simple-query "www.felixcloutier.com"
+                                  "www.felixcloutier.com/x86/" ""]))))
+
+;; Translator for Emacs
+;; M-x fanyi-dwim{,2}, that's all.
+(use-package fanyi
+  :ensure t
+  :commands fanyi-dwim fanyi-dwim2)
+
+(use-package youdao-dictionary
+  :bind (("M-s" . youdao-dictionary-search-at-point+)))
+
+
+#+end_src
 
 ** step by step we strengthen our spell
 *** magit
 #+begin_src emacs-lisp
 (use-package magit
+;;  :hook (git-commit-setup . git-commit-turn-on-flyspell)
   :custom
   (magit-diff-refine-hunk t)            ;what's this?
   (magit-diff-paint-whitespace nil)
@@ -1118,9 +1310,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 #+end_src
-
-#+RESULTS:
-| ediff-restore-window-conf |
 
 ** see the power of spell
 *** compile
