@@ -8,7 +8,6 @@
       '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
         ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
 	    ("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
-(setq package-quickstart t)             ;M-x package-quickstart-refresh
 (package-initialize)
 
 ;; Bootstrap `use-package'

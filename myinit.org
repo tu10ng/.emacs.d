@@ -1,12 +1,11 @@
 
-* FEEL the magic elements
+* PREPARE the truck to magic world
 ** BENCHMARK
 #+begin_src emacs-lisp
 ;; in GNU Emacs 29.0.50, a function used by benchmark turn it's required arguments from 2 to 3, thus need manually change the package source.
 (use-package benchmark-init)
 (benchmark-init/activate)
 #+end_src
-
 ** native compilation
 #+begin_src emacs-lisp
 (setq comp-deferred-compilation t
@@ -14,6 +13,97 @@
 )
 
 #+end_src
+** Try
+#+BEGIN_SRC emacs-lisp
+(use-package try)
+#+END_SRC
+
+** posframe
+#+BEGIN_SRC emacs-lisp
+  (use-package posframe)
+ #+END_SRC
+** connection between session 
+#+BEGIN_SRC emacs-lisp
+(use-package restart-emacs
+  :defer t
+  )
+
+(defun restart-emacs-reopen-current-file ()
+  "restart emacs then reopen the file being visited when casting this command.
+if the buffer isn't a file, simply restart emacs."
+  (interactive)
+  (if (buffer-file-name)
+      (restart-emacs (split-string (buffer-file-name)))
+    (restart-emacs)))
+
+;; Back to the previous position
+(use-package saveplace
+  :hook (after-init . save-place-mode))
+
+(use-package recentf
+  :hook (after-init . recentf-mode)
+  :custom
+  (recentf-max-saved-items 300)
+  (recentf-auto-cleanup 'never)
+  (recentf-exclude '( ;; Folders on MacOS start
+                     "^/private/tmp/"
+                     "^/var/folders/"
+                     ;; Folders on MacOS end
+                     "^/tmp/"
+                     "/ssh\\(x\\)?:"
+                     "/su\\(do\\)?:"
+                     "^/usr/include/"
+                     "/TAGS\\'"
+                     "COMMIT_EDITMSG\\'")))
+
+#+END_SRC
+
+** file on change
+#+begin_src emacs-lisp
+ (setq make-backup-files nil)
+
+;; Update buffer whenever file changes
+;; Also revert dired buffer.
+(use-package autorevert
+  :ensure nil
+  :hook (after-init . global-auto-revert-mode)
+  :custom
+  (auto-revert-interval 3)
+  (auto-revert-avoid-polling t)
+  (auto-revert-verbose nil)
+  (auto-revert-remote-files t)
+  (auto-revert-check-vc-info t)
+  (global-auto-revert-non-file-buffers t))
+
+;; auto save when idle
+(setq auto-save-default nil)
+(setq auto-save-idle 1)
+(defun auto-save-buffers ()
+  (interactive)
+  (let ((auto-save-buffer-list))
+    (save-excursion
+      (dolist (buf (buffer-list))
+	(set-buffer buf)
+	(if (and (buffer-file-name) (buffer-modified-p))
+	    (progn
+	      (push (buffer-name) auto-save-buffer-list)
+	      (with-temp-message "" (basic-save-buffer))
+	      ))))))
+
+(defun auto-save-enable ()
+  (interactive)
+  (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
+
+(auto-save-enable)
+
+#+end_src
+** language difference between this world and magic world
+#+begin_src emacs-lisp
+(use-package youdao-dictionary
+  :bind (("M-s" . youdao-dictionary-search-at-point+)))
+#+end_src
+
+* FEEL the magic elements
 ** find magic
 *** general
 #+BEGIN_SRC emacs-lisp
@@ -328,7 +418,7 @@
 (global-set-key "\M-o" 'open-newline-above)
 #+END_SRC
 
-** rainbow parentheses
+** rainbow delimiters(parenthesis)
 ((t
   (:weight ultra-bold :foreground "#ff6c6b" :background "#1B2229")))
 #+begin_src emacs-lisp
@@ -349,11 +439,8 @@
   (set-face-bold 'rainbow-delimiters-depth-2-face "t")
   :hook
   ((prog-mode . rainbow-delimiters-mode)
-   (conf-mode . rainbow-delimiters-mode)
    (shell-mode . rainbow-delimiters-mode)
    (text-mode . rainbow-delimiters-mode)
-   ;;   (org-mode . rainbow-delimiters-mode)
-   (help-mode . rainbow-delimiters-mode)
    ))
 ;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
 ;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
@@ -366,8 +453,7 @@
 #+end_src
 
 #+RESULTS:
-| rainbow-delimiters-mode |
-
+| rainbow-delimiters-mode | text-mode-hook-identify |
 
 ** rainbow cursor
 #+begin_src emacs-lisp
@@ -470,65 +556,7 @@ The pointer moves by +1, and restore by taking mod.  "
     (server-start))
 #+end_src
 
-** backup
- #+BEGIN_SRC emacs-lisp
- (setq make-backup-files nil)
- #+END_SRC
-** auto-save when idle
-#+BEGIN_SRC emacs-lisp
-(setq auto-save-default nil)
-(setq auto-save-idle 1)
-(defun auto-save-buffers ()
-  (interactive)
-  (let ((auto-save-buffer-list))
-    (save-excursion
-      (dolist (buf (buffer-list))
-	(set-buffer buf)
-	(if (and (buffer-file-name) (buffer-modified-p))
-	    (progn
-	      (push (buffer-name) auto-save-buffer-list)
-	      (with-temp-message "" (basic-save-buffer))
-	      ))))))
-
-(defun auto-save-enable ()
-  (interactive)
-  (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
-
-(auto-save-enable)
-#+END_SRC
-
-* prepare the truck to magic world
-** Try
-#+BEGIN_SRC emacs-lisp
-(use-package try)
-#+END_SRC
-
-** posframe
-#+BEGIN_SRC emacs-lisp
-  (use-package posframe)
- #+END_SRC
-** Restart Emacs
-#+BEGIN_SRC emacs-lisp
-(use-package restart-emacs
-  :defer t
-  )
-
-(defun restart-emacs-reopen-current-file ()
-  "restart emacs then reopen the file being visited when casting this command.
-if the buffer isn't a file, simply restart emacs."
-  (interactive)
-  (if (buffer-file-name)
-      (restart-emacs (split-string (buffer-file-name)))
-    (restart-emacs)))
-#+END_SRC
-
-** youdao-dictionary
-#+begin_src emacs-lisp
-(use-package youdao-dictionary
-  :bind (("M-s" . youdao-dictionary-search-at-point+)))
-#+end_src
-
-* preparing our magic array
+* RECALL the structure of our magic array
 ** ORG mode
 *** outfit
 **** org bullets
