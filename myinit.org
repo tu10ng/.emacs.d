@@ -854,14 +854,146 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** cc mode
 #+begin_src emacs-lisp
-(use-package cc-mode)
-(add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
-;;(define-key c-mode-base-map "\C-m" 'c-context-line-break)
+(use-package cc-mode
+  :defines lsp-clients-clangd-executable lsp-clients-clangd-args
+  :mode ("\\.cxx\\'" . cc-mode)
+  :hook (c-mode-common c-toggle-auto-hungry-state)
+  :config
+  (defconst ccls-args nil)
+  (defconst clangd-args '("-j=2"
+                          "--malloc-trim"
+                          "--background-index"
+                          "--clang-tidy"
+                          "--completion-style=bundled"
+                          "--pch-storage=memory"
+                          "--header-insertion=iwyu"
+                          "--header-insertion-decorators"))
+  (with-eval-after-load 'lsp-mode
+    ;; Prefer `clangd' over `ccls'
+    (cond ((executable-find "clangd") (setq lsp-clients-clangd-executable "clangd"
+                                            lsp-clients-clangd-args clangd-args))
+          ((executable-find "ccls") (setq lsp-clients-clangd-executable "ccls"
+                                          lsp-clients-clangd-args ccls-args))))
+  )
 
-   #+end_src
+;; A compiler output viewer
+(use-package rmsbolt
+  :commands rmsbolt-compile
+  :custom
+  (rmsbolt-asm-format nil)
+  (rmsbolt-default-directory "/tmp"))
 
-   #+RESULTS:
+;; Parser generator
+(use-package bison-mode)
+
+
+;; cmake, the de factor build system for C++
+(use-package cmake-mode
+  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
+         ("\\.cmake\\'"         . cmake-mode))
+  :bind (:map cmake-mode-map
+         ;; Compatible with lsp-mode keybindings
+         ("C-c d" . cmake-help))
+  :config
+  (set-company-backends-for! cmake-mode company-cmake))
+
+;; Extra font locks for cmake
+(use-package cmake-font-lock
+  :hook (cmake-mode . cmake-font-lock-activate))
+
+
+#+end_src
+
+#+RESULTS:
+| cmake-font-lock-activate |
+
+** lisp
+#+begin_src emacs-lisp
+;; elisp
+(defconst eval-as-comment-prefix ";;=> ")
+;; Imitate scala-mode
+;; from https://github.com/dakra/dmacs
+(defun eval-to-comment (&optional arg)
+  (interactive "P")
+  (let ((start (point)))
+    (eval-print-last-sexp arg)
+    (save-excursion
+      (goto-char start)
+      (save-match-data
+        (re-search-forward "[[:space:]\n]+" nil t)
+        (insert eval-as-comment-prefix)))))
+
+(define-key emacs-lisp-mode-map "\C-c\C-b" 'eval-buffer)
+(define-key emacs-lisp-mode-map "\C-c\C-c" 'eval-to-comment)
+(define-key lisp-interaction-mode-map "\C-c\C-c" 'eval-to-comment)
+
+
+(use-package ielm
+  :ensure nil
+  :hook (ielm-mode . company-mode))
+
+
+#+end_src
+
+#+RESULTS:
+| company-mode |
+
 ** python
+#+begin_src emacs-lisp
+(use-package python
+  :custom
+  (python-indent-guess-indent-offset-verbose nil))
+
+;; python -m venv ENV_DIR
+(use-package pyvenv
+  :commands pyvenv-deactivate pyvenv-deactivate)
+
+
+#+end_src
+
+#+RESULTS:
+
+** haskell
+#+begin_src emacs-lisp
+(use-package haskell-mode
+  :ensure t
+  :hook ((haskell-mode . haskell-indentation-mode)
+         (haskell-mode . haskell-doc-mode))
+  :custom
+  (haskell-completing-read-function 'completing-read)
+  (haskell-process-check-cabal-config-on-load nil)
+  (haskell-process-suggest-add-package nil)
+  (haskell-process-suggest-hoogle-imports nil)
+  (haskell-process-suggest-language-pragmas nil)
+  (haskell-process-suggest-overloaded-strings nil)
+  (haskell-process-suggest-restart nil))
+
+
+#+end_src
+
+#+RESULTS:
+| haskell-doc-mode | haskell-indentation-mode |
+
+** rust
+#+begin_src emacs-lisp
+(use-package rust-mode
+  :defines lsp-rust-server
+  :config
+  ;; Prefer `rust-analyzer' over `rls'
+  (with-eval-after-load 'lsp-mode
+    (when (executable-find "rust-analyzer")
+      (setq lsp-rust-server 'rust-analyzer)))
+  :custom
+  (rust-format-on-save (executable-find "rustfmt")))
+
+;; Cargo integration
+(use-package cargo
+  :ensure t
+  :hook (rust-mode . cargo-minor-mode))
+#+end_src
+
+#+RESULTS:
+| cargo-minor-mode | rust-maybe-initialize-buffer-project |
 
 ** other modes
 #+begin_src emacs-lisp
@@ -943,7 +1075,6 @@ The pointer moves by +1, and restore by taking mod.  "
         (citre-jump)
       (error (let* ((xref-prompt-for-identifier nil))
                (call-interactively #'xref-find-definitions)))))
-
   )
 
 ;; Browse devdoc.io
@@ -1179,7 +1310,6 @@ The pointer moves by +1, and restore by taking mod.  "
 *** documentation
 #+begin_src emacs-lisp
 (use-package separedit
-  :ensure t
   :bind (:map prog-mode-map
          ("C-c '" . separedit))
   :custom
