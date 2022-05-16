@@ -357,8 +357,8 @@ if the buffer isn't a file, simply restart emacs."
   :custom
   (shackle-default-size 0.5)
   (shackle-default-alignment 'below)
-  (shackle-rules '((magit-status-mode    :select t)
-                   (magit-log-mode       :select t)
+  (shackle-rules '((magit-status-mode    :select t :align right)
+                   (magit-log-mode       :select t :align right)
                    ("*quickrun*"         :select t)
                    (profiler-report-mode :select t)
                    (xwidget-webkit-mode  :select t :same t)
