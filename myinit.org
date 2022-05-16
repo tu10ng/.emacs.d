@@ -16,12 +16,12 @@
 ** Try
 #+BEGIN_SRC emacs-lisp
 (use-package try)
-#+END_SRC
-
-** posframe
-#+BEGIN_SRC emacs-lisp
-  (use-package posframe)
+(use-package posframe)
+(use-package all-the-icons)
  #+END_SRC
+
+ #+RESULTS:
+
 ** file on change
 #+begin_src emacs-lisp
  (setq make-backup-files nil)
@@ -125,7 +125,7 @@ if the buffer isn't a file, simply restart emacs."
 (setq inhibit-compacting-font-caches t)
 
 (set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
-(set-fontset-font t 'han "黑体:pixelsize=20")
+;;(set-fontset-font t 'han ":pixelsize=20")
 
 (setq display-raw-bytes-as-hex t
       redisplay-skip-fontification-on-input t)
@@ -197,15 +197,15 @@ if the buffer isn't a file, simply restart emacs."
 (use-package info-colors 
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
-(use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
-  :bind
-  ([remap describe-function] . counsel-describe-function)
-  ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
-  ([remap describe-key] . helpful-key))
+;; (use-package helpful
+;;   :custom
+;;   (counsel-describe-function-function #'helpful-callable)
+;;   (counsel-describe-variable-function #'helpful-variable)
+;;   :bind
+;;   ([remap describe-function] . counsel-describe-function)
+;;   ([remap describe-command] . helpful-command)
+;;   ([remap describe-variable] . counsel-describe-variable)
+;;   ([remap describe-key] . helpful-key))
 
 (use-package which-key
   :config
@@ -466,7 +466,7 @@ if the buffer isn't a file, simply restart emacs."
 ;; don't you think it's a little to shine?
 (use-package rainbow-delimiters 
   :config
-  ;; 设置每一级括号的颜色
+
   (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
   (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
   (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
@@ -548,8 +548,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key "\C-cc" 'org-capture)
 
-;; 这样的键盘布局对于人类来说为时尚早……
-;; (defun tl/exchange-keys ()
+;; ;; (defun tl/exchange-keys ()
 ;;   "exchange some keys' behaviour, like '1' will ouput '!', '!' output '1'"
 ;;   (interactive)
 ;;   (global-set-key (kbd "1") (lambda () (interactive) (insert "!")))
@@ -658,8 +657,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| #[0 \305\306	>\203 \307 |
 
 *** outfit
 **** org bullets
@@ -672,21 +669,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
   #+END_SRC
 
-**** table font
-(let ((emacs-font-size 14)
-  (emacs-font-name "WenQuanYi Micro Hei Mono"))
-  (set-frame-font (format "%s-%s" (eval emacs-font-name) (eval emacs-font-size)))
-  (set-fontset-font (frame-parameter nil 'font) 'unicode (eval emacs-font-name)))
-
-(with-eval-after-load 'org
-  (defun org-buffer-face-mode-variable ()
-    (interactive)
-    (make-face 'width-font-face)
-    (set-face-attribute 'width-font-face nil :font "等距更纱黑体 SC 15")
-    (setq buffer-face-mode-face 'width-font-face)
-    (buffer-face-mode))
-
-(add-hook 'org-mode-hook 'org-buffer-face-mode-variable))
 **** cycle
 #+BEGIN_SRC emacs-lisp
 (setq org-cycle-emulate-tab t
@@ -1122,208 +1104,97 @@ The pointer moves by +1, and restore by taking mod.  "
 | flycheck-mode | spdx-tempo-setup | rainbow-delimiters-mode |
 
 ** choosing your lyrics
-*** Company
-#+begin_src emacs-lisp
-(use-package company
-  :hook (prog-mode . company-mode)
-  :bind (:map company-mode-map
-              ([remap completion-at-point] . company-complete)
-              :map company-active-map
-              ([tab]     . company-complete-common-or-cycle)
-              ([backtab] . company-select-previous-or-abort)
-              ("C-n" . nil)
-              ("C-p" . nil)
-              ) ;maybe unbind C-n?
-  :config
-  (define-advice company-capf--candidates (:around (func &rest args))
-    "Try default completion styles."
-    (let ((completion-styles '(basic partial-completion)))
-      (apply func args)))
-  :custom
-  (company-idle-delay 0.2)
-  ;; Easy navigation to candidates with M-<n>
-  (company-show-quick-access t)
-  (company-require-match nil)
-  (company-minimum-prefix-length 1)
-  (company-tooltip-width-grow-only t)
-  (company-tooltip-align-annotations t)
-  ;; complete `abbrev' only in current buffer and make dabbrev case-sensitive
-  (company-dabbrev-other-buffers nil)
-  (company-dabbrev-ignore-case nil)
-  (company-dabbrev-downcase nil)
-  ;; make dabbrev-code case-sensitive
-  (company-dabbrev-code-ignore-case nil)
-  (company-dabbrev-code-everywhere t)
-  ;; call `tempo-expand-if-complete' after completion
-  (company-tempo-expand t)
-  ;; Ignore uninteresting files. Items end with a slash are recognized as
-  ;; directories.
-  (company-files-exclusions '(".git/" ".DS_Store"))
-  ;; No icons
-  (company-format-margin-function nil)
-  (company-backends '((company-capf :with company-tempo)
-                      company-files
-                      (company-dabbrev-code company-keywords)
-                      company-dabbrev
-                      ;; HACK: prevent `lsp-mode' to add `company-capf' back.
-                      company-capf)))
-
-;; (use-package company-tabnine
-;;   :config
-;;   (defun company//sort-by-tabnine (candidates)
-;;     (if (or (functionp company-backend)
-;; 	        (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-;;         candidates
-;;       (let ((candidates-table (make-hash-table :test #'equal))
-;; 	        candidates-1
-;; 	        candidates-2)
-;;         (dolist (candidate candidates)
-;; 	      (if (eq (get-text-property 0 'company-backend candidate)
-;; 		          'company-tabnine)
-;; 	          (unless (gethash candidate candidates-table)
-;; 	            (push candidate candidates-2))
-;; 	        (push candidate candidates-1)
-;; 	        (puthash candidate t candidates-table)))
-;;         (setq candidates-1 (nreverse candidates-1))
-;;         (setq candidates-2 (nreverse candidates-2))
-;;         (nconc (seq-take candidates-1 1)	; number of items tabnine shows
-;; 	           (seq-take candidates-2 1)
-;; 	           (seq-drop candidates-1 1)
-;; 	           (seq-drop candidates-2 1)))))
-
-;;   (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-;;   ;; `:separate`  使得不同 backend 分开排序
-;;   (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
-
-;;   ;; The free version of TabNine is good enough,
-;;   ;; and below code is recommended that TabNine not always
-;;   ;; prompt me to purchase a paid version in a large project.
-;;   (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-;;     (let ((company-message-func (ad-get-arg 0)))
-;;       (when (and company-message-func
-;; 	             (stringp (funcall company-message-func)))
-;;         (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-;; 	      ad-do-it))))
-;;   )
-
-
-
-
-
-
-
-#+end_src
-
-#+RESULTS:
-
-*** corfu
-(use-package corfu
-  ;; TAB-and-Go customizations
-  :custom
-  (corfu-auto t)
-  (corfu-quit-at-boundary t)
-  (corfu-cycle t)             ;; Enable cycling for `corfu-next/previous'
-  (corfu-preselect-first nil) ;; Disable candidate preselection
-  (corfu-auto-prefix 1)
-  (corfu-auto-delay 0.01)
-  ;; Use TAB for cycling, default is `corfu-complete'.
-  :bind
-  (:map corfu-map
-        ("TAB" . corfu-next)
-        ([tab] . corfu-next)
-        ("S-TAB" . corfu-previous)
-        ([backtab] . corfu-previous))
-
-  :init
-  (corfu-global-mode))
-
-;; Use dabbrev with Corfu!
-(use-package dabbrev
-  ;; Swap M-/ and C-M-/
-  :bind (("M-/" . dabbrev-completion)
-         ("C-M-/" . dabbrev-expand)))
-
-(defun corfu-enable-in-minibuffer ()
-  "Enable Corfu in the minibuffer if `completion-at-point' is bound."
-  (when (where-is-internal #'completion-at-point (list (current-local-map)))
-    ;; (setq-local corfu-auto nil) Enable/disable auto completion
-    (corfu-mode 1)))
-(add-hook 'minibuffer-setup-hook #'corfu-enable-in-minibuffer)
-
-*** backends
-(use-package cape
-  :init
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  (add-to-list 'completion-at-point-functions #'cape-tex)
-  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-keyword)
-  (add-to-list 'completion-at-point-functions #'cape-sgml)
-  (add-to-list 'completion-at-point-functions #'cape-rfc1345)
-  (add-to-list 'completion-at-point-functions #'cape-abbrev)
-  (add-to-list 'completion-at-point-functions #'cape-ispell)
-  (add-to-list 'completion-at-point-functions #'cape-dict)
-  (add-to-list 'completion-at-point-functions #'cape-symbol)
-  (add-to-list 'completion-at-point-functions #'cape-line)
-)
-
-** composing our chanting
 *** lsp
 #+begin_src emacs-lisp
-;; lsp-mode
-(use-package lsp-mode
-  :ensure t
-  :hook (prog-mode . lsp-deferred)
-  :custom
-  (lsp-keymap-prefix "C-c l")
-  (lsp-enable-links nil)                 ;; no clickable links
-  (lsp-enable-folding nil)               ;; use `hideshow' instead
-  (lsp-enable-file-watchers nil)         ;; performance matters
-  (lsp-enable-text-document-color nil)   ;; as above
-  (lsp-enable-on-type-formatting nil)    ;; as above
-  (lsp-enable-indentation nil)           ;; don't change my code without my permission
-  (lsp-headerline-breadcrumb-enable nil) ;; keep headline clean
-  (lsp-modeline-code-actions-enable nil) ;; keep modeline clean
-  (lsp-modeline-diagnostics-enable nil)  ;; as above
-  (lsp-log-io nil)                       ;; debug only
-  (lsp-auto-guess-root t)                ;; auto guess root
-  (lsp-keep-workspace-alive nil)         ;; auto kill lsp server
-  (lsp-eldoc-enable-hover nil))          ;; disable eldoc hover
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
+(use-package corfu)
+(require 'cape)
+(require 'lsp-bridge)
+(require 'lsp-bridge-orderless) ;; make lsp-bridge support fuzzy match, optional
+(require 'lsp-bridge-icon) ;; show icon for completion items, optional
 
-(use-package yasnippet      
-  :config (yas-global-mode))
+;;(require 'tabnine-capf)
+
+;;; Code:
+
+;; (lazy-load-set-keys
+;;  '(
+;;    ("M-h" . corfu-complete)
+;;    ("M-." . corfu-first)
+;;    ("M-," . corfu-last)
+;;    )
+;;  corfu-map)
+
+;; (custom-set-faces
+;;  '(corfu-default ((t (:height 1.3)))))
+
+;; (setq lsp-bridge-enable-log t)
+
+(add-to-list 'completion-at-point-functions #'cape-symbol)
+(add-to-list 'completion-at-point-functions #'cape-file)
+(add-to-list 'completion-at-point-functions #'cape-dabbrev)
+
+(dolist (hook (list
+               'emacs-lisp-mode-hook
+               ))
+  (add-hook hook (lambda ()
+                   (setq-local corfu-auto t) ; Elisp
+                   )))
+
+;;
+(defun lsp-bridge-mix-multi-backends ()
+  (setq-local completion-category-defaults nil)
+  (setq-local completion-at-point-functions
+              (list
+               (cape-capf-buster
+                (cape-super-capf
+                 #'lsp-bridge-capf
+                 
+                 #'cape-file
+                 #'cape-dabbrev
+                 )
+                'equal)
+               )))
+
+
+(dolist (hook lsp-bridge-default-mode-hooks)
+  (add-hook hook (lambda ()
+                   (setq-local corfu-auto nil) ; 
+                   (lsp-bridge-mode 1)         ; 
+                   (lsp-bridge-mix-multi-backends) ;
+                   )))
+
+(defun lsp-bridge-jump ()
+  (interactive)
+  (cond
+   ((eq major-mode 'emacs-lisp-mode)
+    (let ((symb (function-called-at-point)))
+      (when symb
+        (find-function symb))))
+   (lsp-bridge-mode
+    (lsp-bridge-find-def))
+   (t
+    (require 'dumb-jump)
+    (dumb-jump-go))))
+
+(defun lsp-bridge-jump-back ()
+  (interactive)
+  (cond
+   (lsp-bridge-mode
+    (lsp-bridge-return-from-def))
+   (t
+    (require 'dumb-jump)
+    (dumb-jump-back))))
+
+
+(global-corfu-mode)
+
+(provide 'init-lsp-bridge)
 #+end_src
 
 #+RESULTS:
-: t
+: init-lsp-bridge
 
-*** ispell
-#+begin_src emacs-lisp
-;; dictionary needed?
-;; (use-package ispell
-;;   :config
-;;   ;; no spell checking for org special blocks
-;;   (add-to-list 'ispell-skip-region-alist '(":\\(PROPERTIES\\|LOGBOOK\\):" . ":END:"))
-;;   (add-to-list 'ispell-skip-region-alist '("#\\+begin_src" . "#\\+end_src"))
-;;   (add-to-list 'ispell-skip-region-alist '("#\\+begin_example" . "#\\+end_example"))
-;;   :custom
-;;   (ispell-really-hunspell t)
-;;   (ispell-program-name "hunspell")
-;;   (ispell-dictionary "en_US")
-;;   (ispell-following-word t)
-;;   (ispell-personal-dictionary (locate-user-emacs-file "hunspell_dict.txt")))
-
-;; Spell check on-the-fly
-;; (use-package flyspell
-;;   :custom
-;;   ;; Use M-C-i instead if M-TAB is shadowed by your window manager
-;;   (flyspell-use-meta-tab t)
-;;   (flyspell-issue-welcome-flag nil)
-;;   (flyspell-issue-message-flag nil))
-
-
-#+end_src
-
-#+RESULTS:
 *** documentation
 #+begin_src emacs-lisp
 (use-package separedit
@@ -1490,7 +1361,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 *** flycheck
 #+BEGIN_SRC emacs-lisp
-;; flycheck好烦阿，能不能只显示未使用的变量和未定义的函数？
+;; flycheck
 (use-package flycheck
   :hook (prog-mode . flycheck-mode)
   :custom
