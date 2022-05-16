@@ -37,8 +37,26 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(c-cleanup-list
-   '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator space-before-funcall compact-empty-funcall comment-close-slash))
- '(c-hanging-braces-alist 'set-from-style)
+   '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator compact-empty-funcall comment-close-slash))
+ '(c-hanging-braces-alist
+   '((defun-open after)
+     (class-open after)
+     (inline-open)
+     (inline-close)
+     (block-open after)
+     (block-close . c-snug-do-while)
+     (statement-cont)
+     (substatement-open after)
+     (brace-list-open)
+     (brace-list-close)
+     (brace-entry-open)
+     (extern-lang-open after)
+     (namespace-open after)
+     (module-open after)
+     (composition-open after)
+     (inexpr-class-open after)
+     (inexpr-class-close before)
+     (arglist-cont-nonempty)))
  '(electric-indent-mode t)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/usr/local/sbin" "/usr/bin/site_perl" "/usr/bin/vendor_perl" "/usr/bin/core_perl" "/usr/lib/emacs/29.0.50/x86_64-pc-linux-gnu" "/home/qb/.local/bin"))
@@ -64,6 +82,9 @@
       "* %^{heading|记录|回忆} %U
 %?" :tree-type week)))
  '(org-confirm-babel-evaluate nil)
+ '(org-latex-compiler "xelatex")
+ '(org-latex-listings t)
+ '(org-latex-packages-alist '("\\usepackage{ctex}"))
  '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-speed-commands
    '(("Outline Navigation")
@@ -128,7 +149,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)

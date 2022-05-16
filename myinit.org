@@ -351,7 +351,7 @@ if the buffer isn't a file, simply restart emacs."
 ** window
 #+begin_src emacs-lisp
 ;; Customize popwin behavior
-(use-package shackle                    ;customize not working?
+(use-package shackle                    ;*customize* not working?
   :ensure t
   :hook (after-init . shackle-mode)
   :custom
@@ -369,6 +369,7 @@ if the buffer isn't a file, simply restart emacs."
                    (grep-mode            :select t :align right)
                    (rg-mode              :select t :align right)
                    (compilation-mode     :select t :align right :size 0.2)
+                   ("*devdocs*"          :select t :align right :popup t :size 0.8)
                    ("*Flycheck errors*"         :select t   :align bellow :size 10)
                    ("*Backtrace*"               :select t   :align bellow :size 15)
                    ("*Shell Command Output*"    :select nil :align bellow :size 0.4)
@@ -389,7 +390,7 @@ if the buffer isn't a file, simply restart emacs."
 #+end_src
 
 #+RESULTS:
-| show-paren-mode | temp-buffer-resize-mode | shackle-mode | recentf-mode | save-place-mode | global-auto-revert-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map |
+| projectile-mode | show-paren-mode | temp-buffer-resize-mode | shackle-mode | vertico-mode | recentf-mode | save-place-mode | global-auto-revert-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map | magit-auto-revert-mode--init-kludge | magit-startup-asserts | magit-version |
 
 ** mark
 *** delsel
@@ -474,7 +475,7 @@ if the buffer isn't a file, simply restart emacs."
   :hook
   ((prog-mode . rainbow-delimiters-mode)
    (shell-mode . rainbow-delimiters-mode)
-   (text-mode . rainbow-delimiters-mode)
+;;   (text-mode . rainbow-delimiters-mode)
    ))
 ;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
 ;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
@@ -592,7 +593,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 * RECALL the structure of our magic array
 ** ORG
-
 *** org
 #+begin_src emacs-lisp
 (use-package org
@@ -619,20 +619,13 @@ The pointer moves by +1, and restore by taking mod.  "
   ;; call C-c C-o explicitly
   (org-return-follows-link nil)
   ;; todo
-  (org-todo-keywords '((sequence "TODO(t)" "HOLD(h!)" "WIP(i!)" "WAIT(w!)" "|" "DONE(d!)" "CANCELLED(c@/!)")
-                       (sequence "REPORT(r)" "BUG(b)" "KNOWNCAUSE(k)" "|" "FIXED(f!)")))
-  (org-todo-keyword-faces '(("TODO"       :foreground "#7c7c75" :weight bold)
-                            ("HOLD"       :foreground "#feb24c" :weight bold)
-                            ("WIP"        :foreground "#0098dd" :weight bold)
-                            ("WAIT"       :foreground "#9f7efe" :weight bold)
+  (org-todo-keywords '((sequence "TODO(t)" "|" "DONE(d!)" "CANCELLED(c@/!)")))
+
+  (org-todo-keyword-faces '(("TODO"       :foreground "#feb24c" :weight bold)
                             ("DONE"       :foreground "#50a14f" :weight bold)
-                            ("CANCELLED"  :foreground "#ff6480" :weight bold)
-                            ("REPORT"     :foreground "magenta" :weight bold)
-                            ("BUG"        :foreground "red"     :weight bold)
-                            ("KNOWNCAUSE" :foreground "yellow"  :weight bold)
-                            ("FIXED"      :foreground "green"   :weight bold)))
+                            ("CANCELLED"  :foreground "#ff6480" :weight bold)))
   (org-use-fast-todo-selection 'auto)   ;expert
-  (org-enforce-todo-dependencies t)
+  (org-enforce-todo-dependencies nil)
   (org-enforce-todo-checkbox-dependencies t)
   (org-priority-faces '((?A :foreground "red")
                         (?B :foreground "orange")
@@ -666,7 +659,7 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 #+RESULTS:
-| visual-line-mode | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | org-tempo-setup | (lambda nil (org-bullets-mode 1)) | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
+| #[0 \305\306	>\203 \307 |
 
 *** outfit
 **** org bullets
@@ -723,6 +716,8 @@ The pointer moves by +1, and restore by taking mod.  "
 
 *** export
 #+BEGIN_SRC emacs-lisp
+(use-package htmlize)
+
 ;; (use-package ox-reveal
 ;;   :commands (org-reveal)
 ;;   :init
@@ -739,14 +734,13 @@ The pointer moves by +1, and restore by taking mod.  "
       org-html-checkbox-type 'html
       org-html-doctype "html5"
       org-html-html5-fancy t)
-
-;; colors for blocks
-(use-package htmlize
-  :defer t
-  )
+(require 'ox-latex)
+(add-to-list 'org-latex-packages-alist '("" "listings"))
+(add-to-list 'org-latex-packages-alist '("" "color"))
  #+END_SRC
 
  #+RESULTS:
+ | ( color) | ( listings) | \usepackage{ctex} |
 *** org-src
 #+BEGIN_SRC emacs-lisp
 (define-key org-src-mode-map "\C-c\C-c" 'org-edit-src-exit)
@@ -814,6 +808,10 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+RESULTS:
 | rst-toc-update |
+** latex
+#+begin_src emacs-lisp
+
+#+end_src
 ** dired
 #+begin_src emacs-lisp
 (setq dired-kill-when-opening-new-dired-buffer t
@@ -854,27 +852,29 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** cc mode
 #+begin_src emacs-lisp
-(use-package cc-mode
-  :defines lsp-clients-clangd-executable lsp-clients-clangd-args
-  :mode ("\\.cxx\\'" . cc-mode)
-  :hook (c-mode-common c-toggle-auto-hungry-state)
-  :config
-  (defconst ccls-args nil)
-  (defconst clangd-args '("-j=2"
-                          "--malloc-trim"
-                          "--background-index"
-                          "--clang-tidy"
-                          "--completion-style=bundled"
-                          "--pch-storage=memory"
-                          "--header-insertion=iwyu"
-                          "--header-insertion-decorators"))
-  (with-eval-after-load 'lsp-mode
-    ;; Prefer `clangd' over `ccls'
-    (cond ((executable-find "clangd") (setq lsp-clients-clangd-executable "clangd"
-                                            lsp-clients-clangd-args clangd-args))
-          ((executable-find "ccls") (setq lsp-clients-clangd-executable "ccls"
-                                          lsp-clients-clangd-args ccls-args))))
-  )
+;; (use-package cc-mode
+;;   :defines lsp-clients-clangd-executable lsp-clients-clangd-args
+;;   :hook (c-mode-common c-toggle-auto-hungry-state)
+;;   :config
+;;   (defconst ccls-args nil)
+;;   (defconst clangd-args '("-j=2"
+;;                           "--malloc-trim"
+;;                           "--background-index"
+;;                           "--clang-tidy"
+;;                           "--completion-style=bundled"
+;;                           "--pch-storage=memory"
+;;                           "--header-insertion=iwyu"
+;;                           "--header-insertion-decorators"))
+;;   (with-eval-after-load 'lsp-mode
+;;     ;; Prefer `clangd' over `ccls'
+;;     (cond ((executable-find "clangd") (setq lsp-clients-clangd-executable "clangd"
+;;                                             lsp-clients-clangd-args clangd-args))
+;;           ((executable-find "ccls") (setq lsp-clients-clangd-executable "ccls"
+;;                                           lsp-clients-clangd-args ccls-args))))
+;;   )
+
+(add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
+(remove-hook 'c-mode-common-hook 'cc-mode)
 
 ;; A compiler output viewer
 (use-package rmsbolt
@@ -886,26 +886,20 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; Parser generator
 (use-package bison-mode)
 
-
 ;; cmake, the de factor build system for C++
 (use-package cmake-mode
-  :mode (("CMakeLists\\.txt\\'" . cmake-mode)
-         ("\\.cmake\\'"         . cmake-mode))
-  :bind (:map cmake-mode-map
-         ;; Compatible with lsp-mode keybindings
-         ("C-c d" . cmake-help))
   :config
   (set-company-backends-for! cmake-mode company-cmake))
 
 ;; Extra font locks for cmake
 (use-package cmake-font-lock
-  :hook (cmake-mode . cmake-font-lock-activate))
+  :hook (cmake-mode cmake-font-lock-activate))
 
 
 #+end_src
 
 #+RESULTS:
-| cmake-font-lock-activate |
+| cmake-font-lock |
 
 ** lisp
 #+begin_src emacs-lisp
@@ -1002,8 +996,8 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package php-mode)
 (use-package crontab-mode)
 (use-package graphviz-dot-mode)
-(use-package gnus
-  :ensure nil)
+(use-package json-mode)
+(use-package csharp-mode)
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
@@ -1012,6 +1006,21 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 #+RESULTS:
+
+** www
+#+begin_src emacs-lisp
+(use-package eww
+  :config
+  (defun eww-open-this-file ()
+    (interactive)
+    (if (buffer-file-name)
+        (eww-open-file (buffer-file-name))
+      (call-interactively 'eww))))
+
+#+end_src
+
+#+RESULTS:
+: t
 
 ** games
 #+begin_src emacs-lisp
@@ -1025,6 +1034,7 @@ The pointer moves by +1, and restore by taking mod.  "
   :defer t)
 (use-package flames-of-freedom
   :defer t)
+
 #+end_src
 
 #+RESULTS:
@@ -1093,12 +1103,12 @@ The pointer moves by +1, and restore by taking mod.  "
   :init (savehist-mode))
 
 ;; Insert SPDX license header
-(use-package spdx
-  :hook (prog-mode . spdx-tempo-setup)
-  :custom
-  (spdx-ignore-deprecated t))
-
+;; (use-package spdx
+;;   :hook (prog-mode . spdx-tempo-setup)
+;;   :custom
+;;   (spdx-ignore-deprecated t))
 ;; tldr man info
+
 (use-package tldr)
   
 ;; I would use grep for searching TODO
@@ -1120,14 +1130,17 @@ The pointer moves by +1, and restore by taking mod.  "
               ([remap completion-at-point] . company-complete)
               :map company-active-map
               ([tab]     . company-complete-common-or-cycle)
-              ([backtab] . company-select-previous-or-abort)) ;maybe unbind C-n?
+              ([backtab] . company-select-previous-or-abort)
+              ("C-n" . nil)
+              ("C-p" . nil)
+              ) ;maybe unbind C-n?
   :config
   (define-advice company-capf--candidates (:around (func &rest args))
     "Try default completion styles."
     (let ((completion-styles '(basic partial-completion)))
       (apply func args)))
   :custom
-  (company-idle-delay 0)
+  (company-idle-delay 0.2)
   ;; Easy navigation to candidates with M-<n>
   (company-show-quick-access t)
   (company-require-match nil)
@@ -1155,47 +1168,53 @@ The pointer moves by +1, and restore by taking mod.  "
                       ;; HACK: prevent `lsp-mode' to add `company-capf' back.
                       company-capf)))
 
-(use-package company-tabnine
-  :config
-  (defun company//sort-by-tabnine (candidates)
-    (if (or (functionp company-backend)
-	        (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
-        candidates
-      (let ((candidates-table (make-hash-table :test #'equal))
-	        candidates-1
-	        candidates-2)
-        (dolist (candidate candidates)
-	      (if (eq (get-text-property 0 'company-backend candidate)
-		          'company-tabnine)
-	          (unless (gethash candidate candidates-table)
-	            (push candidate candidates-2))
-	        (push candidate candidates-1)
-	        (puthash candidate t candidates-table)))
-        (setq candidates-1 (nreverse candidates-1))
-        (setq candidates-2 (nreverse candidates-2))
-        (nconc (seq-take candidates-1 1)	; number of items tabnine shows
-	           (seq-take candidates-2 1)
-	           (seq-drop candidates-1 1)
-	           (seq-drop candidates-2 1)))))
+;; (use-package company-tabnine
+;;   :config
+;;   (defun company//sort-by-tabnine (candidates)
+;;     (if (or (functionp company-backend)
+;; 	        (not (and (listp company-backend) (memq 'company-tabnine company-backend))))
+;;         candidates
+;;       (let ((candidates-table (make-hash-table :test #'equal))
+;; 	        candidates-1
+;; 	        candidates-2)
+;;         (dolist (candidate candidates)
+;; 	      (if (eq (get-text-property 0 'company-backend candidate)
+;; 		          'company-tabnine)
+;; 	          (unless (gethash candidate candidates-table)
+;; 	            (push candidate candidates-2))
+;; 	        (push candidate candidates-1)
+;; 	        (puthash candidate t candidates-table)))
+;;         (setq candidates-1 (nreverse candidates-1))
+;;         (setq candidates-2 (nreverse candidates-2))
+;;         (nconc (seq-take candidates-1 1)	; number of items tabnine shows
+;; 	           (seq-take candidates-2 1)
+;; 	           (seq-drop candidates-1 1)
+;; 	           (seq-drop candidates-2 1)))))
 
-  (add-to-list 'company-transformers 'company//sort-by-tabnine t)
-  ;; `:separate`  使得不同 backend 分开排序
-  (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
+;;   (add-to-list 'company-transformers 'company//sort-by-tabnine t)
+;;   ;; `:separate`  使得不同 backend 分开排序
+;;   (add-to-list 'company-backends '(company-capf :with company-tabnine :separate))
 
-  ;; The free version of TabNine is good enough,
-  ;; and below code is recommended that TabNine not always
-  ;; prompt me to purchase a paid version in a large project.
-  (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
-    (let ((company-message-func (ad-get-arg 0)))
-      (when (and company-message-func
-	             (stringp (funcall company-message-func)))
-        (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
-	      ad-do-it))))
-  )
+;;   ;; The free version of TabNine is good enough,
+;;   ;; and below code is recommended that TabNine not always
+;;   ;; prompt me to purchase a paid version in a large project.
+;;   (defadvice company-echo-show (around disable-tabnine-upgrade-message activate)
+;;     (let ((company-message-func (ad-get-arg 0)))
+;;       (when (and company-message-func
+;; 	             (stringp (funcall company-message-func)))
+;;         (unless (string-match "The free version of TabNine only indexes up to" (funcall company-message-func))
+;; 	      ad-do-it))))
+;;   )
+
+
+
+
 
 
 
 #+end_src
+
+#+RESULTS:
 
 *** corfu
 (use-package corfu
@@ -1254,19 +1273,12 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package lsp-mode
   :ensure t
   :hook (prog-mode . lsp-deferred)
-  :bind (:map lsp-mode-map
-         ("C-c f" . lsp-format-region)
-         ("C-c d" . lsp-describe-thing-at-point)
-         ("C-c a" . lsp-execute-code-action)
-         ("C-c r" . lsp-rename))
   :custom
   (lsp-keymap-prefix "C-c l")
   (lsp-enable-links nil)                 ;; no clickable links
   (lsp-enable-folding nil)               ;; use `hideshow' instead
-  (lsp-enable-snippet nil)               ;; no snippets, it requires `yasnippet'
   (lsp-enable-file-watchers nil)         ;; performance matters
   (lsp-enable-text-document-color nil)   ;; as above
-  (lsp-enable-symbol-highlighting nil)   ;; as above
   (lsp-enable-on-type-formatting nil)    ;; as above
   (lsp-enable-indentation nil)           ;; don't change my code without my permission
   (lsp-headerline-breadcrumb-enable nil) ;; keep headline clean
@@ -1277,8 +1289,13 @@ The pointer moves by +1, and restore by taking mod.  "
   (lsp-keep-workspace-alive nil)         ;; auto kill lsp server
   (lsp-eldoc-enable-hover nil))          ;; disable eldoc hover
 
-
+(use-package yasnippet      
+  :config (yas-global-mode))
 #+end_src
+
+#+RESULTS:
+: t
+
 *** ispell
 #+begin_src emacs-lisp
 ;; dictionary needed?
@@ -1391,17 +1408,18 @@ The pointer moves by +1, and restore by taking mod.  "
   (vc-allow-async-revert t)
   (vc-handled-backends '(Git)))
 
+;; useless and disturbing
 ;; Highlight uncommitted changes using VC
-(use-package diff-hl
-  :ensure t
-  :hook ((after-init         . global-diff-hl-mode)
-         (dired-mode         . diff-hl-dired-mode-unless-remote)
-         (magit-pre-refresh  . diff-hl-magit-pre-refresh)
-         (magit-post-refresh . diff-hl-magit-post-refresh))
-  :config
-  ;; When Emacs runs in terminal, show the indicators in margin instead.
-  (unless (display-graphic-p)
-    (diff-hl-margin-mode)))
+;; (use-package diff-hl
+;;   :ensure t
+;;   :hook ((after-init         . global-diff-hl-mode)
+;;          (dired-mode         . diff-hl-dired-mode-unless-remote)
+;;          (magit-pre-refresh  . diff-hl-magit-pre-refresh)
+;;          (magit-post-refresh . diff-hl-magit-post-refresh))
+;;   :config
+;;   ;; When Emacs runs in terminal, show the indicators in margin instead.
+;;   (unless (display-graphic-p)
+;;     (diff-hl-margin-mode)))
 
 ;; Visual diff interface
 (use-package ediff                ;what's this?
@@ -1462,9 +1480,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| colorize-compilation-buffer |
-
 *** quickrun
 #+begin_src emacs-lisp
 (use-package quickrun
@@ -1482,16 +1497,7 @@ The pointer moves by +1, and restore by taking mod.  "
   (flycheck-temp-prefix ".flycheck")
   (flycheck-emacs-lisp-load-path 'inherit)
   (flycheck-indication-mode 'left-fringe)
-  (flycheck-idle-change-delay 3)
+  (flycheck-idle-change-delay 1)
   )
   #+END_SRC
-
-  #+RESULTS:
-  | flycheck-mode | lsp-deferred | company-mode | spdx-tempo-setup | rainbow-delimiters-mode |
-
-
-
-
-
-
 
