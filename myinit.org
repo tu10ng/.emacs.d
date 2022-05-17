@@ -40,32 +40,49 @@
   (global-auto-revert-non-file-buffers t))
 
 ;; auto save when idle
-(setq auto-save-default nil)
-(setq auto-save-idle 1)
-(defun auto-save-buffers ()
-  (interactive)
-  (let ((auto-save-buffer-list))
-    (save-excursion
-      (dolist (buf (buffer-list))
-	(set-buffer buf)
-	(if (and (buffer-file-name) (buffer-modified-p))
-	    (progn
-	      (push (buffer-name) auto-save-buffer-list)
-	      (with-temp-message "" (basic-save-buffer))
-	      ))))))
+;; (setq auto-save-default nil)
+;; (setq auto-save-idle 1)
+;; (defun auto-save-buffers ()
+;;   (interactive)
+;;   (let ((auto-save-buffer-list))
+;;     (save-excursion
+;;       (dolist (buf (buffer-list))
+;; 	(set-buffer buf)
+;; 	(if (and (buffer-file-name) (buffer-modified-p))
+;; 	    (progn
+;; 	      (push (buffer-name) auto-save-buffer-list)
+;; 	      (with-temp-message "" (basic-save-buffer))
+;; 	      ))))))
 
-(defun auto-save-enable ()
-  (interactive)
-  (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
+;; (defun auto-save-enable ()
+;;   (interactive)
+;;   (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
 
+;; (auto-save-enable)
+
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/auto-save/") ; add auto-save to your load-path
+(require 'auto-save)
 (auto-save-enable)
 
+(setq auto-save-silent t)   ; quietly save
+(setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
+
+;;; custom predicates if you don't want auto save.
+;;; disable auto save mode when current filetype is an gpg file.
+;; (setq auto-save-disable-predicates
+;;       '((lambda ()
+;;       (string-suffix-p
+;;       "gpg"
+;;       (file-name-extension (buffer-name)) t))))
 #+end_src
-** connection between session 
+
+#+RESULTS:
+: t
+
+** connection between session
 #+BEGIN_SRC emacs-lisp
-(use-package restart-emacs
-  :defer t
-  )
+(use-package restart-emacs)
 
 (defun restart-emacs-reopen-current-file ()
   "restart emacs then reopen the file being visited when casting this command.
@@ -105,6 +122,7 @@ if the buffer isn't a file, simply restart emacs."
       shift-select-mode nil
       shell-command-prompt-show-cwd 1)
 
+(setq read-process-output-max (* 3 1024 1024))
 (setq initial-scratch-message nil
       initial-buffer-choice nil)
 (setq inhibit-startup-screen t
@@ -124,8 +142,42 @@ if the buffer isn't a file, simply restart emacs."
 
 (setq inhibit-compacting-font-caches t)
 
+(setq word-wrap-by-category t)
+
+(setq initial-scratch-message "")
+(defun remove-scratch-buffer ()
+  (if (get-buffer "*scratch*")
+      (kill-buffer "*scratch*")))
+(add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
+
+
+;;(setq initial-buffer-choice "~/org/gtd.org")
+
 (set-face-attribute 'default nil :font "Source Code Pro:pixelsize=20")
 ;;(set-fontset-font t 'han ":pixelsize=20")
+;; lazycat's config
+;; (defun load-font-setup()
+;;   (cond ((eq window-system 'pgtk)
+;;          (set-face-attribute 'default nil :height 140 :family "WenQuanYi Micro Hei Mono"))
+;;         (t
+;;          (let ((emacs-font-size 14)
+;;                (chinese-font-name  "TsangerJinKai03-6763")
+;;                english-font-name)
+;;            (cond
+;;             ((featurep 'cocoa)
+;;              (setq english-font-name "Monaco"))
+;;             ((string-equal system-type "gnu/linux")
+;;              (setq english-font-name "WenQuanYi Micro Hei Mono")))
+;;            (when (display-grayscale-p)
+;;              (set-frame-font (format "%s-%s" (eval english-font-name) (eval emacs-font-size)))
+;;              (set-fontset-font (frame-parameter nil 'font) 'unicode (eval english-font-name))
+
+;;              (dolist (charset '(kana han symbol cjk-misc bopomofo))
+;;                (set-fontset-font (frame-parameter nil 'font) charset (font-spec :family (eval chinese-font-name))))
+;;              )))))
+
+;; (load-font-setup)
+
 
 (setq display-raw-bytes-as-hex t
       redisplay-skip-fontification-on-input t)
@@ -138,7 +190,7 @@ if the buffer isn't a file, simply restart emacs."
       read-char-choice-use-read-key t)
 
 
-(setq initial-major-mode 'org-mode)
+;;(setq initial-major-mode 'org-mode)
 (put 'upcase-region    'disabled nil)
 (put 'downcase-region  'disabled nil)
 (put 'narrow-to-defun  'disabled nil)
@@ -147,6 +199,7 @@ if the buffer isn't a file, simply restart emacs."
 
 (setq process-adaptive-read-buffering nil
       read-process-output-max (* 10 1024 1024))
+(setq use-dialog-box nil)
 (setq-default
  fill-column 79
  indent-tabs-mode nil
@@ -160,16 +213,18 @@ if the buffer isn't a file, simply restart emacs."
 
 (use-package all-the-icons)
 
-#+END_SRC  
+#+END_SRC
+
+#+RESULTS:
 
 ** language difference(macros! to solve)
 #+begin_src emacs-lisp
-(defmacro set-company-backends-for! (mode &rest backends)
-  "Set `company-backends' for MODE with BACKENDS."
-  `(add-hook (intern (format "%s-hook" ',mode))
-             (lambda ()
-               (company-mode +1)
-               (setq-local company-backends ',backends))))
+;; (defmacro set-company-backends-for! (mode &rest backends)
+;;   "Set `company-backends' for MODE with BACKENDS."
+;;   `(add-hook (intern (format "%s-hook" ',mode))
+;;              (lambda ()
+;;                (company-mode +1)
+;;                (setq-local company-backends ',backends))))
 
 (defmacro shut-up! (func)
   "Silence FUNC."
@@ -194,7 +249,7 @@ if the buffer isn't a file, simply restart emacs."
 ** find magic
 *** general
 #+BEGIN_SRC emacs-lisp
-(use-package info-colors 
+(use-package info-colors
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
 ;; (use-package helpful
@@ -230,12 +285,13 @@ if the buffer isn't a file, simply restart emacs."
 ;;   (progn
 ;;     (ivy-mode 1)
 ;;     (setq ivy-use-virtual-buffers t)
-;;     (setq ivy-display-style 'fancy))      
+;;     (setq ivy-display-style 'fancy))
 ;;   )
 ;; (use-package ivy-rich
 ;;   :init (ivy-rich-mode 1))
 
-*** consult vertico orderless
+*** consult
+vertico orderless
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
 
@@ -258,13 +314,15 @@ if the buffer isn't a file, simply restart emacs."
    completion-category-overrides '((file (styles partial-completion)))))
 
 (global-unset-key (kbd "C-s"))
+
+
 (use-package consult
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-x bindings (ctl-x-map)
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-         ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-         ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-         ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
+         ;; ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+         ;; ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+         ;; ("C-x r b" . consult-bookmark)            ;; orig. bookmark-jump
          ;; Custom M-# bindings for fast register access
          ;;         ("M-#" . consult-register-load)
          ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
@@ -309,6 +367,16 @@ if the buffer isn't a file, simply restart emacs."
   (consult-async-input-throttle 0.2)
   (consult-async-input-debounce 0.1)
   (consult-project-root-function #'projectile-project-root)
+  (defun consult-buffer ()
+    (interactive)
+    (consult--multi consult-buffer-sources
+                    :require-match
+                    (confirm-nonexistent-file-or-buffer)
+                    :prompt "Switch to: "
+                    :history 'consult--buffer-history
+                    :sort nil))
+
+
   )
 
 (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -320,11 +388,13 @@ if the buffer isn't a file, simply restart emacs."
 
 ** outfit of magic
 #+begin_src emacs-lisp
-(toggle-frame-maximized)
+(toggle-frame-fullscreen)
+;;(toggle-frame-maximized)
+;;(set-frame-parameter nil 'undecorated t)
+
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
 (menu-bar-mode -1)
-(set-frame-parameter nil 'undecorated t)  
 
 ;; (use-package tangotango-theme)
 ;; (enable-theme 'tangotango)
@@ -342,21 +412,26 @@ if the buffer isn't a file, simply restart emacs."
 (setq awesome-tray-active-modules
       '("location" "mode-name" "buffer-name" "parent-dir"
         "circe" "buffer-read-only"
-	    "date" 
+	    "date"
 	    ))
 (awesome-tray-mode 1)
 
 #+END_SRC
 
+#+RESULTS:
+: t
+
 ** window
 #+begin_src emacs-lisp
+(setq split-height-threshold nil)         ;don't split vertically
+
 ;; Customize popwin behavior
 (use-package shackle                    ;*customize* not working?
   :ensure t
   :hook (after-init . shackle-mode)
   :custom
   (shackle-default-size 0.5)
-  (shackle-default-alignment 'below)
+  (shackle-default-alignment 'bellow)
   (shackle-rules '((magit-status-mode    :select t :align right)
                    (magit-log-mode       :select t :align right)
                    ("*quickrun*"         :select t)
@@ -426,7 +501,7 @@ if the buffer isn't a file, simply restart emacs."
 (line-number-mode nil)
 ;; (use-package linum-relative
 ;;   :custom
-;;   (linum-relative-current-symbol "") 
+;;   (linum-relative-current-symbol "")
 ;;   (linum-relative-global-mode t))
 (setq  line-move-ignore-invisible t
        next-line-add-newlines t)
@@ -464,25 +539,27 @@ if the buffer isn't a file, simply restart emacs."
               show-paren-when-point-in-periphery t
               show-paren-highlight-openparen t))
 ;; don't you think it's a little to shine?
-(use-package rainbow-delimiters 
+(use-package rainbow-delimiters
   :config
-
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "gold") 
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1") 
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green") 
-  (set-face-bold 'rainbow-delimiters-depth-1-face "t") 
-  (set-face-bold 'rainbow-delimiters-depth-2-face "t")
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "DarkOrange") ;lazycat
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "DeepSkyBlue")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "DarkRed")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-1-face "gold")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green")
+  ;; (set-face-bold 'rainbow-delimiters-depth-1-face "t")
+  ;; (set-face-bold 'rainbow-delimiters-depth-2-face "t")
   :hook
   ((prog-mode . rainbow-delimiters-mode)
    (shell-mode . rainbow-delimiters-mode)
 ;;   (text-mode . rainbow-delimiters-mode)
    ))
-;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink") 
+;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink")
 ;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-;; (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise") 
-;; (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid") 
-;; (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3") 
-;; (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan") 
+;; (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise")
+;; (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid")
+;; (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3")
+;; (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan")
 
 
 #+end_src
@@ -510,7 +587,7 @@ if the buffer isn't a file, simply restart emacs."
 		                          ))
 (setq rainbow-cursor-color-pointer 1)
 (defun cursor-color-change ()
-  "Take a color from `rainbow-color-list' by the pointer.  
+  "Take a color from `rainbow-color-list' by the pointer.
 The pointer moves by +1, and restore by taking mod.  "
   (setq rainbow-cursor-color-pointer (% (1+ rainbow-cursor-color-pointer)
 				                        (length rainbow-cursor-color-list)))
@@ -520,18 +597,74 @@ The pointer moves by +1, and restore by taking mod.  "
 (run-with-timer ()
 		        (/ .5 (length rainbow-cursor-color-list))
 		        'cursor-color-change)
-    #+end_src    
+    #+end_src
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
-(setq scroll-step 2
-      scroll-margin 2
-      hscroll-step 2
-      hscroll-margin 2
-      scroll-conservatively 101)
+(setq scroll-step 1
+      ;; scroll-margin 2
+      ;; hscroll-step 2
+      ;; hscroll-margin 2
+      scroll-conservatively 10000)
 ;;      scroll-preserve-screen-position 'always
-      
+(pixel-scroll-precision-mode 1)
 #+END_SRC
+
+#+RESULTS:
+: t
+
+** indent
+#+begin_src emacs-lisp
+(setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
+
+(defun adjust-languages-indent (n)
+  (setq-local c-basic-offset n)
+
+  (setq-local coffee-tab-width n)
+  (setq-local javascript-indent-level n)
+  (setq-local js-indent-level n)
+  (setq-local js2-basic-offset n)
+
+  (setq-local web-mode-attr-indent-offset n)
+  (setq-local web-mode-attr-value-indent-offset n)
+  (setq-local web-mode-code-indent-offset n)
+  (setq-local web-mode-css-indent-offset n)
+  (setq-local web-mode-markup-indent-offset n)
+  (setq-local web-mode-sql-indent-offset n)
+
+  (setq-local css-indent-offset n))
+
+(dolist (hook (list
+               'c-mode-hook
+               'c++-mode-hook
+               'java-mode-hook
+               'haskell-mode-hook
+               'asm-mode-hook
+               'sh-mode-hook
+               'haskell-cabal-mode-hook
+               'ruby-mode-hook
+               'qml-mode-hook
+               'scss-mode-hook
+               'coffee-mode-hook
+               ))
+  (add-hook hook #'(lambda ()
+                     (setq indent-tabs-mode nil)
+                     (adjust-languages-indent 4)
+                     )))
+
+(dolist (hook (list
+               'web-mode-hook
+               'js-mode-hook
+               ))
+  (add-hook hook #'(lambda ()
+                     (setq indent-tabs-mode nil)
+                     (adjust-languages-indent 2)
+                     )))
+
+#+end_src
+
+#+RESULTS:
 
 ** keybinding (navigation, etc.)
 #+begin_src emacs-lisp
@@ -575,7 +708,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (setq default-input-method "pyim")
 ;; slow down pyim init speed.
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")  
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")
 ;; (require 'pyim-greatdict)
 ;; (pyim-greatdict-enable)
 #+end_src
@@ -657,7 +790,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-
 *** outfit
 **** org bullets
 #+BEGIN_SRC emacs-lisp
@@ -691,7 +823,7 @@ The pointer moves by +1, and restore by taking mod.  "
   ;; (org-agenda-columns-add-appointments-to-effort-sum t)
   ;; (org-agenda-restore-windows-after-quit t)
   ;; (org-agenda-window-setup 'current-window)
-  
+
 #+end_src
 
 #+RESULTS:
@@ -699,6 +831,23 @@ The pointer moves by +1, and restore by taking mod.  "
 *** export
 #+BEGIN_SRC emacs-lisp
 (use-package htmlize)
+
+(with-eval-after-load 'org
+  (setq org-odt-preferred-output-format "docx") ;ODT转换格式默认为docx
+  (setq org-startup-folded nil)                 ;默认展开内容
+
+  (defun org-export-docx ()
+    (interactive)
+    (let ((docx-file (concat (file-name-sans-extension (buffer-file-name)) ".docx"))
+          (template-file (concat (file-name-as-directory lazycat-emacs-root-dir)
+                                 (file-name-as-directory "template")
+                                 "template.docx")))
+      (shell-command (format "pandoc %s -o %s --reference-doc=%s"
+                             (buffer-file-name)
+                             docx-file
+                             template-file
+                             ))
+      (message "Convert finish: %s" docx-file))))
 
 ;; (use-package ox-reveal
 ;;   :commands (org-reveal)
@@ -834,29 +983,8 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** cc mode
 #+begin_src emacs-lisp
-;; (use-package cc-mode
-;;   :defines lsp-clients-clangd-executable lsp-clients-clangd-args
-;;   :hook (c-mode-common c-toggle-auto-hungry-state)
-;;   :config
-;;   (defconst ccls-args nil)
-;;   (defconst clangd-args '("-j=2"
-;;                           "--malloc-trim"
-;;                           "--background-index"
-;;                           "--clang-tidy"
-;;                           "--completion-style=bundled"
-;;                           "--pch-storage=memory"
-;;                           "--header-insertion=iwyu"
-;;                           "--header-insertion-decorators"))
-;;   (with-eval-after-load 'lsp-mode
-;;     ;; Prefer `clangd' over `ccls'
-;;     (cond ((executable-find "clangd") (setq lsp-clients-clangd-executable "clangd"
-;;                                             lsp-clients-clangd-args clangd-args))
-;;           ((executable-find "ccls") (setq lsp-clients-clangd-executable "ccls"
-;;                                           lsp-clients-clangd-args ccls-args))))
-;;   )
-
 (add-hook 'c-mode-common-hook 'c-toggle-auto-hungry-state)
-(remove-hook 'c-mode-common-hook 'cc-mode)
+;;(remove-hook 'c-mode-common-hook 'cc-mode)
 
 ;; A compiler output viewer
 (use-package rmsbolt
@@ -869,19 +997,56 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package bison-mode)
 
 ;; cmake, the de factor build system for C++
-(use-package cmake-mode
-  :config
-  (set-company-backends-for! cmake-mode company-cmake))
+(use-package cmake-mode)
 
 ;; Extra font locks for cmake
 (use-package cmake-font-lock
   :hook (cmake-mode cmake-font-lock-activate))
 
+(dolist (hook (list
+               'c-mode-hook
+               'c++-mode-hook
+               'c-mode-common-hook
+               ))
+  (add-hook hook #'(lambda ()
+                     (require 'cc-mode)
+                     (require 'modern-cpp-font-lock)
 
+                     (defun c-mode-style-setup ()
+                       (interactive)
+                       ;; cpp font lock.
+                       (modern-c++-font-lock-global-mode t)
+
+                       ;; base-style
+                       (c-set-style "stroustrup")
+
+                       ;; qt keywords and stuff ...
+                       ;; set up indenting correctly for new qt kewords
+                       (setq c-protection-key (concat "\\<\\(public\\|public slot\\|protected"
+                                                      "\\|protected slot\\|private\\|private slot"
+                                                      "\\)\\>")
+                             c-C++-access-key (concat "\\<\\(signals\\|public\\|protected\\|private"
+                                                      "\\|public slots\\|protected slots\\|private slots"
+                                                      "\\)\\>[ \t]*:"))
+                       (progn
+                         ;; modify the colour of slots to match public, private, etc ...
+                         (font-lock-add-keywords 'c++-mode
+                                                 '(("\\<\\(slots\\|signals\\)\\>" . font-lock-type-face)))
+                         ;; make new font for rest of qt keywords
+                         (make-face 'qt-keywords-face)
+                         (set-face-foreground 'qt-keywords-face "DeepSkyBlue1")
+                         ;; qt keywords
+                         (font-lock-add-keywords 'c++-mode
+                                                 '(("\\<Q_OBJECT\\>" . 'qt-keywords-face)))
+                         (font-lock-add-keywords 'c++-mode
+                                                 '(("\\<SIGNAL\\|SLOT\\>" . 'qt-keywords-face)))
+                         (font-lock-add-keywords 'c++-mode
+                                                 '(("\\<Q[A-Z][A-Za-z]\\>" . 'qt-keywords-face)))
+                         ))
+                     (c-mode-style-setup))))
 #+end_src
 
 #+RESULTS:
-| cmake-font-lock |
 
 ** lisp
 #+begin_src emacs-lisp
@@ -1043,6 +1208,15 @@ The pointer moves by +1, and restore by taking mod.  "
   (dumb-jump-aggressive t)
   (dumb-jump-selector 'completing-read))
 
+(use-package tree-sitter)
+(use-package tree-sitter-langs)
+(require 'tree-sitter-hl)
+(require 'tree-sitter-debug)
+(require 'tree-sitter-query)
+
+;;; Code:
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
 (use-package citre
   :init
   (require 'citre-config)
@@ -1060,7 +1234,7 @@ The pointer moves by +1, and restore by taking mod.  "
    citre-use-project-root-when-creating-tags t
    citre-prompt-language-for-ctags-command t
    )
-  
+
   (defun citre-jump+ ()
     (interactive)
     (condition-case _
@@ -1092,7 +1266,7 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; tldr man info
 
 (use-package tldr)
-  
+
 ;; I would use grep for searching TODO
 
 ;; I will not enable whitespace-mode. I only need a tool that automaticly remove spaces, but keep the spaces around my cursor for about five lines to not disturb typing.
@@ -1101,7 +1275,6 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 #+RESULTS:
-| flycheck-mode | spdx-tempo-setup | rainbow-delimiters-mode |
 
 ** choosing your lyrics
 *** lsp
@@ -1149,7 +1322,7 @@ The pointer moves by +1, and restore by taking mod.  "
                (cape-capf-buster
                 (cape-super-capf
                  #'lsp-bridge-capf
-                 
+
                  #'cape-file
                  #'cape-dabbrev
                  )
@@ -1159,8 +1332,8 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (dolist (hook lsp-bridge-default-mode-hooks)
   (add-hook hook (lambda ()
-                   (setq-local corfu-auto nil) ; 
-                   (lsp-bridge-mode 1)         ; 
+                   (setq-local corfu-auto nil) ;
+                   (lsp-bridge-mode 1)         ;
                    (lsp-bridge-mix-multi-backends) ;
                    )))
 
@@ -1194,6 +1367,36 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+RESULTS:
 : init-lsp-bridge
+
+*** yas
+#+begin_src emacs-lisp
+(use-package yasnippet)
+(add-hook 'prog-mode-hook
+          #'(lambda ()
+              (require 'yasnippet)
+
+              (defun get-git-user-name ()
+                (interactive)
+                (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.name")))
+
+              (defun get-git-user-email ()
+                (interactive)
+                (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.email")))
+
+              (add-to-list `yas/root-directory (concat lazycat-emacs-root-dir "/snippets"))
+              (yas-global-mode 1)
+
+              ;; Disable yasnippet mode on some mode.
+              (dolist (hook (list
+                             'term-mode-hook
+                             ))
+                (add-hook hook #'(lambda () (yas-minor-mode -1))))
+              ))
+
+#+end_src
+
+#+RESULTS:
+| (lambda nil (require 'yasnippet) (defun get-git-user-name nil (interactive) (replace-regexp-in-string |
 
 *** documentation
 #+begin_src emacs-lisp
@@ -1273,6 +1476,8 @@ The pointer moves by +1, and restore by taking mod.  "
   (magit-diff-paint-whitespace nil)
   )
 
+(setq magit-commit-ask-to-stage nil)    ;don't ask stage question
+
 (use-package vc
   :custom
   (vc-follow-symlinks t)
@@ -1330,6 +1535,9 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
+#+RESULTS:
+: ((\.gitattributes\' . conf-unix-mode) (\.gitconfig\' . conf-unix-mode) (\.gitignore\' . conf-unix-mode) (\(?:\(?:\.\(?:b\(?:\(?:abel\|ower\)rc\)\|json\(?:ld\)?\)\|composer\.lock\)\'\) . json-mode) (README\(?:\.md\)?\' . gfm-mode) (\.odc\' . archive-mode) (\.odf\' . archive-mode) (\.odi\' . archive-mode) (\.otp\' . archive-mode) (\.odp\' . archive-mode) (\.otg\' . archive-mode) (\.odg\' . archive-mode) (\.ots\' . archive-mode) (\.ods\' . archive-mode) (\.odm\' . archive-mode) (\.ott\' . archive-mode) (\.odt\' . archive-mode) (\.jison\' . jison-mode) (\.l\' . flex-mode) (\.y\' . bison-mode) (\.cmake\' . cmake-mode) (CMakeLists\.txt\' . cmake-mode) (/crontab\(\.X*[[:alnum:]]+\)?\' . crontab-mode) (\.cs\' . csharp-mode) (/fish_funced\..*\' . fish-mode) (\.fish\' . fish-mode) (\.gv\' . graphviz-dot-mode) (\.dot\' . graphviz-dot-mode) (\.hsc\' . haskell-mode) (\.l[gh]s\' . haskell-literate-mode) (\.hsig\' . haskell-mode) (\.[gh]s\' . haskell-mode) (\.cabal\'\|/cabal\.project\|/\.cabal/config\' . haskell-cabal-mode) (\.chs\' . haskell-c2hs-mode) (\.ghci\' . ghci-script-mode) (\.dump-simpl\' . ghc-core-mode) (\.hcr\' . ghc-core-mode) (\.lox\' . lox-mode) (/git-rebase-todo\' . git-rebase-mode) (\.\(?:md\|markdown\|mkd\|mdown\|mkdn\|mdwn\)\' . markdown-mode) (\.\(?:php[s345]?\|phtml\)\' . php-mode-maybe) (\.\(?:php\.inc\|stub\)\' . php-mode) (/\.php_cs\(?:\.dist\)?\' . php-mode) (\.rs\' . rust-mode) (\.gpg\(~\|\.~[0-9]+~\)?\' nil epa-file) (\.elc\' . elisp-byte-code-mode) (\.zst\' nil jka-compr) (\.dz\' nil jka-compr) (\.xz\' nil jka-compr) (\.lzma\' nil jka-compr) (\.lz\' nil jka-compr) (\.g?z\' nil jka-compr) (\.bz2\' nil jka-compr) (\.Z\' nil jka-compr) (\.vr[hi]?\' . vera-mode) (\(?:\.\(?:rbw?\|ru\|rake\|thor\|jbuilder\|rabl\|gemspec\|podspec\)\|/\(?:Gem\|Rake\|Cap\|Thor\|Puppet\|Berks\|Brew\|Vagrant\|Guard\|Pod\)file\)\' . ruby-mode) (\.re?st\' . rst-mode) (\.py[iw]?\' . python-mode) (\.m\' . octave-maybe-mode) (\.less\' . less-css-mode) (\.scss\' . scss-mode) (\.awk\' . awk-mode) (\.\(u?lpc\|pike\|pmod\(\.in\)?\)\' . pike-mode) (\.idl\' . idl-mode) (\.java\' . java-mode) (\.m\' . objc-mode) (\.ii\' . c++-mode) (\.i\' . c-mode) (\.lex\' . c-mode) (\.y\(acc\)?\' . c-mode) (\.h\' . c-or-c++-mode) (\.c\' . c-mode) (\.\(CC?\|HH?\)\' . c++-mode) (\.[ch]\(pp\|xx\|\+\+\)\' . c++-mode) (\.\(cc\|hh\)\' . c++-mode) (\.\(bat\|cmd\)\' . bat-mode) (\.[sx]?html?\(\.[a-zA-Z_]+\)?\' . mhtml-mode) (\.svgz?\' . image-mode) (\.svgz?\' . xml-mode) (\.x[bp]m\' . image-mode) (\.x[bp]m\' . c-mode) (\.p[bpgn]m\' . image-mode) (\.tiff?\' . image-mode) (\.gif\' . image-mode) (\.png\' . image-mode) (\.jpe?g\' . image-mode) (\.webp\' . image-mode) (\.te?xt\' . text-mode) (\.[tT]e[xX]\' . tex-mode) (\.ins\' . tex-mode) (\.ltx\' . latex-mode) (\.dtx\' . doctex-mode) (\.org\' . org-mode) (\.dir-locals\(?:-2\)?\.el\' . lisp-data-mode) (eww-bookmarks\' . lisp-data-mode) (tramp\' . lisp-data-mode) (/archive-contents\' . lisp-data-mode) (places\' . lisp-data-mode) (\.emacs-places\' . lisp-data-mode) (\.el\' . emacs-lisp-mode) (Project\.ede\' . emacs-lisp-mode) (\.\(scm\|stk\|ss\|sch\)\' . scheme-mode) (\.l\' . lisp-mode) (\.li?sp\' . lisp-mode) (\.[fF]\' . fortran-mode) (\.for\' . fortran-mode) (\.p\' . pascal-mode) (\.pas\' . pascal-mode) (\.\(dpr\|DPR\)\' . delphi-mode) (\.\([pP]\([Llm]\|erl\|od\)\|al\)\' . perl-mode) (Imakefile\' . makefile-imake-mode) (Makeppfile\(?:\.mk\)?\' . makefile-makepp-mode) (\.makepp\' . makefile-makepp-mode) (\.mk\' . makefile-gmake-mode) (\.make\' . makefile-gmake-mode) ([Mm]akefile\' . makefile-gmake-mode) (\.am\' . makefile-automake-mode) (\.texinfo\' . texinfo-mode) (\.te?xi\' . texinfo-mode) (\.[sS]\' . asm-mode) (\.asm\' . asm-mode) (\.css\' . css-mode) (\.mixal\' . mixal-mode) (\.gcov\' . compilation-mode) (/\.[a-z0-9-]*gdbinit . gdb-script-mode) (-gdb\.gdb . gdb-script-mode) ([cC]hange\.?[lL]og?\' . change-log-mode) ([cC]hange[lL]og[-.][0-9]+\' . change-log-mode) (\$CHANGE_LOG\$\.TXT . change-log-mode) (\.scm\.[0-9]*\' . scheme-mode) (\.[ckz]?sh\'\|\.shar\'\|/\.z?profile\' . sh-mode) (\.bash\' . sh-mode) (/PKGBUILD\' . sh-mode) (\(/\|\`\)\.\(bash_\(profile\|history\|log\(in\|out\)\)\|z?log\(in\|out\)\)\' . sh-mode) (\(/\|\`\)\.\(shrc\|zshrc\|m?kshrc\|bashrc\|t?cshrc\|esrc\)\' . sh-mode) (\(/\|\`\)\.\([kz]shenv\|xinitrc\|startxrc\|xsession\)\' . sh-mode) (\.m?spec\' . sh-mode) (\.m[mes]\' . nroff-mode) (\.man\' . nroff-mode) (\.sty\' . latex-mode) (\.cl[so]\' . latex-mode) (\.bbl\' . latex-mode) (\.bib\' . bibtex-mode) (\.bst\' . bibtex-style-mode) (\.sql\' . sql-mode) (\(acinclude\|aclocal\|acsite\)\.m4\' . autoconf-mode) (\.m[4c]\' . m4-mode) (\.mf\' . metafont-mode) (\.mp\' . metapost-mode) (\.vhdl?\' . vhdl-mode) (\.article\' . text-mode) (\.letter\' . text-mode) (\.i?tcl\' . tcl-mode) (\.exp\' . tcl-mode) (\.itk\' . tcl-mode) (\.icn\' . icon-mode) (\.sim\' . simula-mode) (\.mss\' . scribe-mode) (\.f9[05]\' . f90-mode) (\.f0[38]\' . f90-mode) (\.indent\.pro\' . fundamental-mode) (\.\(pro\|PRO\)\' . idlwave-mode) (\.srt\' . srecode-template-mode) (\.prolog\' . prolog-mode) (\.tar\' . tar-mode) (\.\(arc\|zip\|lzh\|lha\|zoo\|[jew]ar\|xpi\|rar\|cbr\|7z\|squashfs\|ARC\|ZIP\|LZH\|LHA\|ZOO\|[JEW]AR\|XPI\|RAR\|CBR\|7Z\|SQUASHFS\)\' . archive-mode) (\.oxt\' . archive-mode) (\.\(deb\|[oi]pk\)\' . archive-mode) (\`/tmp/Re . text-mode) (/Message[0-9]*\' . text-mode) (\`/tmp/fol/ . text-mode) (\.oak\' . scheme-mode) (\.sgml?\' . sgml-mode) (\.x[ms]l\' . xml-mode) (\.dbk\' . xml-mode) (\.dtd\' . sgml-mode) (\.ds\(ss\)?l\' . dsssl-mode) (\.js[mx]?\' . javascript-mode) (\.har\' . javascript-mode) (\.json\' . javascript-mode) (\.[ds]?va?h?\' . verilog-mode) (\.by\' . bovine-grammar-mode) (\.wy\' . wisent-grammar-mode) (\.erts\' . erts-mode) ([:/\]\..*\(emacs\|gnus\|viper\)\' . emacs-lisp-mode) (\`\..*emacs\' . emacs-lisp-mode) ([:/]_emacs\' . emacs-lisp-mode) (/crontab\.X*[0-9]+\' . shell-script-mode) (\.ml\' . lisp-mode) (\.ld[si]?\' . ld-script-mode) (ld\.?script\' . ld-script-mode) (\.xs\' . c-mode) (\.x[abdsru]?[cnw]?\' . ld-script-mode) (\.zone\' . dns-mode) (\.soa\' . dns-mode) (\.asd\' . lisp-mode) (\.\(asn\|mib\|smi\)\' . snmp-mode) (\.\(as\|mi\|sm\)2\' . snmpv2-mode) (\.\(diffs?\|patch\|rej\)\' . diff-mode) (\.\(dif\|pat\)\' . diff-mode) (\.[eE]?[pP][sS]\' . ps-mode) (\.\(?:PDF\|EPUB\|CBZ\|FB2\|O?XPS\|DVI\|OD[FGPST]\|DOCX\|XLSX?\|PPTX?\|pdf\|epub\|cbz\|fb2\|o?xps\|djvu\|dvi\|od[fgpst]\|docx\|xlsx?\|pptx?\)\' . doc-view-mode-maybe) (configure\.\(ac\|in\)\' . autoconf-mode) (\.s\(v\|iv\|ieve\)\' . sieve-mode) (BROWSE\' . ebrowse-tree-mode) (\.ebrowse\' . ebrowse-tree-mode) (#\*mail\* . mail-mode) (\.g\' . antlr-mode) (\.mod\' . m2-mode) (\.ses\' . ses-mode) (\.docbook\' . sgml-mode) (\.com\' . dcl-mode) (/config\.\(?:bat\|log\)\' . fundamental-mode) (/\.\(authinfo\|netrc\)\' . authinfo-mode) (\.\(?:[iI][nN][iI]\|[lL][sS][tT]\|[rR][eE][gG]\|[sS][yY][sS]\)\' . conf-mode) (\.la\' . conf-unix-mode) (\.ppd\' . conf-ppd-mode) (java.+\.conf\' . conf-javaprop-mode) (\.properties\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-javaprop-mode) (\.toml\' . conf-toml-mode) (\.desktop\' . conf-desktop-mode) (/\.redshift\.conf\' . conf-windows-mode) (\`/etc/\(?:DIR_COLORS\|ethers\|.?fstab\|.*hosts\|lesskey\|login\.?de\(?:fs\|vperm\)\|magic\|mtab\|pam\.d/.*\|permissions\(?:\.d/.+\)?\|protocols\|rpc\|services\)\' . conf-space-mode) (\`/etc/\(?:acpid?/.+\|aliases\(?:\.d/.+\)?\|default/.+\|group-?\|hosts\..+\|inittab\|ksysguarddrc\|opera6rc\|passwd-?\|shadow-?\|sysconfig/.+\)\' . conf-mode) ([cC]hange[lL]og[-.][-0-9a-z]+\' . change-log-mode) (/\.?\(?:gitconfig\|gnokiirc\|hgrc\|kde.*rc\|mime\.types\|wgetrc\)\' . conf-mode) (/\.\(?:asound\|enigma\|fetchmail\|gltron\|gtk\|hxplayer\|mairix\|mbsync\|msmtp\|net\|neverball\|nvidia-settings-\|offlineimap\|qt/.+\|realplayer\|reportbug\|rtorrent\.\|screen\|scummvm\|sversion\|sylpheed/.+\|xmp\)rc\' . conf-mode) (/\.\(?:gdbtkinit\|grip\|mpdconf\|notmuch-config\|orbital/.+txt\|rhosts\|tuxracer/options\)\' . conf-mode) (/\.?X\(?:default\|resource\|re\)s\> . conf-xdefaults-mode) (/X11.+app-defaults/\|\.ad\' . conf-xdefaults-mode) (/X11.+locale/.+/Compose\' . conf-colon-mode) (/X11.+locale/compose\.dir\' . conf-javaprop-mode) (\.~?[0-9]+\.[0-9][-.0-9]*~?\' nil t) (\.\(?:orig\|in\|[bB][aA][kK]\)\' nil t) ([/.]c\(?:on\)?f\(?:i?g\)?\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-mode-maybe) (\.[1-9]\' . nroff-mode) (\.art\' . image-mode) (\.avs\' . image-mode) (\.bmp\' . image-mode) (\.cmyk\' . image-mode) (\.cmyka\' . image-mode) (\.crw\' . image-mode) (\.dcr\' . image-mode) (\.dcx\' . image-mode) (\.dng\' . image-mode) (\.dpx\' . image-mode) (\.fax\' . image-mode) (\.heic\' . image-mode) (\.hrz\' . image-mode) (\.icb\' . image-mode) (\.icc\' . image-mode) (\.icm\' . image-mode) (\.ico\' . image-mode) (\.icon\' . image-mode) (\.jbg\' . image-mode) (\.jbig\' . image-mode) (\.jng\' . image-mode) (\.jnx\' . image-mode) (\.miff\' . image-mode) (\.mng\' . image-mode) (\.mvg\' . image-mode) (\.otb\' . image-mode) (\.p7\' . image-mode) (\.pcx\' . image-mode) (\.pdb\' . image-mode) (\.pfa\' . image-mode) (\.pfb\' . image-mode) (\.picon\' . image-mode) (\.pict\' . image-mode) (\.rgb\' . image-mode) (\.rgba\' . image-mode) (\.tga\' . image-mode) (\.wbmp\' . image-mode) (\.webp\' . image-mode) (\.wmf\' . image-mode) (\.wpg\' . image-mode) (\.xcf\' . image-mode) (\.xmp\' . image-mode) (\.xwd\' . image-mode) (\.yuv\' . image-mode) (\.tgz\' . tar-mode) (\.tbz2?\' . tar-mode) (\.txz\' . tar-mode) (\.tzst\' . tar-mode))
+
 ** see the power of spell
 *** compile
 #+begin_src emacs-lisp
@@ -1362,13 +1570,63 @@ The pointer moves by +1, and restore by taking mod.  "
 *** flycheck
 #+BEGIN_SRC emacs-lisp
 ;; flycheck
-(use-package flycheck
-  :hook (prog-mode . flycheck-mode)
-  :custom
-  (flycheck-temp-prefix ".flycheck")
-  (flycheck-emacs-lisp-load-path 'inherit)
-  (flycheck-indication-mode 'left-fringe)
-  (flycheck-idle-change-delay 1)
-  )
+(use-package flycheck)
+;;   :hook (prog-mode . flycheck-mode)
+;;   :custom
+;;   (flycheck-temp-prefix ".flycheck")
+;;   (flycheck-emacs-lisp-load-path 'inherit)
+;;   (flycheck-indication-mode 'left-fringe)
+;;   (flycheck-idle-change-delay 1)
+;;   )
+
+(use-package flycheck-posframe)
+;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
+(dolist (hook (list
+               'c-mode-common-hook
+               'ruby-mode-hook
+               'python-mode-hook
+               'swift-mode-hook
+               'go-mode-hook
+               'js-mode-hook
+               ))
+  (add-hook
+   hook
+   #'(lambda ()
+       ;; OS Config
+       (when (featurep 'cocoa)
+         ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
+         (require 'exec-path-from-shell)
+         (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
+         (exec-path-from-shell-initialize))
+
+       (require 'flycheck)
+
+       (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
+                     (append flycheck-disabled-checkers
+                             '(json-jsonlist)))
+
+       (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+                     (append flycheck-disabled-checkers
+                             '(javascript-jshint)))
+
+       (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
+
+       (setq-default flycheck-temp-prefix ".flycheck")
+
+       (with-eval-after-load 'flycheck
+         (require 'flycheck-posframe)
+         (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+       (flycheck-mode 1))))
+
+;; Add flycheck for swift.
+(add-hook 'swift-mode-hook
+          #'(lambda ()
+              (require 'flycheck-swift)
+              (flycheck-swift-setup)
+              ))
   #+END_SRC
 
+  #+RESULTS:
+  | lambda | nil | (when (featurep 'cocoa) (require 'exec-path-from-shell) (setq exec-path-from-shell-variables '(PATH MANPATH GEM_PATH)) (exec-path-from-shell-initialize))       | (require 'flycheck)    | (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))         | (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))         | (flycheck-add-mode 'javascript-eslint 'web-mode) | (setq-default flycheck-temp-prefix .flycheck)         | (with-eval-after-load 'flycheck (require 'flycheck-posframe) (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))           | (flycheck-mode 1) |
+  | lambda | nil | (require 'flycheck-swift)                                                                                                                                       | (flycheck-swift-setup) |                                                                                                        |                                                                                                            |                                                  |                                                       |                                                                                                                                 |                   |
+  | lambda | nil | (if (featurep 'cocoa) (progn (require 'exec-path-from-shell) (setq exec-path-from-shell-variables '(PATH MANPATH GEM_PATH)) (exec-path-from-shell-initialize))) | (require 'flycheck)    | (progn (set-default 'flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))) | (progn (set-default 'flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))) | (flycheck-add-mode 'javascript-eslint 'web-mode) | (progn (set-default 'flycheck-temp-prefix .flycheck)) | (eval-after-load 'flycheck #'(lambda nil (require 'flycheck-posframe) (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))) | (flycheck-mode 1) |

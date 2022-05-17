@@ -79,8 +79,7 @@
  '(org-capture-templates
    '(("d" "diary" entry
       (file+olp+datetree "~/org/diary.org")
-      "* %^{heading|记录|回忆} %U
-%?" :tree-type week)))
+      "* %^{heading|记录|回忆} %U\12%?" :tree-type week)))
  '(org-confirm-babel-evaluate nil)
  '(org-latex-compiler "xelatex")
  '(org-latex-listings t)
@@ -149,7 +148,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
@@ -179,4 +178,3 @@
 ;; 		      (font-spec :family chinese :size chinese-size))))
 
 ;; (set-font "Source Code Pro" "黑体" 20 17)
-
