@@ -444,6 +444,9 @@ vertico orderless
                    (grep-mode            :select t :align right)
                    (rg-mode              :select t :align right)
                    (compilation-mode     :select t :align right :size 0.2)
+                   ("*eww*"              :select t :align right :popup t :size 0.6)
+                   ("*info*"             :select t :align right :popup t :size 0.5)
+                   ("*Org Agenda*"       :select t :align right :popup t :size 0.3)
                    ("*devdocs*"          :select t :align right :popup t :size 0.8)
                    ("*Flycheck errors*"         :select t   :align bellow :size 10)
                    ("*Backtrace*"               :select t   :align bellow :size 15)
@@ -465,7 +468,7 @@ vertico orderless
 #+end_src
 
 #+RESULTS:
-| projectile-mode | show-paren-mode | temp-buffer-resize-mode | shackle-mode | vertico-mode | recentf-mode | save-place-mode | global-auto-revert-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map | magit-auto-revert-mode--init-kludge | magit-startup-asserts | magit-version |
+| projectile-mode | show-paren-mode | temp-buffer-resize-mode | shackle-mode | vertico-mode | recentf-mode | save-place-mode | #[0 \303\235\203 \304\303"\301\305!\210	\205 \306 \210\307\211\207 [command-line-args desktop-save-mode inhibit-startup-screen --no-desktop delete 0 desktop-read t] 3] | global-auto-revert-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map | magit-auto-revert-mode--init-kludge | magit-startup-asserts | magit-version |
 
 ** mark
 *** delsel
@@ -601,7 +604,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
-(setq scroll-step 1
+(setq scroll-step 2
       ;; scroll-margin 2
       ;; hscroll-step 2
       ;; hscroll-margin 2
@@ -618,49 +621,49 @@ The pointer moves by +1, and restore by taking mod.  "
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
-(defun adjust-languages-indent (n)
-  (setq-local c-basic-offset n)
+;; (defun adjust-languages-indent (n)
+;;   (setq-local c-basic-offset n)
 
-  (setq-local coffee-tab-width n)
-  (setq-local javascript-indent-level n)
-  (setq-local js-indent-level n)
-  (setq-local js2-basic-offset n)
+;;   (setq-local coffee-tab-width n)
+;;   (setq-local javascript-indent-level n)
+;;   (setq-local js-indent-level n)
+;;   (setq-local js2-basic-offset n)
 
-  (setq-local web-mode-attr-indent-offset n)
-  (setq-local web-mode-attr-value-indent-offset n)
-  (setq-local web-mode-code-indent-offset n)
-  (setq-local web-mode-css-indent-offset n)
-  (setq-local web-mode-markup-indent-offset n)
-  (setq-local web-mode-sql-indent-offset n)
+;;   (setq-local web-mode-attr-indent-offset n)
+;;   (setq-local web-mode-attr-value-indent-offset n)
+;;   (setq-local web-mode-code-indent-offset n)
+;;   (setq-local web-mode-css-indent-offset n)
+;;   (setq-local web-mode-markup-indent-offset n)
+;;   (setq-local web-mode-sql-indent-offset n)
 
-  (setq-local css-indent-offset n))
+;;   (setq-local css-indent-offset n))
 
-(dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
-               'java-mode-hook
-               'haskell-mode-hook
-               'asm-mode-hook
-               'sh-mode-hook
-               'haskell-cabal-mode-hook
-               'ruby-mode-hook
-               'qml-mode-hook
-               'scss-mode-hook
-               'coffee-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 4)
-                     )))
+;; (dolist (hook (list
+;;                'c-mode-hook
+;;                'c++-mode-hook
+;;                'java-mode-hook
+;;                'haskell-mode-hook
+;;                'asm-mode-hook
+;;                'sh-mode-hook
+;;                'haskell-cabal-mode-hook
+;;                'ruby-mode-hook
+;;                'qml-mode-hook
+;;                'scss-mode-hook
+;;                'coffee-mode-hook
+;;                ))
+;;   (add-hook hook #'(lambda ()
+;;                      (setq indent-tabs-mode nil)
+;;                      (adjust-languages-indent 4)
+;;                      )))
 
-(dolist (hook (list
-               'web-mode-hook
-               'js-mode-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (setq indent-tabs-mode nil)
-                     (adjust-languages-indent 2)
-                     )))
+;; (dolist (hook (list
+;;                'web-mode-hook
+;;                'js-mode-hook
+;;                ))
+;;   (add-hook hook #'(lambda ()
+;;                      (setq indent-tabs-mode nil)
+;;                      (adjust-languages-indent 2)
+;;                      )))
 
 #+end_src
 
@@ -677,7 +680,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
 
 (global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda)
+(global-set-key "\C-ca" 'org-agenda-list)
 (global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key "\C-cc" 'org-capture)
 
@@ -691,6 +694,9 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;   )
 ;;     (add-hook 'after-init-hook 'tl/exchange-keys)
 #+end_src
+
+#+RESULTS:
+: org-capture
 
 ** keyboard input method
 *** pyim
@@ -1118,12 +1124,6 @@ The pointer moves by +1, and restore by taking mod.  "
 ** rust
 #+begin_src emacs-lisp
 (use-package rust-mode
-  :defines lsp-rust-server
-  :config
-  ;; Prefer `rust-analyzer' over `rls'
-  (with-eval-after-load 'lsp-mode
-    (when (executable-find "rust-analyzer")
-      (setq lsp-rust-server 'rust-analyzer)))
   :custom
   (rust-format-on-save (executable-find "rustfmt")))
 
@@ -1134,7 +1134,9 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 #+RESULTS:
-| cargo-minor-mode | rust-maybe-initialize-buffer-project |
+| (lambda nil (set (make-local-variable 'corfu-auto) nil) (lsp-bridge-mode 1) (lsp-bridge-mix-multi-backends)) | cargo-minor-mode | rust-maybe-initialize-buffer-project |
+
+
 
 ** other modes
 #+begin_src emacs-lisp
@@ -1145,6 +1147,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package graphviz-dot-mode)
 (use-package json-mode)
 (use-package csharp-mode)
+(use-package gnuplot)
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
@@ -1175,6 +1178,8 @@ The pointer moves by +1, and restore by taking mod.  "
   :defer t)
 (use-package speed-type
   :defer t)
+(use-package typit)
+(setq typit-test-time (* 5 60))
 (use-package zone-nyan
   :defer t)
 (use-package autotetris-mode
@@ -1280,62 +1285,11 @@ The pointer moves by +1, and restore by taking mod.  "
 *** lsp
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
-(use-package corfu)
-(require 'cape)
+(require 'yasnippet)
 (require 'lsp-bridge)
-(require 'lsp-bridge-orderless) ;; make lsp-bridge support fuzzy match, optional
-(require 'lsp-bridge-icon) ;; show icon for completion items, optional
+(require 'lsp-bridge-jdtls)
 
-;;(require 'tabnine-capf)
-
-;;; Code:
-
-;; (lazy-load-set-keys
-;;  '(
-;;    ("M-h" . corfu-complete)
-;;    ("M-." . corfu-first)
-;;    ("M-," . corfu-last)
-;;    )
-;;  corfu-map)
-
-;; (custom-set-faces
-;;  '(corfu-default ((t (:height 1.3)))))
-
-;; (setq lsp-bridge-enable-log t)
-
-(add-to-list 'completion-at-point-functions #'cape-symbol)
-(add-to-list 'completion-at-point-functions #'cape-file)
-(add-to-list 'completion-at-point-functions #'cape-dabbrev)
-
-(dolist (hook (list
-               'emacs-lisp-mode-hook
-               ))
-  (add-hook hook (lambda ()
-                   (setq-local corfu-auto t) ; Elisp
-                   )))
-
-;;
-(defun lsp-bridge-mix-multi-backends ()
-  (setq-local completion-category-defaults nil)
-  (setq-local completion-at-point-functions
-              (list
-               (cape-capf-buster
-                (cape-super-capf
-                 #'lsp-bridge-capf
-
-                 #'cape-file
-                 #'cape-dabbrev
-                 )
-                'equal)
-               )))
-
-
-(dolist (hook lsp-bridge-default-mode-hooks)
-  (add-hook hook (lambda ()
-                   (setq-local corfu-auto nil) ;
-                   (lsp-bridge-mode 1)         ;
-                   (lsp-bridge-mix-multi-backends) ;
-                   )))
+(global-lsp-bridge-mode)
 
 (defun lsp-bridge-jump ()
   (interactive)
@@ -1359,44 +1313,37 @@ The pointer moves by +1, and restore by taking mod.  "
     (require 'dumb-jump)
     (dumb-jump-back))))
 
+(global-set-key (kbd "M-.") 'lsp-bridge-jump)
+(global-set-key (kbd "M-,") 'lsp-bridge-jump-back)
 
-(global-corfu-mode)
-
-(provide 'init-lsp-bridge)
 #+end_src
 
 #+RESULTS:
-: init-lsp-bridge
+: lsp-bridge-jump-back
 
 *** yas
-#+begin_src emacs-lisp
 (use-package yasnippet)
-(add-hook 'prog-mode-hook
-          #'(lambda ()
-              (require 'yasnippet)
+;; (add-hook 'prog-mode-hook
+;;           #'(lambda ()
+;;               (require 'yasnippet)
 
-              (defun get-git-user-name ()
-                (interactive)
-                (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.name")))
+;;               (defun get-git-user-name ()
+;;                 (interactive)
+;;                 (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.name")))
 
-              (defun get-git-user-email ()
-                (interactive)
-                (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.email")))
+;;               (defun get-git-user-email ()
+;;                 (interactive)
+;;                 (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.email")))
 
-              (add-to-list `yas/root-directory (concat lazycat-emacs-root-dir "/snippets"))
-              (yas-global-mode 1)
+;;               (add-to-list `yas/root-directory (concat lazycat-emacs-root-dir "/snippets"))
+;;               (yas-global-mode 1)
 
-              ;; Disable yasnippet mode on some mode.
-              (dolist (hook (list
-                             'term-mode-hook
-                             ))
-                (add-hook hook #'(lambda () (yas-minor-mode -1))))
-              ))
-
-#+end_src
-
-#+RESULTS:
-| (lambda nil (require 'yasnippet) (defun get-git-user-name nil (interactive) (replace-regexp-in-string |
+;;               ;; Disable yasnippet mode on some mode.
+;;               (dolist (hook (list
+;;                              'term-mode-hook
+;;                              ))
+;;                 (add-hook hook #'(lambda () (yas-minor-mode -1))))
+;;               ))
 
 *** documentation
 #+begin_src emacs-lisp
@@ -1581,49 +1528,49 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (use-package flycheck-posframe)
 ;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
-(dolist (hook (list
-               'c-mode-common-hook
-               'ruby-mode-hook
-               'python-mode-hook
-               'swift-mode-hook
-               'go-mode-hook
-               'js-mode-hook
-               ))
-  (add-hook
-   hook
-   #'(lambda ()
-       ;; OS Config
-       (when (featurep 'cocoa)
-         ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
-         (require 'exec-path-from-shell)
-         (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
-         (exec-path-from-shell-initialize))
+;; (dolist (hook (list
+;;                'c-mode-common-hook
+;;                'ruby-mode-hook
+;;                'python-mode-hook
+;;                'swift-mode-hook
+;;                'go-mode-hook
+;;                'js-mode-hook
+;;                ))
+;;   (add-hook
+;;    hook
+;;    #'(lambda ()
+;;        ;; OS Config
+;;        (when (featurep 'cocoa)
+;;          ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
+;;          (require 'exec-path-from-shell)
+;;          (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
+;;          (exec-path-from-shell-initialize))
 
-       (require 'flycheck)
+;;        (require 'flycheck)
 
-       (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
-                     (append flycheck-disabled-checkers
-                             '(json-jsonlist)))
+;;        (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
+;;                      (append flycheck-disabled-checkers
+;;                              '(json-jsonlist)))
 
-       (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
-                     (append flycheck-disabled-checkers
-                             '(javascript-jshint)))
+;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+;;                      (append flycheck-disabled-checkers
+;;                              '(javascript-jshint)))
 
-       (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
+;;        (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
 
-       (setq-default flycheck-temp-prefix ".flycheck")
+;;        (setq-default flycheck-temp-prefix ".flycheck")
 
-       (with-eval-after-load 'flycheck
-         (require 'flycheck-posframe)
-         (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
-       (flycheck-mode 1))))
+;;        (with-eval-after-load 'flycheck
+;;          (require 'flycheck-posframe)
+;;          (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+;;        (flycheck-mode 1))))
 
-;; Add flycheck for swift.
-(add-hook 'swift-mode-hook
-          #'(lambda ()
-              (require 'flycheck-swift)
-              (flycheck-swift-setup)
-              ))
+;; ;; Add flycheck for swift.
+;; (add-hook 'swift-mode-hook
+;;           #'(lambda ()
+;;               (require 'flycheck-swift)
+;;               (flycheck-swift-setup)
+;;               ))
   #+END_SRC
 
   #+RESULTS:

@@ -36,6 +36,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(browse-url-browser-function 'eww-browse-url)
  '(c-cleanup-list
    '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator compact-empty-funcall comment-close-slash))
  '(c-hanging-braces-alist
@@ -75,16 +76,21 @@
  '(org-adapt-indentation nil)
  '(org-agenda-files
    '("~/org/homework.org" "/home/qb/org/gtd.org" "/home/qb/org/diary.org" "/home/qb/.emacs.d/myinit.org"))
+ '(org-agenda-restore-windows-after-quit t)
  '(org-agenda-span 8)
+ '(org-agenda-window-setup 'other-window)
  '(org-capture-templates
    '(("d" "diary" entry
       (file+olp+datetree "~/org/diary.org")
-      "* %^{heading|记录|回忆} %U\12%?" :tree-type week)))
+      "* %^{heading|记录|回忆} %U\12%?" :tree-type week)
+     ("h" "homework" entry
+      (file "~/org/homework.org")
+      "* TODO %^{什么课？|数据结构|计组|汇编|逻辑|运筹|模式识别|计图|英语|职业} %?\12DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)))
  '(org-confirm-babel-evaluate nil)
  '(org-latex-compiler "xelatex")
  '(org-latex-listings t)
  '(org-latex-packages-alist '("\\usepackage{ctex}"))
- '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
+ '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes))
  '(org-speed-commands
    '(("Outline Navigation")
      ("n" org-speed-move-safe 'org-next-visible-heading)
@@ -148,7 +154,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
