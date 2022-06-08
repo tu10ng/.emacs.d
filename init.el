@@ -85,12 +85,15 @@
       "* %^{heading|记录|回忆} %U\12%?" :tree-type week)
      ("h" "homework" entry
       (file "~/org/homework.org")
-      "* TODO %^{什么课？|数据结构|计组|汇编|逻辑|运筹|模式识别|计图|英语|职业} %?\12DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)))
+      "* TODO %^{什么课？|数据结构|计组|汇编|逻辑|运筹|模式识别|计图|英语|职业} %?\12DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)
+     ("g" "gtd" entry
+      (file "~/org/gtd.org")
+      "* TODO %^{gtd?}" :prepend t :immediate-finish t)))
  '(org-confirm-babel-evaluate nil)
  '(org-latex-compiler "xelatex")
  '(org-latex-listings t)
  '(org-latex-packages-alist '("\\usepackage{ctex}"))
- '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes))
+ '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-speed-commands
    '(("Outline Navigation")
      ("n" org-speed-move-safe 'org-next-visible-heading)

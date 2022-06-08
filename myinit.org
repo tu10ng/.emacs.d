@@ -448,8 +448,8 @@ vertico orderless
                    ("*info*"             :select t :align right :popup t :size 0.5)
                    ("*Org Agenda*"       :select t :align right :popup t :size 0.3)
                    ("*devdocs*"          :select t :align right :popup t :size 0.8)
-                   ("*Flycheck errors*"         :select t   :align bellow :size 10)
-                   ("*Backtrace*"               :select t   :align bellow :size 15)
+                   ;; ("*Flycheck errors*"         :select t   :align bellow :size 10)
+                   ;; ("*Backtrace*"               :select t   :align bellow :size 0.1)
                    ("*Shell Command Output*"    :select nil :align bellow :size 0.4)
                    ("*Async Shell Command*"     :select nil :align bellow :size 0.4)
                    ("*Org-Babel Error Output*"  :select nil :align bellow :size 0.3)
@@ -574,6 +574,7 @@ vertico orderless
 #+begin_src emacs-lisp
 ;; we don't want the cursor vanish
 (blink-cursor-mode -1)
+
 (setq rainbow-cursor-color-list '("#FF0000";red
 		                          "#FF5000"
 		                          "#FF9F00";orange
@@ -597,10 +598,11 @@ The pointer moves by +1, and restore by taking mod.  "
   (set-cursor-color (nth rainbow-cursor-color-pointer
 		                 rainbow-cursor-color-list)))
 
-(run-with-timer ()
-		        (/ .5 (length rainbow-cursor-color-list))
-		        'cursor-color-change)
+(run-with-timer 0 0.05 'cursor-color-change)
     #+end_src
+
+    #+RESULTS:
+    : [nil 25248 48941 124138 0.05 cursor-color-change nil nil 545000 nil]
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
@@ -700,7 +702,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** keyboard input method
 *** pyim
-#+begin_src elisp
+
 (use-package pyim)
 (pyim-default-scheme 'quanpin)
 (if (posframe-workable-p)
@@ -717,10 +719,8 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")
 ;; (require 'pyim-greatdict)
 ;; (pyim-greatdict-enable)
+#+begin_src elisp
 #+end_src
-
-#+RESULTS:
-: pyim
 
 ** server
 #+begin_src emacs-lisp
