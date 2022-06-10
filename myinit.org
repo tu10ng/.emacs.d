@@ -252,15 +252,15 @@ if the buffer isn't a file, simply restart emacs."
 (use-package info-colors
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
-;; (use-package helpful
-;;   :custom
-;;   (counsel-describe-function-function #'helpful-callable)
-;;   (counsel-describe-variable-function #'helpful-variable)
-;;   :bind
-;;   ([remap describe-function] . counsel-describe-function)
-;;   ([remap describe-command] . helpful-command)
-;;   ([remap describe-variable] . counsel-describe-variable)
-;;   ([remap describe-key] . helpful-key))
+(use-package helpful
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable)
+  :bind
+  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-command] . helpful-command)
+  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-key] . helpful-key))
 
 (use-package which-key
   :config
@@ -271,6 +271,9 @@ if the buffer isn't a file, simply restart emacs."
 	))
 
 #+END_SRC
+
+#+RESULTS:
+: t
 
 *** swiper counsel
 ;; (use-package swiper
@@ -409,11 +412,38 @@ vertico orderless
 ;;can modeline change its color overtime if it doesnot have any other functionalies?
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
-(setq awesome-tray-active-modules
-      '("location" "mode-name" "buffer-name" "parent-dir"
+(setq awesome-tray-active-modules       ;flycheck total,
+      '("location" "belong" "mode-name" "buffer-name" "parent-dir"
         "circe" "buffer-read-only"
 	    "date"
-	    ))
+	    )
+      awesome-tray-update-interval 0.05)
+(set-default 'awesome-tray-mode-line-active-color "DarkBlue")
+;; (defun tu10ng/toggle-input-method ()
+;;   (interactive)
+;;   (toggle-input-method)
+;;   (if (eq current-input-method nil)     ;is english
+;;       (setq awesome-tray-mode-line-active-color "DarkBlue")
+;;     (setq awesome-tray-mode-line-active-color "DarkRed"))
+;;   (awesome-tray-disable)
+;;   (awesome-tray-enable))
+(global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
+
+;; (set-face-attribute 'mode-line nil
+;;                     :foreground "DarkBlue"
+;;                     :background "DarkBlue")
+;; (global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
+(defun tu10ng/toggle-input-method ()
+  (interactive)
+  (toggle-input-method)
+  (if (eq current-input-method nil)     ;if current english
+      (set-face-attribute 'mode-line nil
+                    :foreground "DarkBlue"
+                    :background "DarkBlue")
+    (set-face-attribute 'mode-line nil
+                    :foreground "DarkRed"
+                    :background "DarkRed")))
+
 (awesome-tray-mode 1)
 
 #+END_SRC
@@ -432,7 +462,7 @@ vertico orderless
   :custom
   (shackle-default-size 0.5)
   (shackle-default-alignment 'bellow)
-  (shackle-rules '((magit-status-mode    :select t :align right)
+  (shackle-rules '((magit-status-mode    :select t :align right :size 0.2)
                    (magit-log-mode       :select t :align right)
                    ("*quickrun*"         :select t)
                    (profiler-report-mode :select t)
@@ -446,6 +476,7 @@ vertico orderless
                    (compilation-mode     :select t :align right :size 0.2)
                    ("*eww*"              :select t :align right :popup t :size 0.6)
                    ("*info*"             :select t :align right :popup t :size 0.5)
+                   ("*Org todo*"         :select t :align right :popup t :size 0.3)
                    ("*Org Agenda*"       :select t :align right :popup t :size 0.3)
                    ("*devdocs*"          :select t :align right :popup t :size 0.8)
                    ;; ("*Flycheck errors*"         :select t   :align bellow :size 10)
@@ -541,34 +572,35 @@ vertico orderless
   :init (setq show-paren-when-point-inside-paren t
               show-paren-when-point-in-periphery t
               show-paren-highlight-openparen t))
-;; don't you think it's a little to shine?
+;; don't you think it's a little to shine? no. useful in lisp programming.
 (use-package rainbow-delimiters
   :config
-  (set-face-foreground 'rainbow-delimiters-depth-1-face "DarkOrange") ;lazycat
-  (set-face-foreground 'rainbow-delimiters-depth-2-face "DeepSkyBlue")
-  (set-face-foreground 'rainbow-delimiters-depth-3-face "DarkRed")
-  ;; (set-face-foreground 'rainbow-delimiters-depth-1-face "gold")
-  ;; (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1")
-  ;; (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green")
-  ;; (set-face-bold 'rainbow-delimiters-depth-1-face "t")
-  ;; (set-face-bold 'rainbow-delimiters-depth-2-face "t")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-1-face "DarkOrange") ;lazycat
+  ;; (set-face-foreground 'rainbow-delimiters-depth-2-face "DeepSkyBlue")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-3-face "DarkRed")
+  (set-face-foreground 'rainbow-delimiters-depth-1-face "gold")
+  (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1")
+  (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise")
+  (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid")
+  (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3")
+  (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan")
+
+  (set-face-bold 'rainbow-delimiters-depth-1-face "t")
+  (set-face-bold 'rainbow-delimiters-depth-2-face "t")
   :hook
   ((prog-mode . rainbow-delimiters-mode)
    (shell-mode . rainbow-delimiters-mode)
 ;;   (text-mode . rainbow-delimiters-mode)
    ))
-;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink")
-;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-;; (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise")
-;; (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid")
-;; (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3")
-;; (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan")
 
 
 #+end_src
 
 #+RESULTS:
-| rainbow-delimiters-mode | text-mode-hook-identify |
+| rainbow-delimiters-mode |
 
 ** rainbow cursor
 #+begin_src emacs-lisp
@@ -602,7 +634,7 @@ The pointer moves by +1, and restore by taking mod.  "
     #+end_src
 
     #+RESULTS:
-    : [nil 25248 48941 124138 0.05 cursor-color-change nil nil 545000 nil]
+    : [nil 25248 51956 459651 0.05 cursor-color-change nil nil 383000 nil]
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
@@ -702,14 +734,15 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** keyboard input method
 *** pyim
-
+#+begin_src elisp
 (use-package pyim)
 (pyim-default-scheme 'quanpin)
-(if (posframe-workable-p)
-    (setq pyim-page-tooltip 'posframe)
-  (setq pyim-page-tooltip 'popup))
-(setq pyim-page-length 9)
-(setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
+;; (if (posframe-workable-p)
+;;     (setq pyim-page-tooltip 'posframe)
+;;   (setq pyim-page-tooltip 'popup))
+(setq pyim-page-length 7)
+;; (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
+(setq pyim-indicator-list nil)
 
 (use-package pyim-basedict)
 (pyim-basedict-enable)
@@ -719,8 +752,11 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")
 ;; (require 'pyim-greatdict)
 ;; (pyim-greatdict-enable)
-#+begin_src elisp
+
 #+end_src
+
+#+RESULTS:
+: pyim
 
 ** server
 #+begin_src emacs-lisp
@@ -1148,6 +1184,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package json-mode)
 (use-package csharp-mode)
 (use-package gnuplot)
+
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
@@ -1171,6 +1208,15 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+RESULTS:
 : t
+
+* IRC
+#+begin_src emacs-lisp
+(use-package circe)
+(setq circe-default-nick "tu10ng")
+#+end_src
+
+#+RESULTS:
+: tu10ng
 
 ** games
 #+begin_src emacs-lisp
@@ -1203,15 +1249,15 @@ The pointer moves by +1, and restore by taking mod.  "
   (setq xref-show-definitions-function #'xref-show-definitions-completing-read)
   :hook ((xref-after-return xref-after-jump) . recenter))
 
-(use-package dumb-jump
-  :init
-  (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
-  :bind (("M-g j" . dumb-jump-go)
-         ("M-g J" . dumb-jump-go-other-window))
-  :custom
-  (dumb-jump-quiet t)
-  (dumb-jump-aggressive t)
-  (dumb-jump-selector 'completing-read))
+;; (use-package dumb-jump
+;;   :init
+;;   (add-hook 'xref-backend-functions #'dumb-jump-xref-activate t)
+;;   :bind (("M-g j" . dumb-jump-go)
+;;          ("M-g J" . dumb-jump-go-other-window))
+;;   :custom
+;;   (dumb-jump-quiet t)
+;;   (dumb-jump-aggressive t)
+;;   (dumb-jump-selector 'completing-read))
 
 (use-package tree-sitter)
 (use-package tree-sitter-langs)
@@ -1222,31 +1268,31 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;; Code:
 (global-tree-sitter-mode)
 (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-(use-package citre
-  :init
-  (require 'citre-config)
-  (global-set-key (kbd "M-.") 'citre-ace-peek)
-  (global-set-key (kbd "M-,") 'citre-peek-restore)
-  :bind (("C-c d c" . citre-update-this-tags-file))
-  :custom
-  (citre-prompt-language-for-ctags-command t)
-  (citre-ctags-program (executable-find "ctags"))
-  (citre-readtags-program (executable-find "readtags"))
-  :config
-  (setq
-   citre-project-root-function #'projectile-project-root
-   citre-default-create-tags-file-location 'global-cache
-   citre-use-project-root-when-creating-tags t
-   citre-prompt-language-for-ctags-command t
-   )
+;; (use-package citre
+;;   :init
+;;   (require 'citre-config)
+;;   (global-set-key (kbd "M-.") 'citre-ace-peek)
+;;   (global-set-key (kbd "M-,") 'citre-peek-restore)
+;;   :bind (("C-c d c" . citre-update-this-tags-file))
+;;   :custom
+;;   (citre-prompt-language-for-ctags-command t)
+;;   (citre-ctags-program (executable-find "ctags"))
+;;   (citre-readtags-program (executable-find "readtags"))
+;;   :config
+;;   (setq
+;;    citre-project-root-function #'projectile-project-root
+;;    citre-default-create-tags-file-location 'global-cache
+;;    citre-use-project-root-when-creating-tags t
+;;    citre-prompt-language-for-ctags-command t
+;;    )
 
-  (defun citre-jump+ ()
-    (interactive)
-    (condition-case _
-        (citre-jump)
-      (error (let* ((xref-prompt-for-identifier nil))
-               (call-interactively #'xref-find-definitions)))))
-  )
+;;   (defun citre-jump+ ()
+;;     (interactive)
+;;     (condition-case _
+;;         (citre-jump)
+;;       (error (let* ((xref-prompt-for-identifier nil))
+;;                (call-interactively #'xref-find-definitions)))))
+;;   )
 
 ;; Browse devdoc.io
 (use-package devdocs
@@ -1291,12 +1337,15 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (global-lsp-bridge-mode)
 
+(setq lsp-bridge-jump-elisp-last-file nil)
 (defun lsp-bridge-jump ()
   (interactive)
   (cond
    ((eq major-mode 'emacs-lisp-mode)
     (let ((symb (function-called-at-point)))
       (when symb
+        (push (buffer-name) lsp-bridge-jump-elisp-last-file)
+        (push-mark)
         (find-function symb))))
    (lsp-bridge-mode
     (lsp-bridge-find-def))
@@ -1307,6 +1356,10 @@ The pointer moves by +1, and restore by taking mod.  "
 (defun lsp-bridge-jump-back ()
   (interactive)
   (cond
+   ((eq major-mode 'emacs-lisp-mode)
+    (when lsp-bridge-jump-elisp-last-file
+      (switch-to-buffer (pop lsp-bridge-jump-elisp-last-file))))
+
    (lsp-bridge-mode
     (lsp-bridge-return-from-def))
    (t
@@ -1315,11 +1368,12 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (global-set-key (kbd "M-.") 'lsp-bridge-jump)
 (global-set-key (kbd "M-,") 'lsp-bridge-jump-back)
+(global-set-key (kbd "C-M-.") 'lsp-bridge-find-references)
 
 #+end_src
 
 #+RESULTS:
-: lsp-bridge-jump-back
+: lsp-bridge-find-references
 
 *** yas
 (use-package yasnippet)
@@ -1517,63 +1571,60 @@ The pointer moves by +1, and restore by taking mod.  "
 *** flycheck
 #+BEGIN_SRC emacs-lisp
 ;; flycheck
-(use-package flycheck)
-;;   :hook (prog-mode . flycheck-mode)
-;;   :custom
-;;   (flycheck-temp-prefix ".flycheck")
-;;   (flycheck-emacs-lisp-load-path 'inherit)
-;;   (flycheck-indication-mode 'left-fringe)
-;;   (flycheck-idle-change-delay 1)
-;;   )
+(use-package flycheck
+  ;; :hook (prog-mode . flycheck-mode)
+  :custom
+  ;;   (flycheck-temp-prefix ".flycheck")
+  (flycheck-emacs-lisp-load-path 'inherit)
+  ;;   (flycheck-indication-mode 'left-fringe)
+  (flycheck-idle-change-delay 0.05))
+
 
 (use-package flycheck-posframe)
 ;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
-;; (dolist (hook (list
-;;                'c-mode-common-hook
-;;                'ruby-mode-hook
-;;                'python-mode-hook
-;;                'swift-mode-hook
-;;                'go-mode-hook
-;;                'js-mode-hook
-;;                ))
-;;   (add-hook
-;;    hook
-;;    #'(lambda ()
-;;        ;; OS Config
-;;        (when (featurep 'cocoa)
-;;          ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
-;;          (require 'exec-path-from-shell)
-;;          (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
-;;          (exec-path-from-shell-initialize))
+(dolist (hook (list
+               'c-mode-common-hook
+               ;; 'ruby-mode-hook
+               'python-mode-hook
+               ;; 'swift-mode-hook
+               ;; 'go-mode-hook
+               'js-mode-hook
+               )))
+  ;;   (add-hook
+  ;;    hook
+  ;;    #'(lambda ()
+  ;;        ;; OS Config
+  ;;        (when (featurep 'cocoa)
+  ;;          ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
+  ;;          (require 'exec-path-from-shell)
+  ;;          (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
+  ;;          (exec-path-from-shell-initialize))
 
-;;        (require 'flycheck)
+  ;;        (require 'flycheck)
 
-;;        (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
-;;                      (append flycheck-disabled-checkers
-;;                              '(json-jsonlist)))
+  ;;        (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
+  ;;                      (append flycheck-disabled-checkers
+  ;;                              '(json-jsonlist)))
 
-;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
-;;                      (append flycheck-disabled-checkers
-;;                              '(javascript-jshint)))
+  ;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+  ;;                      (append flycheck-disabled-checkers
+  ;;                              '(javascript-jshint)))
 
-;;        (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
+  ;;        (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
 
-;;        (setq-default flycheck-temp-prefix ".flycheck")
+  ;;        (setq-default flycheck-temp-prefix ".flycheck")
 
-;;        (with-eval-after-load 'flycheck
-;;          (require 'flycheck-posframe)
-;;          (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
-;;        (flycheck-mode 1))))
+  ;;        (with-eval-after-load 'flycheck
+  ;;          (require 'flycheck-posframe)
+  ;;          (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
+  ;;        (flycheck-mode 1))))
 
-;; ;; Add flycheck for swift.
-;; (add-hook 'swift-mode-hook
-;;           #'(lambda ()
-;;               (require 'flycheck-swift)
-;;               (flycheck-swift-setup)
-;;               ))
+  ;; ;; Add flycheck for swift.
+  ;; (add-hook 'swift-mode-hook
+  ;;           #'(lambda ()
+  ;;               (require 'flycheck-swift)
+  ;;               (flycheck-swift-setup)
+  ;;               ))
   #+END_SRC
 
   #+RESULTS:
-  | lambda | nil | (when (featurep 'cocoa) (require 'exec-path-from-shell) (setq exec-path-from-shell-variables '(PATH MANPATH GEM_PATH)) (exec-path-from-shell-initialize))       | (require 'flycheck)    | (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))         | (setq-default flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))         | (flycheck-add-mode 'javascript-eslint 'web-mode) | (setq-default flycheck-temp-prefix .flycheck)         | (with-eval-after-load 'flycheck (require 'flycheck-posframe) (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))           | (flycheck-mode 1) |
-  | lambda | nil | (require 'flycheck-swift)                                                                                                                                       | (flycheck-swift-setup) |                                                                                                        |                                                                                                            |                                                  |                                                       |                                                                                                                                 |                   |
-  | lambda | nil | (if (featurep 'cocoa) (progn (require 'exec-path-from-shell) (setq exec-path-from-shell-variables '(PATH MANPATH GEM_PATH)) (exec-path-from-shell-initialize))) | (require 'flycheck)    | (progn (set-default 'flycheck-disabled-checkers (append flycheck-disabled-checkers '(json-jsonlist)))) | (progn (set-default 'flycheck-disabled-checkers (append flycheck-disabled-checkers '(javascript-jshint)))) | (flycheck-add-mode 'javascript-eslint 'web-mode) | (progn (set-default 'flycheck-temp-prefix .flycheck)) | (eval-after-load 'flycheck #'(lambda nil (require 'flycheck-posframe) (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))) | (flycheck-mode 1) |

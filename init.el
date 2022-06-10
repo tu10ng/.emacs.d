@@ -1,7 +1,7 @@
 ;;; init.el --- The ma entry for emacs.
 ;;; Commentary:
 ;;; Code:
-(setq gc-cons-threshold (* 3 1024 1024 1024))
+(setq gc-cons-threshold (* 10 1024 1024 1024))
 
 (require 'package)
 (setq package-archives
@@ -36,6 +36,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(awesome-tray-mode-line-active-color "DarkBlue")
  '(browse-url-browser-function 'eww-browse-url)
  '(c-cleanup-list
    '(brace-else-brace brace-elseif-brace brace-catch-brace empty-defun-braces one-liner-defun defun-close-semi list-close-comma scope-operator compact-empty-funcall comment-close-slash))
@@ -157,7 +158,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile helpful ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
+   '(elisp-refs helpful circe gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode cargo rust-mode pyvenv cmake-font-lock cmake-mode bison-mode rmsbolt tldr fanyi separedit diredfl dired valign org-agenda devdocs hl-todo spdx shackle graphviz-dot-mode all-the-icons exa dirvish cape corfu php-mode py-autopep8 lsp-pyright diff-hl speed-type lox-mode counsel-projectile ivy-rich company-lsp helm-lsp lsp-ui yasnippet projectile lsp-java fish-mode benchmark-init flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode pyim-basedict pyim rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref dumb-jump magit company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun haskell-mode wolfram-mode youdao-dictionary zh-align posframe undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters ripgrep flycheck pdf-tools hungry-delete org which-key use-package try tangotango-theme restart-emacs org-bullets counsel auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
