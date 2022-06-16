@@ -219,13 +219,6 @@ if the buffer isn't a file, simply restart emacs."
 
 ** language difference(macros! to solve)
 #+begin_src emacs-lisp
-;; (defmacro set-company-backends-for! (mode &rest backends)
-;;   "Set `company-backends' for MODE with BACKENDS."
-;;   `(add-hook (intern (format "%s-hook" ',mode))
-;;              (lambda ()
-;;                (company-mode +1)
-;;                (setq-local company-backends ',backends))))
-
 (defmacro shut-up! (func)
   "Silence FUNC."
   `(advice-add ,func :around
@@ -237,13 +230,13 @@ if the buffer isn't a file, simply restart emacs."
   "Delay the evaluation of BODY."
   `(lambda ()
      ,@body))
-
-
-
 #+end_src
 
-#+RESULTS:
-: lazy!
+** one-key
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/one-key/")
+(require 'one-key)
+#+end_src
 
 * FEEL the magic elements
 ** find magic
@@ -253,13 +246,10 @@ if the buffer isn't a file, simply restart emacs."
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
 
 (use-package helpful
-  :custom
-  (counsel-describe-function-function #'helpful-callable)
-  (counsel-describe-variable-function #'helpful-variable)
   :bind
-  ([remap describe-function] . counsel-describe-function)
+  ([remap describe-function] . helpful-callable)
   ([remap describe-command] . helpful-command)
-  ([remap describe-variable] . counsel-describe-variable)
+  ([remap describe-variable] . helpful-variable)
   ([remap describe-key] . helpful-key))
 
 (use-package which-key
@@ -318,9 +308,7 @@ vertico orderless
 
 (global-unset-key (kbd "C-s"))
 
-
 (use-package consult
-  ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-x bindings (ctl-x-map)
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ;; ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
@@ -357,29 +345,20 @@ vertico orderless
 
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :init
-  (setq register-preview-delay 0
+  (setq consult-async-refresh-delay 0.01)
+  (setq register-preview-delay 0.01
         register-preview-function #'consult-register-format)
   (advice-add #'register-preview :override #'consult-register-window)
-  (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
+  ;; (advice-add #'completing-read-multiple :override #'consult-completing-read-multiple)
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
   :custom
-  (consult-fontify-preserve nil)
+;  (consult-fontify-preserve nil)
   (consult-async-min-input 2)
-  (consult-async-refresh-delay 0.15)
+  (consult-async-refresh-delay 0.01)
   (consult-async-input-throttle 0.2)
   (consult-async-input-debounce 0.1)
-  (consult-project-root-function #'projectile-project-root)
-  (defun consult-buffer ()
-    (interactive)
-    (consult--multi consult-buffer-sources
-                    :require-match
-                    (confirm-nonexistent-file-or-buffer)
-                    :prompt "Switch to: "
-                    :history 'consult--buffer-history
-                    :sort nil))
-
-
+;  (consult-project-root-function #'projectile-project-root)
   )
 
 (setq minibuffer-prompt-properties '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -419,23 +398,9 @@ vertico orderless
 	    )
       awesome-tray-update-interval 0.05)
 (set-default 'awesome-tray-mode-line-active-color "DarkBlue")
-;; (defun tu10ng/toggle-input-method ()
-;;   (interactive)
-;;   (toggle-input-method)
-;;   (if (eq current-input-method nil)     ;is english
-;;       (setq awesome-tray-mode-line-active-color "DarkBlue")
-;;     (setq awesome-tray-mode-line-active-color "DarkRed"))
-;;   (awesome-tray-disable)
-;;   (awesome-tray-enable))
-(global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
 
-;; (set-face-attribute 'mode-line nil
-;;                     :foreground "DarkBlue"
-;;                     :background "DarkBlue")
-;; (global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
-(defun tu10ng/toggle-input-method ()
-  (interactive)
-  (toggle-input-method)
+(global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
+(defun tu10ng/set-mode-line-color-input-method ()
   (if (eq current-input-method nil)     ;if current english
       (set-face-attribute 'mode-line nil
                     :foreground "DarkBlue"
@@ -443,8 +408,29 @@ vertico orderless
     (set-face-attribute 'mode-line nil
                     :foreground "DarkRed"
                     :background "DarkRed")))
+(defun tu10ng/toggle-input-method ()
+  (interactive)
+  (toggle-input-method)
+  (tu10ng/set-mode-line-color-input-method))
 
 (awesome-tray-mode 1)
+
+(defun tu10ng/other-window (COUNT &optional ALL-FRAMES INTERACTIVE)
+  ""
+  (interactive "p\ni\np")
+  (if (= (length (window-list-1)) 1)
+      (consult-buffer-other-window)
+    (other-window COUNT ALL-FRAMES INTERACTIVE))
+  (tu10ng/set-mode-line-color-input-method))
+
+
+(global-set-key "\M-i" 'tu10ng/other-window)
+
+;; (defun tu10ng/switch-buffer (&optional sources)
+;;   (interactive)
+;;   (consult-buffer sources)
+;;   (tu10ng/set-mode-line-color-input-method))
+;; (global-set-key "\C-xb" 'tu10ng/switch-buffer)
 
 #+END_SRC
 
@@ -462,7 +448,7 @@ vertico orderless
   :custom
   (shackle-default-size 0.5)
   (shackle-default-alignment 'bellow)
-  (shackle-rules '((magit-status-mode    :select t :align right :size 0.2)
+  (shackle-rules '((magit-status-mode    :select t :align right :size 0.3)
                    (magit-log-mode       :select t :align right)
                    ("*quickrun*"         :select t)
                    (profiler-report-mode :select t)
@@ -474,6 +460,8 @@ vertico orderless
                    (grep-mode            :select t :align right)
                    (rg-mode              :select t :align right)
                    (compilation-mode     :select t :align right :size 0.2)
+                   (Man-mode             :select t :align right)
+                   ("*elfeed-entry*"     :select t :align right :popup t :same nil :size 0.5) ;
                    ("*eww*"              :select t :align right :popup t :size 0.6)
                    ("*info*"             :select t :align right :popup t :size 0.5)
                    ("*Org todo*"         :select t :align right :popup t :size 0.3)
@@ -562,6 +550,59 @@ vertico orderless
 (global-set-key "\M-o" 'open-newline-above)
 #+END_SRC
 
+** things(thing edit)
+#+begin_src emacs-lisp
+(add-to-list 'load-path "~/.emacs.d/site-lisp/thing-edit")
+(require 'thing-edit)
+(setq thing-edit-show-message-p nil)
+(setq thing-edit-flash-line-delay 0.1)
+
+(one-key-create-menu
+ "THING-EDIT"
+ '(
+   ;; Copy.
+   (("w" . "Copy Word") . thing-copy-word)
+   (("s" . "Copy Symbol") . thing-copy-symbol)
+   (("o" . "Copy Filename") . thing-copy-filename)
+   (("u" . "Copy URL") . thing-copy-url)
+   (("x" . "Copy Sexp") . thing-copy-sexp)
+   (("g" . "Copy Page") . thing-copy-page)
+   (("h" . "Copy Buffer") . thing-copy-whole-buffer)
+   (("t" . "Copy Sentence") . thing-copy-sentence)
+   (("i" . "Copy List") . thing-copy-list)
+   (("c" . "Copy Comment") . thing-copy-comment)
+   (("f" . "Copy Function") . thing-copy-defun)
+   (("p" . "Copy Parentheses") . thing-copy-parentheses)
+   (("l" . "Copy Line") . thing-copy-line)
+   (("a" . "Copy To Line Begin") . thing-copy-to-line-beginning)
+   (("e" . "Copy To Line End") . thing-copy-to-line-end)
+   ;; Cut.
+   (("W" . "Cut Word") . thing-cut-word)
+   (("S" . "Cut Symbol") . thing-cut-symbol)
+   (("M" . "Cut Email") . thing-cut-email)
+   (("O" . "Cut Filename") . thing-cut-filename)
+   (("U" . "Cut URL") . thing-cut-url)
+   (("X" . "Cut Sexp") . thing-cut-sexp)
+   (("G" . "Cut Page") . thing-cut-page)
+   (("H" . "Cut Buffer") . thing-cut-whole-buffer)
+   (("T" . "Cut Sentence") . thing-cut-sentence)
+   (("I" . "Cut List") . thing-cut-list)
+   (("C" . "Cut Comment") . thing-cut-comment)
+   (("F" . "Cut Function") . thing-cut-defun)
+   (("P" . "Cut Parentheses") . thing-cut-parentheses)
+   (("L" . "Cut Line") . thing-cut-line)
+   (("A" . "Cut To Line Begin") . thing-cut-to-line-beginning)
+   (("E" . "Cut To Line End") . thing-cut-to-line-end)
+   )
+ t)
+
+(global-set-key (kbd "C-c SPC") 'one-key-menu-thing-edit)
+
+#+end_src
+
+#+RESULTS:
+: one-key-menu-thing-edit
+
 ** rainbow delimiters(parenthesis)
 ((t
   (:weight ultra-bold :foreground "#ff6c6b" :background "#1B2229")))
@@ -571,7 +612,9 @@ vertico orderless
   :hook (after-init . show-paren-mode)
   :init (setq show-paren-when-point-inside-paren t
               show-paren-when-point-in-periphery t
-              show-paren-highlight-openparen t))
+              show-paren-highlight-openparen t
+              show-paren-delay 0.01
+              rainbow-delimiters-max-face-count 6))
 ;; don't you think it's a little to shine? no. useful in lisp programming.
 (use-package rainbow-delimiters
   :config
@@ -581,15 +624,25 @@ vertico orderless
   (set-face-foreground 'rainbow-delimiters-depth-1-face "gold")
   (set-face-foreground 'rainbow-delimiters-depth-2-face "DodgerBlue1")
   (set-face-foreground 'rainbow-delimiters-depth-3-face "lime green")
-  (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink")
-  (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
-  (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise")
-  (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid")
-  (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3")
-  (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan")
+  (set-face-foreground 'rainbow-delimiters-depth-4-face "gold")
+  (set-face-foreground 'rainbow-delimiters-depth-5-face "DodgerBlue1")
+  (set-face-foreground 'rainbow-delimiters-depth-6-face "lime green")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-4-face "deep pink")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-5-face "DarkOrange2")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-6-face "turquoise")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-7-face "medium orchid")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-8-face "chartreuse3")
+  ;; (set-face-foreground 'rainbow-delimiters-depth-9-face "cyan")
 
-  (set-face-bold 'rainbow-delimiters-depth-1-face "t")
-  (set-face-bold 'rainbow-delimiters-depth-2-face "t")
+(set-face-attribute 'rainbow-delimiters-depth-1-face nil :weight 'ultra-heavy)
+(set-face-attribute 'rainbow-delimiters-depth-2-face nil :weight 'ultra-heavy)
+(set-face-attribute 'rainbow-delimiters-depth-3-face nil :weight 'ultra-heavy)
+(set-face-attribute 'rainbow-delimiters-depth-4-face nil :weight 'thin)
+(set-face-attribute 'rainbow-delimiters-depth-5-face nil :weight 'thin)
+(set-face-attribute 'rainbow-delimiters-depth-6-face nil :weight 'thin)
+;; (set-face-attribute 'rainbow-delimiters-depth-7-face nil :weight 'thin)
+;; (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'thin)
+;; (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'ultra-heavy)
   :hook
   ((prog-mode . rainbow-delimiters-mode)
    (shell-mode . rainbow-delimiters-mode)
@@ -703,19 +756,24 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+RESULTS:
 
-** keybinding (navigation, etc.)
+** key navigation
 #+begin_src emacs-lisp
-;;learn from lazy-cat's thing-edit and move-text
-(global-set-key "\M-i" 'other-window)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
+(require 'vi-navigate)
+(dolist (hook '(helpful-mode-hook
+                read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
+  (add-to-list 'vi-navigate-hook-list hook))
+(vi-navigate-load-keys)
+
 (global-set-key "\C-r" 'query-replace)
 
 (global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
 (global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
 (global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
 
-(global-set-key "\C-cl" 'org-store-link)
+;; (global-set-key "\C-cl" 'org-store-link)
 (global-set-key "\C-ca" 'org-agenda-list)
-(global-set-key "\C-cb" 'org-iswitchb)
 (global-set-key "\C-cc" 'org-capture)
 
 ;; ;; (defun tl/exchange-keys ()
@@ -741,6 +799,7 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;     (setq pyim-page-tooltip 'posframe)
 ;;   (setq pyim-page-tooltip 'popup))
 (setq pyim-page-length 7)
+(setq pyim-cloudim 'google)
 ;; (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
 (setq pyim-indicator-list nil)
 
@@ -749,14 +808,22 @@ The pointer moves by +1, and restore by taking mod.  "
 
 (setq default-input-method "pyim")
 ;; slow down pyim init speed.
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-greatdict")
-;; (require 'pyim-greatdict)
-;; (pyim-greatdict-enable)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/pyim-tsinghua-dict")
+(require 'pyim-tsinghua-dict)
+(pyim-tsinghua-dict-enable)
+(require 'pyim-cstring-utils)
+;; (keymap-set 'global-key-map "<remap> <forward-word>" 'pyim-forward-word)
+;; (global-set-key (kbd "M-f") 'pyim-forward-word)
+;; (global-set-key (kbd "M-b") 'pyim-backward-word)
 
+(defun my-orderless-regexp (orig-func component)
+  (let ((result (funcall orig-func component)))
+    (pyim-cregexp-build result)))
+
+(advice-add 'orderless-regexp :around #'my-orderless-regexp)
 #+end_src
 
 #+RESULTS:
-: pyim
 
 ** server
 #+begin_src emacs-lisp
@@ -764,6 +831,35 @@ The pointer moves by +1, and restore by taking mod.  "
 (or (eq (server-running-p) t)
     (server-start))
 #+end_src
+
+** eaf not working? or not intuitive.
+#+begin_src emacs-lisp
+#+end_src
+(use-package eaf
+  :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
+  :custom
+  (eaf-browser-continue-where-left-off t)
+  (eaf-browser-enable-adblocker t)
+  (browse-url-browser-function 'eaf-open-browser))
+
+(require 'eaf-browser)
+
+
+;; (require 'eaf-git)
+;; (require 'eaf-pdf-viewer)
+;; (require 'eaf-image-viewer)
+;; (require 'eaf-video-player)
+;;(require 'eaf-terminal) ;not working
+;; (require 'eaf-system-monitor)
+;; (require 'eaf-rss-reader)
+
+(defalias 'browse-web #'eaf-open-browser)
+;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+
+
+#+RESULTS:
+: browse-web
 
 * RECALL the structure of our magic array
 ** ORG
@@ -830,7 +926,11 @@ The pointer moves by +1, and restore by taking mod.  "
                            ("WG21"   . "https://wg21.link/"))))
 
 
+;; (setq org-startup-folded 'show2levels)
 #+end_src
+
+#+RESULTS:
+| (closure ((hook . org-mode-hook) (--dolist-tail--) t) nil (lsp-bridge-mode 1)) | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | valign-mode | org-tempo-setup | (lambda nil (org-bullets-mode 1)) | visual-line-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
 
 *** outfit
 **** org bullets
@@ -926,6 +1026,7 @@ The pointer moves by +1, and restore by taking mod.  "
                                (shell      . t)
                                (latex      . t)
                                (dot        . t)
+
                                ))
  #+END_SRC
 
@@ -1209,7 +1310,7 @@ The pointer moves by +1, and restore by taking mod.  "
 #+RESULTS:
 : t
 
-* IRC
+** IRC
 #+begin_src emacs-lisp
 (use-package circe)
 (setq circe-default-nick "tu10ng")
@@ -1217,6 +1318,28 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+RESULTS:
 : tu10ng
+** rss
+#+begin_src emacs-lisp
+#+end_src
+(use-package elfeed)
+(global-set-key (kbd "C-c w") 'elfeed)
+(setq elfeed-feeds
+      '(
+        "http://arxiv.org/rss/cs"
+        "http://nullprogram.com/feed/"
+        "https://planet.emacslife.com/atom.xml"
+        "https://mkq.nm.cn/rss.xml"
+        ;; "https://emacs-china.org/posts.rss"
+        ;; "https://emacs-china.org/latest.rss"
+        ))
+(setf url-queue-timeout 30)
+(define-key elfeed-search-mode-map "o" 'elfeed-search-show-entry)
+(define-key elfeed-search-mode-map "w" 'elfeed-search-yank)
+
+
+
+#+RESULTS:
+: elfeed-search-yank
 
 ** games
 #+begin_src emacs-lisp
@@ -1224,8 +1347,12 @@ The pointer moves by +1, and restore by taking mod.  "
   :defer t)
 (use-package speed-type
   :defer t)
-(use-package typit)
-(setq typit-test-time (* 5 60))
+;;(use-package typit)
+(add-to-list 'load-path "~/.emacs.d/site-lisp/typit/")
+(setq typit-test-time (* 5 60)
+      typit-display-method 'display-buffer-at-bottom)
+
+;;(setq typit-line-length (window-width))
 (use-package zone-nyan
   :defer t)
 (use-package autotetris-mode
@@ -1301,8 +1428,33 @@ The pointer moves by +1, and restore by taking mod.  "
   :config
   (add-to-list 'completion-category-defaults '(devdocs (styles . (flex)))))
 
+;; Return symbol class characters for symbol S.
+;;
+;; Function:
+;; f function
+;; c command
+;; C interactive-only command
+;; m macro
+;; M special-form
+;; g cl-generic
+;; p pure
+;; s side-effect-free
+;; @ autoloaded
+;; ! advised
+;; - obsolete
+;;
+;; Variable:
+;; u custom (U modified compared to global value)
+;; v variable
+;; l local (L modified compared to default value)
+;; - obsolete
+;;
+;; Other:
+;; a face
+;; t cl-type"
 (use-package marginalia
-  :config
+
+  :init
   (marginalia-mode))
 
 ;; persist history over emacs restarts.
@@ -1335,7 +1487,16 @@ The pointer moves by +1, and restore by taking mod.  "
 (require 'lsp-bridge)
 (require 'lsp-bridge-jdtls)
 
+
 (global-lsp-bridge-mode)
+
+#+end_src
+
+#+RESULTS:
+: lsp-bridge-find-references
+
+**** functions
+#+begin_src emacs-lisp
 
 (setq lsp-bridge-jump-elisp-last-file nil)
 (defun lsp-bridge-jump ()
@@ -1365,15 +1526,21 @@ The pointer moves by +1, and restore by taking mod.  "
    (t
     (require 'dumb-jump)
     (dumb-jump-back))))
+#+end_src
+**** key bindings
+#+begin_src emacs-lisp
+
 
 (global-set-key (kbd "M-.") 'lsp-bridge-jump)
 (global-set-key (kbd "M-,") 'lsp-bridge-jump-back)
 (global-set-key (kbd "C-M-.") 'lsp-bridge-find-references)
+(global-set-key (kbd "C-c o e") 'lsp-bridge-toggle-english-helper)
+(global-set-key (kbd "C-c o r") 'lsp-bridge-rename)
 
 #+end_src
 
 #+RESULTS:
-: lsp-bridge-find-references
+: lsp-bridge-rename
 
 *** yas
 (use-package yasnippet)
@@ -1466,6 +1633,33 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 #+end_src
+
+** forming
+learn from lazy-cat's thing-edit and move-text
+one key
+#+begin_src emacs-lisp
+(setq next-error-recenter 25)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/move-text/")
+(add-to-list 'load-path "~/.emacs.d/site-lisp/move-text/")
+(require 'move-text)
+(global-set-key (kbd "M-n") 'move-text-down)
+(global-set-key (kbd "M-p") 'move-text-up)
+
+(add-to-list 'load-path "~/.emacs.d/site-lisp/duplicate-line/")
+(require 'duplicate-line)
+
+;; ch source code.
+(global-set-key (kbd "C-M-p") 'duplicate-line-or-region-above)
+(global-set-key (kbd "C-M-n") 'duplicate-line-or-region-below)
+
+;; `widget-forward' `forward-button'
+()
+
+
+#+end_src
+
+#+RESULTS:
 
 ** step by step we strengthen our spell
 *** magit
@@ -1564,9 +1758,13 @@ The pointer moves by +1, and restore by taking mod.  "
 #+begin_src emacs-lisp
 (use-package quickrun
   :bind ("C-c r" . quickrun)
+  :bind ("C-c C-r" . quickrun)
   )
 
 #+end_src
+
+#+RESULTS:
+: quickrun
 
 *** flycheck
 #+BEGIN_SRC emacs-lisp
@@ -1577,47 +1775,31 @@ The pointer moves by +1, and restore by taking mod.  "
   ;;   (flycheck-temp-prefix ".flycheck")
   (flycheck-emacs-lisp-load-path 'inherit)
   ;;   (flycheck-indication-mode 'left-fringe)
-  (flycheck-idle-change-delay 0.05))
+  (flycheck-idle-change-delay 0.01)
+  (flycheck-display-errors-delay 0.01))
 
-
-(use-package flycheck-posframe)
 ;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
 (dolist (hook (list
+               'sh-mode-hook
+               'fish-mode-hook
                'c-mode-common-hook
                ;; 'ruby-mode-hook
                'python-mode-hook
+               'verilog-mode-hook
                ;; 'swift-mode-hook
                ;; 'go-mode-hook
                'js-mode-hook
-               )))
-  ;;   (add-hook
-  ;;    hook
-  ;;    #'(lambda ()
-  ;;        ;; OS Config
-  ;;        (when (featurep 'cocoa)
-  ;;          ;; Initialize environment from user's shell to make eshell know every PATH by other shell.
-  ;;          (require 'exec-path-from-shell)
-  ;;          (setq exec-path-from-shell-variables '("PATH" "MANPATH" "GEM_PATH"))
-  ;;          (exec-path-from-shell-initialize))
-
-  ;;        (require 'flycheck)
-
-  ;;        (setq-default flycheck-disabled-checkers ;disable json-jsonlist checking for json files
-  ;;                      (append flycheck-disabled-checkers
-  ;;                              '(json-jsonlist)))
-
-  ;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
-  ;;                      (append flycheck-disabled-checkers
-  ;;                              '(javascript-jshint)))
-
-  ;;        (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
-
-  ;;        (setq-default flycheck-temp-prefix ".flycheck")
-
-  ;;        (with-eval-after-load 'flycheck
-  ;;          (require 'flycheck-posframe)
-  ;;          (add-hook 'flycheck-mode-hook #'flycheck-posframe-mode))
-  ;;        (flycheck-mode 1))))
+               ))
+  (add-hook
+   hook
+   #'(lambda ()
+       (require 'flycheck)
+       (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+                     (append flycheck-disabled-checkers
+                             '(javascript-jshint)))
+       (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
+       (setq-default flycheck-temp-prefix ".flycheck")
+       (flycheck-mode 1))))
 
   ;; ;; Add flycheck for swift.
   ;; (add-hook 'swift-mode-hook
