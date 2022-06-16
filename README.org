@@ -19,16 +19,16 @@ another important notice is that some files are changed in the source file and a
 
 * usage
 some daily keybindings:
-M-i `tu10ng/other-window'
-M-u, M-l, M-c will take effect backwards, like (downcase-word (- ARG))
-M-o open new line above
-C-o open new line below
-C-c SPC one-key-menu-thing-edit
-C-ca org-agenda-list
-C-cc org-capture
-M-. lsp-bridge-jump
-M-p, M-n move line up/down
-C-M-p, C-M-n duplicate above/below line(changed in source)
+- M-i `tu10ng/other-window'
+- M-u, M-l, M-c will take effect backwards, like (downcase-word (- ARG))
+- M-o open new line above
+- C-o open new line below
+- C-c SPC one-key-menu-thing-edit
+- C-ca org-agenda-list
+- C-cc org-capture
+- M-. lsp-bridge-jump
+- M-p, M-n move line up/down
+- C-M-p, C-M-n duplicate above/below line(changed in source)
 
 * TODO add script to auto download dependencies.
 
