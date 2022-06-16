@@ -1,29 +1,48 @@
 * emacs
 this is my personal emacs configuration directory.
 
-[[file:myinit.org][file:myinit.org]]
+* installation
+can't be used out the box.
+list of packages need manually download and move to ~/.emacs.d/site-lisp:
+- [[https://github.com/manateelazycat/lazycat-theme.git][lazycat-theme]]
+- [[https://github.com/manateelazycat/awesome-tray.git][awesome-tray]].
+- thing-edit
+- one-key
+- vi-navigate
+- move-text
+- duplicate-line
+- lsp-bridge
+- pyim-tsinghua-dict
+- typit
 
-#+begin_src 
-  ___ _ __ ___   __ _  ___ ___ 
+another important notice is that some files are changed in the source file and aren't shown in this repository.
+
+* usage
+some daily keybindings:
+M-i `tu10ng/other-window'
+M-u, M-l, M-c will take effect backwards, like (downcase-word (- ARG))
+M-o open new line above
+C-o open new line below
+C-c SPC one-key-menu-thing-edit
+C-ca org-agenda-list
+C-cc org-capture
+M-. lsp-bridge-jump
+M-p, M-n move line up/down
+C-M-p, C-M-n duplicate above/below line(changed in source)
+
+* TODO add script to auto download dependencies.
+
+#+begin_src
+  ___ _ __ ___   __ _  ___ ___
  / _ \ '_ ` _ \ / _` |/ __/ __|
 |  __/ | | | | | (_| | (__\__ \
  \___|_| |_| |_|\__,_|\___|___/
 
-#+end_src                               
+ _         _  ___
+| |_ _   _/ |/ _ \ _ __   __ _
+| __| | | | | | | | '_ \ / _` |
+| |_| |_| | | |_| | | | | (_| |
+ \__|\__,_|_|\___/|_| |_|\__, |
+                         |___/
 
-* installation
-need manually download [[https://github.com/manateelazycat/lazycat-theme.git][lazycat-theme]] and [[https://github.com/manateelazycat/awesome-tray.git][awesome-tray]].
-(I'm lazy enough not adding auto installation for this.)
-(actually I'm afraid the slow connection of github will introduce bugs)
-
-* usage
-some keybindings have been changed:
-M-i = C-x o since M-i isn't bound on any key.
-M-u, M-l, M-c will take effect backwards instead of forwards.
-M-o open line above, etc.
-
-* todo
-this configuration is basicly just a set of `use-package's, bear my poor programming skill.
-
-
-
+#+end_src
