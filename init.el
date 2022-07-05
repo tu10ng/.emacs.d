@@ -15,7 +15,7 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (eval-and-compile
-  (setq package-enable-at-startup nil     ;what is this?
+  (setq package-enable-at-startup t
         use-package-always-ensure t
         use-pfackage-expand-minimally t
         use-package-enable-imenu-support t))
@@ -59,6 +59,9 @@
      (inexpr-class-open after)
      (inexpr-class-close before)
      (arglist-cont-nonempty)))
+ '(eaf-proxy-host "127.0.0.1")
+ '(eaf-proxy-port "8889")
+ '(eaf-proxy-type "http")
  '(electric-indent-mode t)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/usr/local/sbin" "/usr/bin/site_perl" "/usr/bin/vendor_perl" "/usr/bin/core_perl" "/usr/lib/emacs/29.0.50/x86_64-pc-linux-gnu" "/home/qb/.local/bin"))
@@ -92,9 +95,14 @@
       . "texlab")
      ((clojure-mode clojurec-mode clojurescript-mode clojurex-mode)
       . "clojure-lsp")
+     ((sh-mode)
+      . "bash-language-server")
      ((css-mode)
       . "vscode-css-language-server")
-     (elm-mode . "elm-language-server")))
+     (elm-mode . "elm-language-server")
+     (verilog-mode . "hdl_checker")
+     (php-mode . "intelephense")
+     (yaml-mode . "yaml-language-server")))
  '(lsp-eldoc-enable-hover t)
  '(lsp-eldoc-render-all t)
  '(lsp-ui-flycheck-list-position 'right)
@@ -187,7 +195,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(elfeed elisp-refs helpful circe gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 speed-type lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html typit minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org use-package try tangotango-theme restart-emacs org-bullets auto-complete))
+   '(gcmh elfeed elisp-refs helpful circe gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 speed-type lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org use-package try tangotango-theme restart-emacs org-bullets auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
@@ -230,3 +238,4 @@
 ;; (set-font "Source Code Pro" "黑体" 20 17)
 
 (find-file "~/org/gtd.org")
+(put 'list-timers 'disabled nil)

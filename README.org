@@ -30,7 +30,8 @@ some daily keybindings:
 - M-p, M-n move line up/down
 - C-M-p, C-M-n duplicate above/below line(changed in source)
 
-* TODO add script to auto download dependencies.
+* TODOS
+** TODO add script to auto download dependencies.
 
 #+begin_src
   ___ _ __ ___   __ _  ___ ___

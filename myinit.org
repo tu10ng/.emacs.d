@@ -13,6 +13,10 @@
 )
 
 #+end_src
+
+#+RESULTS:
+: t
+
 ** Try
 #+BEGIN_SRC emacs-lisp
 (use-package try)
@@ -116,7 +120,7 @@ if the buffer isn't a file, simply restart emacs."
 
 ** misc
 #+begin_src emacs-lisp
-(setq garbage-collection-messages t
+(setq garbage-collection-messages nil
       large-file-warning-threshold nil
       confirm-kill-processes nil
       shift-select-mode nil
@@ -150,6 +154,11 @@ if the buffer isn't a file, simply restart emacs."
       (kill-buffer "*scratch*")))
 (add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
 
+
+;; key repeat delay through /usr/bin/xset
+;; auto repeat delay, repeat rate
+;; set to xset r rate 200 30
+;; from 500 20
 
 ;;(setq initial-buffer-choice "~/org/gtd.org")
 
@@ -217,6 +226,18 @@ if the buffer isn't a file, simply restart emacs."
 
 #+RESULTS:
 
+** gc
+#+begin_src emacs-lisp
+(use-package gcmh)
+(setq gcmh-high-cons-threshold (* 1024 1024 1024))
+(gcmh-mode 1)
+
+
+#+end_src
+
+#+RESULTS:
+: t
+
 ** language difference(macros! to solve)
 #+begin_src emacs-lisp
 (defmacro shut-up! (func)
@@ -236,6 +257,13 @@ if the buffer isn't a file, simply restart emacs."
 #+begin_src emacs-lisp
 (add-to-list 'load-path "~/.emacs.d/site-lisp/one-key/")
 (require 'one-key)
+#+end_src
+
+** emacs c source directory
+#+begin_src emacs-lisp
+(setq source-directory "/home/qb/Projects/emacs-git/")
+(setq find-function-C-source-directory "/home/qb/Projects/emacs-git/src/")
+
 #+end_src
 
 * FEEL the magic elements
@@ -309,6 +337,7 @@ vertico orderless
 (global-unset-key (kbd "C-s"))
 
 (use-package consult
+  :demand t
   :bind (;; C-x bindings (ctl-x-map)
          ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
          ;; ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
@@ -396,7 +425,7 @@ vertico orderless
         "circe" "buffer-read-only"
 	    "date"
 	    )
-      awesome-tray-update-interval 0.05)
+      awesome-tray-update-interval 1)
 (set-default 'awesome-tray-mode-line-active-color "DarkBlue")
 
 (global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
@@ -466,7 +495,7 @@ vertico orderless
                    ("*info*"             :select t :align right :popup t :size 0.5)
                    ("*Org todo*"         :select t :align right :popup t :size 0.3)
                    ("*Org Agenda*"       :select t :align right :popup t :size 0.3)
-                   ("*devdocs*"          :select t :align right :popup t :size 0.8)
+                   ("*devdocs*"          :select t :align right :popup t :size 0.6)
                    ;; ("*Flycheck errors*"         :select t   :align bellow :size 10)
                    ;; ("*Backtrace*"               :select t   :align bellow :size 0.1)
                    ("*Shell Command Output*"    :select nil :align bellow :size 0.4)
@@ -683,11 +712,12 @@ The pointer moves by +1, and restore by taking mod.  "
   (set-cursor-color (nth rainbow-cursor-color-pointer
 		                 rainbow-cursor-color-list)))
 
+(set-cursor-color "gold")
 (run-with-timer 0 0.05 'cursor-color-change)
     #+end_src
 
     #+RESULTS:
-    : [nil 25248 51956 459651 0.05 cursor-color-change nil nil 383000 nil]
+    : [nil 25261 29739 224681 0.05 cursor-color-change nil nil 455000 nil]
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
@@ -758,13 +788,13 @@ The pointer moves by +1, and restore by taking mod.  "
 
 ** key navigation
 #+begin_src emacs-lisp
-
-(add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
-(require 'vi-navigate)
-(dolist (hook '(helpful-mode-hook
-                read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
-  (add-to-list 'vi-navigate-hook-list hook))
-(vi-navigate-load-keys)
+;; not useful, and buther when reading info because of shading.
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
+;; (require 'vi-navigate)
+;; (dolist (hook '(helpful-mode-hook
+;;                 read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
+;;   (add-to-list 'vi-navigate-hook-list hook))
+;; (vi-navigate-load-keys)
 
 (global-set-key "\C-r" 'query-replace)
 
@@ -800,8 +830,12 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;   (setq pyim-page-tooltip 'popup))
 (setq pyim-page-length 7)
 (setq pyim-cloudim 'google)
+(setq pyim-process-async-delay 0.01
+      pyim-process-run-delay 0.01)
 ;; (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
 (setq pyim-indicator-list nil)
+;; (setq pyim-punctuation-half-width-functions t)
+(setq pyim-punctuation-dict nil)        ;disable chinese punctuation.
 
 (use-package pyim-basedict)
 (pyim-basedict-enable)
@@ -842,24 +876,26 @@ The pointer moves by +1, and restore by taking mod.  "
   (eaf-browser-enable-adblocker t)
   (browse-url-browser-function 'eaf-open-browser))
 
+(require 'eaf-vue-demo)
+;;(require 'eaf-git)
+(require 'eaf-pdf-viewer)
+(require 'eaf-image-viewer)
+(require 'eaf-video-player)
+;;(require 'eaf-terminal)
 (require 'eaf-browser)
-
-
-;; (require 'eaf-git)
-;; (require 'eaf-pdf-viewer)
-;; (require 'eaf-image-viewer)
-;; (require 'eaf-video-player)
-;;(require 'eaf-terminal) ;not working
-;; (require 'eaf-system-monitor)
-;; (require 'eaf-rss-reader)
+(require 'eaf-rss-reader)
+(require 'eaf-file-browser)
 
 (defalias 'browse-web #'eaf-open-browser)
-;; (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
-;; (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+
+;; (add-to-list 'TeX-command-list '("XeLaTeX" "%`xelatex --synctex=1%(mode)%' %t" TeX-run-TeX nil t))
+;; (add-to-list 'TeX-view-program-list '("eaf" eaf-pdf-synctex-forward-view))
+;; (add-to-list 'TeX-view-program-selection '(output-pdf "eaf"))
 
 
 #+RESULTS:
 : browse-web
+
 
 * RECALL the structure of our magic array
 ** ORG
@@ -1146,50 +1182,60 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package cmake-font-lock
   :hook (cmake-mode cmake-font-lock-activate))
 
-(dolist (hook (list
-               'c-mode-hook
-               'c++-mode-hook
-               'c-mode-common-hook
-               ))
-  (add-hook hook #'(lambda ()
-                     (require 'cc-mode)
-                     (require 'modern-cpp-font-lock)
+;; (dolist (hook (list
+;;                'c-mode-hook
+;;                'c++-mode-hook
+;;                'c-mode-common-hook
+;;                ))
+;;   (add-hook hook #'(lambda ()
+;;                      (require 'cc-mode)
+;;                      (require 'modern-cpp-font-lock)
 
-                     (defun c-mode-style-setup ()
-                       (interactive)
-                       ;; cpp font lock.
-                       (modern-c++-font-lock-global-mode t)
+;;                      (defun c-mode-style-setup ()
+;;                        (interactive)
+;;                        ;; cpp font lock.
+;;                        (modern-c++-font-lock-global-mode t)
 
-                       ;; base-style
-                       (c-set-style "stroustrup")
+;;                        ;; base-style
+;;                        ;; (c-set-style "stroustrup")
 
-                       ;; qt keywords and stuff ...
-                       ;; set up indenting correctly for new qt kewords
-                       (setq c-protection-key (concat "\\<\\(public\\|public slot\\|protected"
-                                                      "\\|protected slot\\|private\\|private slot"
-                                                      "\\)\\>")
-                             c-C++-access-key (concat "\\<\\(signals\\|public\\|protected\\|private"
-                                                      "\\|public slots\\|protected slots\\|private slots"
-                                                      "\\)\\>[ \t]*:"))
-                       (progn
-                         ;; modify the colour of slots to match public, private, etc ...
-                         (font-lock-add-keywords 'c++-mode
-                                                 '(("\\<\\(slots\\|signals\\)\\>" . font-lock-type-face)))
-                         ;; make new font for rest of qt keywords
-                         (make-face 'qt-keywords-face)
-                         (set-face-foreground 'qt-keywords-face "DeepSkyBlue1")
-                         ;; qt keywords
-                         (font-lock-add-keywords 'c++-mode
-                                                 '(("\\<Q_OBJECT\\>" . 'qt-keywords-face)))
-                         (font-lock-add-keywords 'c++-mode
-                                                 '(("\\<SIGNAL\\|SLOT\\>" . 'qt-keywords-face)))
-                         (font-lock-add-keywords 'c++-mode
-                                                 '(("\\<Q[A-Z][A-Za-z]\\>" . 'qt-keywords-face)))
-                         ))
-                     (c-mode-style-setup))))
+;;                        ;; qt keywords and stuff ...
+;;                        ;; set up indenting correctly for new qt kewords
+;;                        (setq c-protection-key (concat "\\<\\(public\\|public slot\\|protected"
+;;                                                       "\\|protected slot\\|private\\|private slot"
+;;                                                       "\\)\\>")
+;;                              c-C++-access-key (concat "\\<\\(signals\\|public\\|protected\\|private"
+;;                                                       "\\|public slots\\|protected slots\\|private slots"
+;;                                                       "\\)\\>[ \t]*:"))
+;;                        (progn
+;;                          ;; modify the colour of slots to match public, private, etc ...
+;;                          (font-lock-add-keywords 'c++-mode
+;;                                                  '(("\\<\\(slots\\|signals\\)\\>" . font-lock-type-face)))
+;;                          ;; make new font for rest of qt keywords
+;;                          (make-face 'qt-keywords-face)
+;;                          (set-face-foreground 'qt-keywords-face "DeepSkyBlue1")
+;;                          ;; qt keywords
+;;                          (font-lock-add-keywords 'c++-mode
+;;                                                  '(("\\<Q_OBJECT\\>" . 'qt-keywords-face)))
+;;                          (font-lock-add-keywords 'c++-mode
+;;                                                  '(("\\<SIGNAL\\|SLOT\\>" . 'qt-keywords-face)))
+;;                          (font-lock-add-keywords 'c++-mode
+;;                                                  '(("\\<Q[A-Z][A-Za-z]\\>" . 'qt-keywords-face)))
+;;                          ))
+;;                      (c-mode-style-setup))))
 #+end_src
 
 #+RESULTS:
+
+** gcb
+#+begin_src emacs-lisp
+;; maybe use gdb in terminal is better for asm view.
+(setq gdb-show-main t
+      gdb-restore-window-configuration-after-quit t
+      )
+
+(gud-tooltip-mode 1)
+#+end_src
 
 ** lisp
 #+begin_src emacs-lisp
@@ -1487,13 +1533,16 @@ The pointer moves by +1, and restore by taking mod.  "
 (require 'lsp-bridge)
 (require 'lsp-bridge-jdtls)
 
+(add-hook 'org-mode-hook #'(lambda () (lsp-bridge-mode -1)) )  ;disable; before global-lsp, so the order in the hook is correct
 
 (global-lsp-bridge-mode)
 
+
 #+end_src
 
-#+RESULTS:
-: lsp-bridge-find-references
+
+
+
 
 **** functions
 #+begin_src emacs-lisp
@@ -1730,8 +1779,7 @@ one key
 
 #+end_src
 
-#+RESULTS:
-: ((\.gitattributes\' . conf-unix-mode) (\.gitconfig\' . conf-unix-mode) (\.gitignore\' . conf-unix-mode) (\(?:\(?:\.\(?:b\(?:\(?:abel\|ower\)rc\)\|json\(?:ld\)?\)\|composer\.lock\)\'\) . json-mode) (README\(?:\.md\)?\' . gfm-mode) (\.odc\' . archive-mode) (\.odf\' . archive-mode) (\.odi\' . archive-mode) (\.otp\' . archive-mode) (\.odp\' . archive-mode) (\.otg\' . archive-mode) (\.odg\' . archive-mode) (\.ots\' . archive-mode) (\.ods\' . archive-mode) (\.odm\' . archive-mode) (\.ott\' . archive-mode) (\.odt\' . archive-mode) (\.jison\' . jison-mode) (\.l\' . flex-mode) (\.y\' . bison-mode) (\.cmake\' . cmake-mode) (CMakeLists\.txt\' . cmake-mode) (/crontab\(\.X*[[:alnum:]]+\)?\' . crontab-mode) (\.cs\' . csharp-mode) (/fish_funced\..*\' . fish-mode) (\.fish\' . fish-mode) (\.gv\' . graphviz-dot-mode) (\.dot\' . graphviz-dot-mode) (\.hsc\' . haskell-mode) (\.l[gh]s\' . haskell-literate-mode) (\.hsig\' . haskell-mode) (\.[gh]s\' . haskell-mode) (\.cabal\'\|/cabal\.project\|/\.cabal/config\' . haskell-cabal-mode) (\.chs\' . haskell-c2hs-mode) (\.ghci\' . ghci-script-mode) (\.dump-simpl\' . ghc-core-mode) (\.hcr\' . ghc-core-mode) (\.lox\' . lox-mode) (/git-rebase-todo\' . git-rebase-mode) (\.\(?:md\|markdown\|mkd\|mdown\|mkdn\|mdwn\)\' . markdown-mode) (\.\(?:php[s345]?\|phtml\)\' . php-mode-maybe) (\.\(?:php\.inc\|stub\)\' . php-mode) (/\.php_cs\(?:\.dist\)?\' . php-mode) (\.rs\' . rust-mode) (\.gpg\(~\|\.~[0-9]+~\)?\' nil epa-file) (\.elc\' . elisp-byte-code-mode) (\.zst\' nil jka-compr) (\.dz\' nil jka-compr) (\.xz\' nil jka-compr) (\.lzma\' nil jka-compr) (\.lz\' nil jka-compr) (\.g?z\' nil jka-compr) (\.bz2\' nil jka-compr) (\.Z\' nil jka-compr) (\.vr[hi]?\' . vera-mode) (\(?:\.\(?:rbw?\|ru\|rake\|thor\|jbuilder\|rabl\|gemspec\|podspec\)\|/\(?:Gem\|Rake\|Cap\|Thor\|Puppet\|Berks\|Brew\|Vagrant\|Guard\|Pod\)file\)\' . ruby-mode) (\.re?st\' . rst-mode) (\.py[iw]?\' . python-mode) (\.m\' . octave-maybe-mode) (\.less\' . less-css-mode) (\.scss\' . scss-mode) (\.awk\' . awk-mode) (\.\(u?lpc\|pike\|pmod\(\.in\)?\)\' . pike-mode) (\.idl\' . idl-mode) (\.java\' . java-mode) (\.m\' . objc-mode) (\.ii\' . c++-mode) (\.i\' . c-mode) (\.lex\' . c-mode) (\.y\(acc\)?\' . c-mode) (\.h\' . c-or-c++-mode) (\.c\' . c-mode) (\.\(CC?\|HH?\)\' . c++-mode) (\.[ch]\(pp\|xx\|\+\+\)\' . c++-mode) (\.\(cc\|hh\)\' . c++-mode) (\.\(bat\|cmd\)\' . bat-mode) (\.[sx]?html?\(\.[a-zA-Z_]+\)?\' . mhtml-mode) (\.svgz?\' . image-mode) (\.svgz?\' . xml-mode) (\.x[bp]m\' . image-mode) (\.x[bp]m\' . c-mode) (\.p[bpgn]m\' . image-mode) (\.tiff?\' . image-mode) (\.gif\' . image-mode) (\.png\' . image-mode) (\.jpe?g\' . image-mode) (\.webp\' . image-mode) (\.te?xt\' . text-mode) (\.[tT]e[xX]\' . tex-mode) (\.ins\' . tex-mode) (\.ltx\' . latex-mode) (\.dtx\' . doctex-mode) (\.org\' . org-mode) (\.dir-locals\(?:-2\)?\.el\' . lisp-data-mode) (eww-bookmarks\' . lisp-data-mode) (tramp\' . lisp-data-mode) (/archive-contents\' . lisp-data-mode) (places\' . lisp-data-mode) (\.emacs-places\' . lisp-data-mode) (\.el\' . emacs-lisp-mode) (Project\.ede\' . emacs-lisp-mode) (\.\(scm\|stk\|ss\|sch\)\' . scheme-mode) (\.l\' . lisp-mode) (\.li?sp\' . lisp-mode) (\.[fF]\' . fortran-mode) (\.for\' . fortran-mode) (\.p\' . pascal-mode) (\.pas\' . pascal-mode) (\.\(dpr\|DPR\)\' . delphi-mode) (\.\([pP]\([Llm]\|erl\|od\)\|al\)\' . perl-mode) (Imakefile\' . makefile-imake-mode) (Makeppfile\(?:\.mk\)?\' . makefile-makepp-mode) (\.makepp\' . makefile-makepp-mode) (\.mk\' . makefile-gmake-mode) (\.make\' . makefile-gmake-mode) ([Mm]akefile\' . makefile-gmake-mode) (\.am\' . makefile-automake-mode) (\.texinfo\' . texinfo-mode) (\.te?xi\' . texinfo-mode) (\.[sS]\' . asm-mode) (\.asm\' . asm-mode) (\.css\' . css-mode) (\.mixal\' . mixal-mode) (\.gcov\' . compilation-mode) (/\.[a-z0-9-]*gdbinit . gdb-script-mode) (-gdb\.gdb . gdb-script-mode) ([cC]hange\.?[lL]og?\' . change-log-mode) ([cC]hange[lL]og[-.][0-9]+\' . change-log-mode) (\$CHANGE_LOG\$\.TXT . change-log-mode) (\.scm\.[0-9]*\' . scheme-mode) (\.[ckz]?sh\'\|\.shar\'\|/\.z?profile\' . sh-mode) (\.bash\' . sh-mode) (/PKGBUILD\' . sh-mode) (\(/\|\`\)\.\(bash_\(profile\|history\|log\(in\|out\)\)\|z?log\(in\|out\)\)\' . sh-mode) (\(/\|\`\)\.\(shrc\|zshrc\|m?kshrc\|bashrc\|t?cshrc\|esrc\)\' . sh-mode) (\(/\|\`\)\.\([kz]shenv\|xinitrc\|startxrc\|xsession\)\' . sh-mode) (\.m?spec\' . sh-mode) (\.m[mes]\' . nroff-mode) (\.man\' . nroff-mode) (\.sty\' . latex-mode) (\.cl[so]\' . latex-mode) (\.bbl\' . latex-mode) (\.bib\' . bibtex-mode) (\.bst\' . bibtex-style-mode) (\.sql\' . sql-mode) (\(acinclude\|aclocal\|acsite\)\.m4\' . autoconf-mode) (\.m[4c]\' . m4-mode) (\.mf\' . metafont-mode) (\.mp\' . metapost-mode) (\.vhdl?\' . vhdl-mode) (\.article\' . text-mode) (\.letter\' . text-mode) (\.i?tcl\' . tcl-mode) (\.exp\' . tcl-mode) (\.itk\' . tcl-mode) (\.icn\' . icon-mode) (\.sim\' . simula-mode) (\.mss\' . scribe-mode) (\.f9[05]\' . f90-mode) (\.f0[38]\' . f90-mode) (\.indent\.pro\' . fundamental-mode) (\.\(pro\|PRO\)\' . idlwave-mode) (\.srt\' . srecode-template-mode) (\.prolog\' . prolog-mode) (\.tar\' . tar-mode) (\.\(arc\|zip\|lzh\|lha\|zoo\|[jew]ar\|xpi\|rar\|cbr\|7z\|squashfs\|ARC\|ZIP\|LZH\|LHA\|ZOO\|[JEW]AR\|XPI\|RAR\|CBR\|7Z\|SQUASHFS\)\' . archive-mode) (\.oxt\' . archive-mode) (\.\(deb\|[oi]pk\)\' . archive-mode) (\`/tmp/Re . text-mode) (/Message[0-9]*\' . text-mode) (\`/tmp/fol/ . text-mode) (\.oak\' . scheme-mode) (\.sgml?\' . sgml-mode) (\.x[ms]l\' . xml-mode) (\.dbk\' . xml-mode) (\.dtd\' . sgml-mode) (\.ds\(ss\)?l\' . dsssl-mode) (\.js[mx]?\' . javascript-mode) (\.har\' . javascript-mode) (\.json\' . javascript-mode) (\.[ds]?va?h?\' . verilog-mode) (\.by\' . bovine-grammar-mode) (\.wy\' . wisent-grammar-mode) (\.erts\' . erts-mode) ([:/\]\..*\(emacs\|gnus\|viper\)\' . emacs-lisp-mode) (\`\..*emacs\' . emacs-lisp-mode) ([:/]_emacs\' . emacs-lisp-mode) (/crontab\.X*[0-9]+\' . shell-script-mode) (\.ml\' . lisp-mode) (\.ld[si]?\' . ld-script-mode) (ld\.?script\' . ld-script-mode) (\.xs\' . c-mode) (\.x[abdsru]?[cnw]?\' . ld-script-mode) (\.zone\' . dns-mode) (\.soa\' . dns-mode) (\.asd\' . lisp-mode) (\.\(asn\|mib\|smi\)\' . snmp-mode) (\.\(as\|mi\|sm\)2\' . snmpv2-mode) (\.\(diffs?\|patch\|rej\)\' . diff-mode) (\.\(dif\|pat\)\' . diff-mode) (\.[eE]?[pP][sS]\' . ps-mode) (\.\(?:PDF\|EPUB\|CBZ\|FB2\|O?XPS\|DVI\|OD[FGPST]\|DOCX\|XLSX?\|PPTX?\|pdf\|epub\|cbz\|fb2\|o?xps\|djvu\|dvi\|od[fgpst]\|docx\|xlsx?\|pptx?\)\' . doc-view-mode-maybe) (configure\.\(ac\|in\)\' . autoconf-mode) (\.s\(v\|iv\|ieve\)\' . sieve-mode) (BROWSE\' . ebrowse-tree-mode) (\.ebrowse\' . ebrowse-tree-mode) (#\*mail\* . mail-mode) (\.g\' . antlr-mode) (\.mod\' . m2-mode) (\.ses\' . ses-mode) (\.docbook\' . sgml-mode) (\.com\' . dcl-mode) (/config\.\(?:bat\|log\)\' . fundamental-mode) (/\.\(authinfo\|netrc\)\' . authinfo-mode) (\.\(?:[iI][nN][iI]\|[lL][sS][tT]\|[rR][eE][gG]\|[sS][yY][sS]\)\' . conf-mode) (\.la\' . conf-unix-mode) (\.ppd\' . conf-ppd-mode) (java.+\.conf\' . conf-javaprop-mode) (\.properties\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-javaprop-mode) (\.toml\' . conf-toml-mode) (\.desktop\' . conf-desktop-mode) (/\.redshift\.conf\' . conf-windows-mode) (\`/etc/\(?:DIR_COLORS\|ethers\|.?fstab\|.*hosts\|lesskey\|login\.?de\(?:fs\|vperm\)\|magic\|mtab\|pam\.d/.*\|permissions\(?:\.d/.+\)?\|protocols\|rpc\|services\)\' . conf-space-mode) (\`/etc/\(?:acpid?/.+\|aliases\(?:\.d/.+\)?\|default/.+\|group-?\|hosts\..+\|inittab\|ksysguarddrc\|opera6rc\|passwd-?\|shadow-?\|sysconfig/.+\)\' . conf-mode) ([cC]hange[lL]og[-.][-0-9a-z]+\' . change-log-mode) (/\.?\(?:gitconfig\|gnokiirc\|hgrc\|kde.*rc\|mime\.types\|wgetrc\)\' . conf-mode) (/\.\(?:asound\|enigma\|fetchmail\|gltron\|gtk\|hxplayer\|mairix\|mbsync\|msmtp\|net\|neverball\|nvidia-settings-\|offlineimap\|qt/.+\|realplayer\|reportbug\|rtorrent\.\|screen\|scummvm\|sversion\|sylpheed/.+\|xmp\)rc\' . conf-mode) (/\.\(?:gdbtkinit\|grip\|mpdconf\|notmuch-config\|orbital/.+txt\|rhosts\|tuxracer/options\)\' . conf-mode) (/\.?X\(?:default\|resource\|re\)s\> . conf-xdefaults-mode) (/X11.+app-defaults/\|\.ad\' . conf-xdefaults-mode) (/X11.+locale/.+/Compose\' . conf-colon-mode) (/X11.+locale/compose\.dir\' . conf-javaprop-mode) (\.~?[0-9]+\.[0-9][-.0-9]*~?\' nil t) (\.\(?:orig\|in\|[bB][aA][kK]\)\' nil t) ([/.]c\(?:on\)?f\(?:i?g\)?\(?:\.[a-zA-Z0-9._-]+\)?\' . conf-mode-maybe) (\.[1-9]\' . nroff-mode) (\.art\' . image-mode) (\.avs\' . image-mode) (\.bmp\' . image-mode) (\.cmyk\' . image-mode) (\.cmyka\' . image-mode) (\.crw\' . image-mode) (\.dcr\' . image-mode) (\.dcx\' . image-mode) (\.dng\' . image-mode) (\.dpx\' . image-mode) (\.fax\' . image-mode) (\.heic\' . image-mode) (\.hrz\' . image-mode) (\.icb\' . image-mode) (\.icc\' . image-mode) (\.icm\' . image-mode) (\.ico\' . image-mode) (\.icon\' . image-mode) (\.jbg\' . image-mode) (\.jbig\' . image-mode) (\.jng\' . image-mode) (\.jnx\' . image-mode) (\.miff\' . image-mode) (\.mng\' . image-mode) (\.mvg\' . image-mode) (\.otb\' . image-mode) (\.p7\' . image-mode) (\.pcx\' . image-mode) (\.pdb\' . image-mode) (\.pfa\' . image-mode) (\.pfb\' . image-mode) (\.picon\' . image-mode) (\.pict\' . image-mode) (\.rgb\' . image-mode) (\.rgba\' . image-mode) (\.tga\' . image-mode) (\.wbmp\' . image-mode) (\.webp\' . image-mode) (\.wmf\' . image-mode) (\.wpg\' . image-mode) (\.xcf\' . image-mode) (\.xmp\' . image-mode) (\.xwd\' . image-mode) (\.yuv\' . image-mode) (\.tgz\' . tar-mode) (\.tbz2?\' . tar-mode) (\.txz\' . tar-mode) (\.tzst\' . tar-mode))
+
 
 ** see the power of spell
 *** compile
@@ -1760,6 +1808,7 @@ one key
   :bind ("C-c r" . quickrun)
   :bind ("C-c C-r" . quickrun)
   )
+(setq quickrun-timeout-seconds 5)
 
 #+end_src
 
