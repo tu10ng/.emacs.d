@@ -43,34 +43,13 @@
   (auto-revert-check-vc-info t)
   (global-auto-revert-non-file-buffers t))
 
-;; auto save when idle
-;; (setq auto-save-default nil)
-;; (setq auto-save-idle 1)
-;; (defun auto-save-buffers ()
-;;   (interactive)
-;;   (let ((auto-save-buffer-list))
-;;     (save-excursion
-;;       (dolist (buf (buffer-list))
-;; 	(set-buffer buf)
-;; 	(if (and (buffer-file-name) (buffer-modified-p))
-;; 	    (progn
-;; 	      (push (buffer-name) auto-save-buffer-list)
-;; 	      (with-temp-message "" (basic-save-buffer))
-;; 	      ))))))
-
-;; (defun auto-save-enable ()
-;;   (interactive)
-;;   (run-with-idle-timer auto-save-idle t #'auto-save-buffers))
-
-;; (auto-save-enable)
-
-
 (add-to-list 'load-path "~/.emacs.d/site-lisp/auto-save/") ; add auto-save to your load-path
 (require 'auto-save)
 (auto-save-enable)
+(add-hook 'makefile-mode-hook #'(lambda () (fset 'makefile-warn-suspicious-lines 'ignore)))
 
 (setq auto-save-silent t)   ; quietly save
-(setq auto-save-delete-trailing-whitespace t)  ; automatically delete spaces at the end of the line when saving
+(setq auto-save-delete-trailing-whitespace nil)  ; automatically delete spaces at the end of the line when saving
 
 ;;; custom predicates if you don't want auto save.
 ;;; disable auto save mode when current filetype is an gpg file.
@@ -157,7 +136,7 @@ if the buffer isn't a file, simply restart emacs."
 
 ;; key repeat delay through /usr/bin/xset
 ;; auto repeat delay, repeat rate
-;; set to xset r rate 200 30
+;; set to xset r rate 180 30
 ;; from 500 20
 
 ;;(setq initial-buffer-choice "~/org/gtd.org")
@@ -268,7 +247,7 @@ if the buffer isn't a file, simply restart emacs."
 
 * FEEL the magic elements
 ** find magic
-*** general
+*** packages
 #+BEGIN_SRC emacs-lisp
 (use-package info-colors
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
@@ -292,26 +271,7 @@ if the buffer isn't a file, simply restart emacs."
 
 #+RESULTS:
 : t
-
-*** swiper counsel
-;; (use-package swiper
-;;   :ensure try
-;;   :bind (("C-s"  . swiper))
-;;   )
-;; (use-package counsel
-;;   :bind
-;;   ("M-x"  . counsel-M-x)
-;;   ("C-x C-f"  . counsel-find-file)
-;;   :config
-;;   (progn
-;;     (ivy-mode 1)
-;;     (setq ivy-use-virtual-buffers t)
-;;     (setq ivy-display-style 'fancy))
-;;   )
-;; (use-package ivy-rich
-;;   :init (ivy-rich-mode 1))
-
-*** consult
+*** TODO consult: when press p or f in `consult-buffer', change into `consult-file'
 vertico orderless
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
@@ -334,7 +294,6 @@ vertico orderless
    completion-category-defaults nil
    completion-category-overrides '((file (styles partial-completion)))))
 
-(global-unset-key (kbd "C-s"))
 
 (use-package consult
   :demand t
@@ -360,18 +319,7 @@ vertico orderless
          ("M-g k" . consult-global-mark)
          ("M-g i" . consult-imenu)
          ("M-g I" . consult-imenu-multi)
-         ;; C-s bindings (search-map)
-         ("C-s d" . consult-find)
-         ("C-s D" . consult-locate)
-         ("C-s g" . consult-grep)
-         ("C-s G" . consult-git-grep)
-         ("C-s r" . consult-ripgrep)
-         ("C-s l" . consult-line)
-         ("C-s L" . consult-line-multi)
-         ("C-s m" . consult-multi-occur)
-         ("C-s k" . consult-keep-lines)
-         ("C-s u" . consult-focus-lines))
-
+         )
   :hook (completion-list-mode . consult-preview-at-point-mode)
   :init
   (setq consult-async-refresh-delay 0.01)
@@ -396,6 +344,90 @@ vertico orderless
 
 #+RESULTS:
 | cursor-intangible-mode |
+
+*** TODO keyboard shortcut: advise `browse-url-at-point' disable error message
+#+begin_src emacs-lisp
+;; not useful, and buther when reading info because of shading.
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
+;; (require 'vi-navigate)
+;; (dolist (hook '(helpful-mode-hook
+;;                 read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
+;;   (add-to-list 'vi-navigate-hook-list hook))
+;; (vi-navigate-load-keys)
+
+(global-set-key "\C-r" #'query-replace)
+
+(global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
+(global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
+(global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
+
+;; (global-set-key "\C-cl" #'org-store-link)
+(global-set-key "\C-ca" #'org-agenda-list)
+(global-set-key "\C-cc" #'org-capture)
+
+(global-set-key "\C-ct" #'tldr)
+(global-set-key "\C-cm" #'man)
+
+
+;; TODO with temporaly highlight all the char in this or next line
+(defun tu10ng/jump-to-char (arg char &optional interactive)
+  "Kill up to and including ARGth occurrence of CHAR.
+When run interactively, the argument INTERACTIVE is non-nil.
+Case is ignored if `case-fold-search' is non-nil in the current buffer.
+Goes backward if ARG is negative; error if CHAR not found.
+See also `zap-up-to-char'.
+If called interactively, do a case sensitive search if CHAR
+is an upper-case character."
+  (interactive (list (prefix-numeric-value current-prefix-arg)
+		             (read-char-from-minibuffer "Zap to char: "
+						                        nil 'read-char-history)
+                     t))
+  ;; Avoid "obsolete" warnings for translation-table-for-input.
+  (with-no-warnings
+    (if (char-table-p translation-table-for-input)
+	    (setq char (or (aref translation-table-for-input char) char))))
+  (let ((case-fold-search (if (and interactive (char-uppercase-p char))
+                              nil
+                            case-fold-search)))
+    (goto-char (- (search-forward (char-to-string char) nil nil arg) 1))))
+
+(global-set-key "\M-z" #'tu10ng/jump-to-char)
+
+(one-key-create-menu
+ "CS"
+ '(
+   (("d" . "find") . consult-find)
+   (("D" . "locate") . consult-locate)
+   (("g" . "") . consult-grep)
+   (("G" . "") . consult-git-grep)
+   (("r" . "") . consult-ripgrep)
+   (("l" . "") . consult-line)
+   (("L" . "") . consult-line-multi)
+   (("m" . "") . consult-multi-occur)
+   (("k" . "") . consult-keep-lines)
+   (("u" . "") . consult-focus-lines)
+   (("w" . "") . browse-url-at-point)   ;eww
+   )
+ t)
+
+(global-unset-key (kbd "C-s"))
+(global-set-key (kbd "C-s") 'one-key-menu-cs)
+
+;; http://qb.tulong.xyz
+;; (defun tl/exchange-keys ()
+;;   "exchange some keys' behaviour, like '1' will ouput '!', '!' output '1'"
+;;   (interactive)
+;;   (global-set-key (kbd "1") (lambda () (interactive) (insert "!")))
+;;   (global-set-key (kbd "4") (lambda () (interactive) (insert "$")))
+;;   (global-set-key (kbd "!") (lambda () (interactive) (insert "1")))
+;;   (global-set-key (kbd "$") (lambda () (interactive) (insert "4")))
+;;   )
+;; (add-hook 'after-init-hook 'tl/exchange-keys)
+#+end_src
+
+#+RESULTS:
+: org-capture
+
 
 ** outfit of magic
 #+begin_src emacs-lisp
@@ -688,32 +720,50 @@ vertico orderless
 #+begin_src emacs-lisp
 ;; we don't want the cursor vanish
 (blink-cursor-mode -1)
+(set-cursor-color "gold")
 
-(setq rainbow-cursor-color-list '("#FF0000";red
-		                          "#FF5000"
-		                          "#FF9F00";orange
-		                          "#FFFF00";yellow
-		                          "#BFFF00"
-		                          "#00FF00";green
-		                          "#00FFFF";
-		                          "#0088FF"
-		                          "#0000FF";blue
-		                          "#5F00FF"
-		                          "#8B00FF";purple
-		                          "#CF00FF"
-		                          "#FF0088"
-		                          ))
+
+(defvar rainbow-cursor-timer nil)
+(setq rainbow-cursor-color-list (vector"#FF0000";red
+		                               "#FF5000"
+		                               "#FF9F00";orange
+		                               "#FFFF00";yellow
+		                               "#BFFF00"
+		                               "#00FF00";green
+		                               "#00FFFF";
+		                               "#0088FF"
+		                               "#0000FF";blue
+		                               "#5F00FF"
+		                               "#8B00FF";purple
+		                               "#CF00FF"
+		                               "#FF0088"
+		                               ))
 (setq rainbow-cursor-color-pointer 1)
-(defun cursor-color-change ()
+(defun rainbow-cursor-change-color ()
   "Take a color from `rainbow-color-list' by the pointer.
 The pointer moves by +1, and restore by taking mod.  "
   (setq rainbow-cursor-color-pointer (% (1+ rainbow-cursor-color-pointer)
 				                        (length rainbow-cursor-color-list)))
-  (set-cursor-color (nth rainbow-cursor-color-pointer
-		                 rainbow-cursor-color-list)))
+  (set-cursor-color (elt rainbow-cursor-color-list
+                         rainbow-cursor-color-pointer)))
 
-(set-cursor-color "gold")
-(run-with-timer 0 0.05 'cursor-color-change)
+
+(defun rainbow-cursor-disable ()
+  ""
+  (interactive)
+  (when rainbow-cursor-timer
+    (cancel-timer rainbow-cursor-timer)
+    (setq rainbow-cursor-timer nil)))
+
+(defun rainbow-cursor-enable ()
+  ""
+  (interactive)
+  (rainbow-cursor-disable)
+  (setq rainbow-cursor-timer
+        (run-with-timer 0 0.05 #'rainbow-cursor-change-color)))
+
+(rainbow-cursor-enable)
+
     #+end_src
 
     #+RESULTS:
@@ -785,40 +835,6 @@ The pointer moves by +1, and restore by taking mod.  "
 #+end_src
 
 #+RESULTS:
-
-** key navigation
-#+begin_src emacs-lisp
-;; not useful, and buther when reading info because of shading.
-;; (add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
-;; (require 'vi-navigate)
-;; (dolist (hook '(helpful-mode-hook
-;;                 read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
-;;   (add-to-list 'vi-navigate-hook-list hook))
-;; (vi-navigate-load-keys)
-
-(global-set-key "\C-r" 'query-replace)
-
-(global-set-key (kbd "M-l") (lambda (ARG) (interactive "p") (downcase-word (- ARG))))
-(global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
-(global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
-
-;; (global-set-key "\C-cl" 'org-store-link)
-(global-set-key "\C-ca" 'org-agenda-list)
-(global-set-key "\C-cc" 'org-capture)
-
-;; ;; (defun tl/exchange-keys ()
-;;   "exchange some keys' behaviour, like '1' will ouput '!', '!' output '1'"
-;;   (interactive)
-;;   (global-set-key (kbd "1") (lambda () (interactive) (insert "!")))
-;;   (global-set-key (kbd "4") (lambda () (interactive) (insert "$")))
-;;   (global-set-key (kbd "!") (lambda () (interactive) (insert "1")))
-;;   (global-set-key (kbd "$") (lambda () (interactive) (insert "4")))
-;;   )
-;;     (add-hook 'after-init-hook 'tl/exchange-keys)
-#+end_src
-
-#+RESULTS:
-: org-capture
 
 ** keyboard input method
 *** pyim
@@ -1257,10 +1273,22 @@ The pointer moves by +1, and restore by taking mod.  "
 (define-key emacs-lisp-mode-map "\C-c\C-c" 'eval-to-comment)
 (define-key lisp-interaction-mode-map "\C-c\C-c" 'eval-to-comment)
 
+(defun tu10ng/sharp-quote ()
+  "Insert #' unless in a string or comment."
+  (interactive)
+  (call-interactively #'self-insert-command)
+  (let ((ppss (syntax-ppss)))
+    (unless (or (elt ppss 3)
+                (elt ppss 4)
+                (eq (char-after) ?'))
+      (insert ?'))))
+
+(define-key emacs-lisp-mode-map "#" #'tu10ng/sharp-quote)
 
 (use-package ielm
   :ensure nil
   :hook (ielm-mode . company-mode))
+
 
 
 #+end_src
@@ -1316,10 +1344,27 @@ The pointer moves by +1, and restore by taking mod.  "
   :hook (rust-mode . cargo-minor-mode))
 #+end_src
 
-#+RESULTS:
-| (lambda nil (set (make-local-variable 'corfu-auto) nil) (lsp-bridge-mode 1) (lsp-bridge-mix-multi-backends)) | cargo-minor-mode | rust-maybe-initialize-buffer-project |
+** makefile
+#+begin_src emacs-lisp
+(defun tu10ng/makefile-dollar-paren (ch)
+  "command when pressed $. if ch ALPHA, Insert $(CH, otherwise $CH, like $<."
+  (interactive "cvar?:")
+  (unless (eq (char-after) ?\()
+    (unless (or (< ch ?A)                   ;like <
+                (and (> ch ?Z)
+                     (< ch ?a))
+                (> ch ?z))
+      (insert ?\())
+    (insert ch)))
+
+(with-eval-after-load 'make-mode
+  (define-key makefile-mode-map "$" #'(lambda ()
+                                        (interactive)
+                                        (self-insert-command 1)
+                                        (call-interactively #'tu10ng/makefile-dollar-paren))))
 
 
+#+end_src
 
 ** other modes
 #+begin_src emacs-lisp
@@ -1692,8 +1737,8 @@ one key
 (add-to-list 'load-path "~/.emacs.d/site-lisp/move-text/")
 (add-to-list 'load-path "~/.emacs.d/site-lisp/move-text/")
 (require 'move-text)
-(global-set-key (kbd "M-n") 'move-text-down)
-(global-set-key (kbd "M-p") 'move-text-up)
+(global-set-key (kbd "M-<up>") 'move-text-up)
+(global-set-key (kbd "M-<down>") 'move-text-down)
 
 (add-to-list 'load-path "~/.emacs.d/site-lisp/duplicate-line/")
 (require 'duplicate-line)
@@ -1780,6 +1825,15 @@ one key
 #+end_src
 
 
+*** working with other magicians
+#+begin_src emacs-lisp
+(use-package editorconfig)
+(editorconfig-mode 1)
+
+#+end_src
+
+#+RESULTS:
+: t
 
 ** see the power of spell
 *** compile

@@ -15,10 +15,9 @@
   (package-refresh-contents)
   (package-install 'use-package))
 (eval-and-compile
-  (setq package-enable-at-startup t
-        use-package-always-ensure t
-        use-pfackage-expand-minimally t
-        use-package-enable-imenu-support t))
+  (setq use-package-always-ensure t
+        use-package-always-demand t
+        use-package-expand-minimally t))
 (eval-when-compile
   (require 'use-package))
 
@@ -65,9 +64,9 @@
  '(electric-indent-mode t)
  '(exec-path
    '("/usr/local/bin" "/usr/bin" "/usr/local/sbin" "/usr/bin/site_perl" "/usr/bin/vendor_perl" "/usr/bin/core_perl" "/usr/lib/emacs/29.0.50/x86_64-pc-linux-gnu" "/home/qb/.local/bin"))
- '(flycheck-check-syntax-automatically '(idle-change idle-buffer-switch mode-enabled))
+ '(flycheck-check-syntax-automatically '(save))
  '(flycheck-disabled-checkers '(python-pycompile))
- '(flycheck-display-errors-delay 0)
+ '(flycheck-display-errors-delay 0.01)
  '(flycheck-error-list-minimum-level 'error)
  '(flycheck-navigation-minimum-level 'error)
  '(lsp-bridge-lang-server-mode-list
@@ -195,7 +194,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(gcmh elfeed elisp-refs helpful circe gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe csharp-mode json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 speed-type lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org use-package try tangotango-theme restart-emacs org-bullets auto-complete))
+   '(editorconfig gcmh elfeed circe gnuplot gnu-plot tree-sitter-langs tree-sitter noflet modern-cpp-font-lock flycheck-posframe json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 speed-type lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org use-package try tangotango-theme restart-emacs org-bullets auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
