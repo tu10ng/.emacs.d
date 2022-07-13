@@ -1,21 +1,36 @@
-* emacs
+* Hi there!
+I am tu10ng.
 this is my personal emacs configuration directory.
 
 * installation
-can't be used out the box.
-list of packages need manually download and move to ~/.emacs.d/site-lisp:
+build on vanilla emacs.
+
+you need to download these packages manually to ~/.emacs.d/site-lisp, and follow their readme in order to use:
 - [[https://github.com/manateelazycat/lazycat-theme.git][lazycat-theme]]
 - [[https://github.com/manateelazycat/awesome-tray.git][awesome-tray]].
 - thing-edit
 - one-key
-- vi-navigate
 - move-text
 - duplicate-line
 - lsp-bridge
 - pyim-tsinghua-dict
-- typit
 
-another important notice is that some files are changed in the source file and aren't shown in this repository.
+you could try the command below:
+#+begin_src sh
+mkdir -p ~/.emacs.d/site-lisp/
+cd ~/.emacs.d/site-lisp/
+git clone --depth=1 https://github.com/manateelazycat/lazycat-theme.git
+git clone --depth=1 https://github.com/manateelazycat/awesome-tray.git
+git clone --depth=1 https://github.com/manateelazycat/thing-edit.git
+git clone --depth=1 https://github.com/manateelazycat/one-key.git
+git clone --depth=1 https://github.com/manateelazycat/move-text.git
+git clone --depth=1 https://github.com/manateelazycat/duplicate-line.git
+
+git clone --depth=1 https://github.com/manateelazycat/lsp-bridge.git
+pip3 install epc
+
+git clone --depth=1 https://github.com/redguardtoo/pyim-tsinghua-dict.git
+#+end_src
 
 * usage
 some daily keybindings:
@@ -24,26 +39,12 @@ some daily keybindings:
 - M-o open new line above
 - C-o open new line below
 - C-c SPC one-key-menu-thing-edit
+- C-s consult search functions
 - C-ca org-agenda-list
 - C-cc org-capture
 - M-. lsp-bridge-jump
-- M-p, M-n move line up/down
+- M-<up>, M-<down> move line up/down
 - C-M-p, C-M-n duplicate above/below line(changed in source)
 
-* TODOS
-** TODO add script to auto download dependencies.
-
-#+begin_src
-  ___ _ __ ___   __ _  ___ ___
- / _ \ '_ ` _ \ / _` |/ __/ __|
-|  __/ | | | | | (_| | (__\__ \
- \___|_| |_| |_|\__,_|\___|___/
-
- _         _  ___
-| |_ _   _/ |/ _ \ _ __   __ _
-| __| | | | | | | | '_ \ / _` |
-| |_| |_| | | |_| | | | | (_| |
- \__|\__,_|_|\___/|_| |_|\__, |
-                         |___/
-
-#+end_src
+* TODO add script to auto download dependencies.
+not sure wheter to use git submodule or shell script, or use-package.
