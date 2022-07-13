@@ -722,7 +722,6 @@ is an upper-case character."
 (blink-cursor-mode -1)
 (set-cursor-color "gold")
 
-
 (defvar rainbow-cursor-timer nil)
 (setq rainbow-cursor-color-list (vector"#FF0000";red
 		                               "#FF5000"
