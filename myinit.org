@@ -1,4 +1,5 @@
-
+#+STARTUP: content nohideblocks
+#+PROPERTY: header-args :results output none
 * PREPARE the truck to magic world
 ** BENCHMARK
 #+begin_src emacs-lisp
@@ -14,17 +15,12 @@
 
 #+end_src
 
-#+RESULTS:
-: t
-
 ** Try
 #+BEGIN_SRC emacs-lisp
 (use-package try)
 (use-package posframe)
 (use-package all-the-icons)
- #+END_SRC
-
- #+RESULTS:
+#+END_SRC
 
 ** file on change
 #+begin_src emacs-lisp
@@ -59,9 +55,6 @@
 ;;       "gpg"
 ;;       (file-name-extension (buffer-name)) t))))
 #+end_src
-
-#+RESULTS:
-: t
 
 ** connection between session
 #+BEGIN_SRC emacs-lisp
@@ -203,8 +196,6 @@ if the buffer isn't a file, simply restart emacs."
 
 #+END_SRC
 
-#+RESULTS:
-
 ** gc
 #+begin_src emacs-lisp
 (use-package gcmh)
@@ -213,9 +204,6 @@ if the buffer isn't a file, simply restart emacs."
 
 
 #+end_src
-
-#+RESULTS:
-: t
 
 ** language difference(macros! to solve)
 #+begin_src emacs-lisp
@@ -243,6 +231,14 @@ if the buffer isn't a file, simply restart emacs."
 (setq source-directory "/home/qb/Projects/emacs-git/")
 (setq find-function-C-source-directory "/home/qb/Projects/emacs-git/src/")
 
+
+#+end_src
+
+** showing off to others
+#+begin_src emacs-lisp
+(use-package wakatime-mode)
+
+(global-wakatime-mode 1) 
 #+end_src
 
 * FEEL the magic elements
@@ -251,6 +247,8 @@ if the buffer isn't a file, simply restart emacs."
 #+BEGIN_SRC emacs-lisp
 (use-package info-colors
   :hook ('Info-selection-hook . 'info-colors-fontify-node))
+(use-package info-rename-buffer)
+(info-rename-buffer-mode 1)
 
 (use-package helpful
   :bind
@@ -269,8 +267,7 @@ if the buffer isn't a file, simply restart emacs."
 
 #+END_SRC
 
-#+RESULTS:
-: t
+
 *** TODO consult: when press p or f in `consult-buffer', change into `consult-file'
 vertico orderless
 #+begin_src emacs-lisp
@@ -342,10 +339,7 @@ vertico orderless
 (add-hook 'minibuffer-set-up-hook #'cursor-intangible-mode)
 #+end_src
 
-#+RESULTS:
-| cursor-intangible-mode |
-
-*** TODO keyboard shortcut: advise `browse-url-at-point' disable error message
+*** TODO key bindings: advise `browse-url-at-point' disable error message
 #+begin_src emacs-lisp
 ;; not useful, and buther when reading info because of shading.
 ;; (add-to-list 'load-path "~/.emacs.d/site-lisp/vi-navigate/")
@@ -354,6 +348,10 @@ vertico orderless
 ;;                 read-only-mode-hook))   ;useless when a RO file open from helpful, maybe because RO is set when openning file?
 ;;   (add-to-list 'vi-navigate-hook-list hook))
 ;; (vi-navigate-load-keys)
+
+
+(global-set-key "\M-p" #'previous-line)
+(global-set-key "\M-n" #'next-line)
 
 (global-set-key "\C-r" #'query-replace)
 
@@ -367,7 +365,7 @@ vertico orderless
 
 (global-set-key "\C-ct" #'tldr)
 (global-set-key "\C-cm" #'man)
-
+(global-set-key "\C-x\C-d" #'dired)
 
 ;; TODO with temporaly highlight all the char in this or next line
 (defun tu10ng/jump-to-char (arg char &optional interactive)
@@ -393,6 +391,11 @@ is an upper-case character."
 
 (global-set-key "\M-z" #'tu10ng/jump-to-char)
 
+(setq eww-search-prefix "https://www.google.com/search?q=")
+(setq url-proxy-services 
+      '(("http" . "127.0.0.1:8889")
+        ("https" . "127.0.0.1:8889"))
+      )
 (one-key-create-menu
  "CS"
  '(
@@ -406,7 +409,9 @@ is an upper-case character."
    (("m" . "") . consult-multi-occur)
    (("k" . "") . consult-keep-lines)
    (("u" . "") . consult-focus-lines)
-   (("w" . "") . browse-url-at-point)   ;eww
+   (("w" . "") . eww-search-words)   ;eww
+   (("e" . "") . browse-url-at-point)   ;eww
+   
    )
  t)
 
@@ -424,10 +429,6 @@ is an upper-case character."
 ;;   )
 ;; (add-hook 'after-init-hook 'tl/exchange-keys)
 #+end_src
-
-#+RESULTS:
-: org-capture
-
 
 ** outfit of magic
 #+begin_src emacs-lisp
@@ -453,11 +454,15 @@ is an upper-case character."
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
 (setq awesome-tray-active-modules       ;flycheck total,
-      '("location" "belong" "mode-name" "buffer-name" "parent-dir"
+      '("location" "belong" "mode-name" "buffer-name" "file-path"
         "circe" "buffer-read-only"
 	    "date"
 	    )
-      awesome-tray-update-interval 1)
+      awesome-tray-update-interval 1
+      awesome-tray-buffer-name-max-length 40
+      awesome-tray-file-path-show-filename nil
+      awesome-tray-file-path-truncated-name-length 40
+      awesome-tray-file-path-full-dirname-levels 4)
 (set-default 'awesome-tray-mode-line-active-color "DarkBlue")
 
 (global-set-key (kbd "C-\\") 'tu10ng/toggle-input-method)
@@ -495,10 +500,10 @@ is an upper-case character."
 
 #+END_SRC
 
-#+RESULTS:
-: t
+
 
 ** window
+*** shackle
 #+begin_src emacs-lisp
 (setq split-height-threshold nil)         ;don't split vertically
 
@@ -509,7 +514,7 @@ is an upper-case character."
   :custom
   (shackle-default-size 0.5)
   (shackle-default-alignment 'bellow)
-  (shackle-rules '((magit-status-mode    :select t :align right :size 0.3)
+  (shackle-rules '((magit-status-mode    :select t :align right :size 0.5)
                    (magit-log-mode       :select t :align right)
                    ("*quickrun*"         :select t)
                    (profiler-report-mode :select t)
@@ -522,9 +527,9 @@ is an upper-case character."
                    (rg-mode              :select t :align right)
                    (compilation-mode     :select t :align right :size 0.2)
                    (Man-mode             :select t :align right)
+                   (info-mode            :select t :align right :popup t :size 0.5)
                    ("*elfeed-entry*"     :select t :align right :popup t :same nil :size 0.5) ;
                    ("*eww*"              :select t :align right :popup t :size 0.6)
-                   ("*info*"             :select t :align right :popup t :size 0.5)
                    ("*Org todo*"         :select t :align right :popup t :size 0.3)
                    ("*Org Agenda*"       :select t :align right :popup t :size 0.3)
                    ("*devdocs*"          :select t :align right :popup t :size 0.6)
@@ -547,8 +552,11 @@ is an upper-case character."
 
 #+end_src
 
-#+RESULTS:
-| projectile-mode | show-paren-mode | temp-buffer-resize-mode | shackle-mode | vertico-mode | recentf-mode | save-place-mode | #[0 \303\235\203 \304\303"\301\305!\210	\205 \306 \210\307\211\207 [command-line-args desktop-save-mode inhibit-startup-screen --no-desktop delete 0 desktop-read t] 3] | global-auto-revert-mode | x-wm-set-size-hint | tramp-register-archive-file-name-handler | magit-maybe-define-global-key-bindings | table--make-cell-map | magit-auto-revert-mode--init-kludge | magit-startup-asserts | magit-version |
+*** restore windows in bookmark
+#+begin_src emacs-lisp
+(use-package bookmark-view)
+(global-set-key "\C-xrw" #'bookmark-view)
+#+end_src
 
 ** mark
 *** delsel
@@ -661,9 +669,6 @@ is an upper-case character."
 
 #+end_src
 
-#+RESULTS:
-: one-key-menu-thing-edit
-
 ** rainbow delimiters(parenthesis)
 ((t
   (:weight ultra-bold :foreground "#ff6c6b" :background "#1B2229")))
@@ -712,9 +717,6 @@ is an upper-case character."
 
 
 #+end_src
-
-#+RESULTS:
-| rainbow-delimiters-mode |
 
 ** rainbow cursor
 #+begin_src emacs-lisp
@@ -765,8 +767,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
     #+end_src
 
-    #+RESULTS:
-    : [nil 25261 29739 224681 0.05 cursor-color-change nil nil 455000 nil]
+
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
@@ -774,13 +775,12 @@ The pointer moves by +1, and restore by taking mod.  "
       ;; scroll-margin 2
       ;; hscroll-step 2
       ;; hscroll-margin 2
-      scroll-conservatively 10000)
+      scroll-conservatively 0)
 ;;      scroll-preserve-screen-position 'always
 (pixel-scroll-precision-mode 1)
 #+END_SRC
 
-#+RESULTS:
-: t
+
 
 ** indent
 #+begin_src emacs-lisp
@@ -833,8 +833,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-
 ** keyboard input method
 *** pyim
 #+begin_src elisp
@@ -872,8 +870,6 @@ The pointer moves by +1, and restore by taking mod.  "
 (advice-add 'orderless-regexp :around #'my-orderless-regexp)
 #+end_src
 
-#+RESULTS:
-
 ** server
 #+begin_src emacs-lisp
 (require 'server)
@@ -908,8 +904,6 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; (add-to-list 'TeX-view-program-selection '(output-pdf "eaf"))
 
 
-#+RESULTS:
-: browse-web
 
 
 * RECALL the structure of our magic array
@@ -980,9 +974,6 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; (setq org-startup-folded 'show2levels)
 #+end_src
 
-#+RESULTS:
-| (closure ((hook . org-mode-hook) (--dolist-tail--) t) nil (lsp-bridge-mode 1)) | #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | valign-mode | org-tempo-setup | (lambda nil (org-bullets-mode 1)) | visual-line-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes |
-
 *** outfit
 **** org bullets
 #+BEGIN_SRC emacs-lisp
@@ -1019,7 +1010,17 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
+*** refile
+#+begin_src emacs-lisp
+  ;; refile
+(setq org-log-refile nil)
+(setq org-refile-targets '((nil . (:level . 1))
+                           (nil . (:level . 2))
+                           (nil . (:level . 3))))
+
+#+end_src
+
+
 
 *** export
 #+BEGIN_SRC emacs-lisp
@@ -1063,8 +1064,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (add-to-list 'org-latex-packages-alist '("" "color"))
  #+END_SRC
 
- #+RESULTS:
- | ( color) | ( listings) | \usepackage{ctex} |
+
 *** org-src
 #+BEGIN_SRC emacs-lisp
 (define-key org-src-mode-map "\C-c\C-c" 'org-edit-src-exit)
@@ -1080,8 +1080,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
                                ))
  #+END_SRC
-
- #+RESULTS:
 
 *** mouse
 #+begin_src emacs-lisp
@@ -1131,8 +1129,15 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| rst-toc-update |
+
+** ansi color
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+
+
 ** latex
 #+begin_src emacs-lisp
 
@@ -1152,8 +1157,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| diredfl-mode | diff-hl-dired-mode-unless-remote |
+
 
 ** project and file's magic
 #+BEGIN_SRC emacs-lisp
@@ -1240,18 +1244,6 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;                      (c-mode-style-setup))))
 #+end_src
 
-#+RESULTS:
-
-** gcb
-#+begin_src emacs-lisp
-;; maybe use gdb in terminal is better for asm view.
-(setq gdb-show-main t
-      gdb-restore-window-configuration-after-quit t
-      )
-
-(gud-tooltip-mode 1)
-#+end_src
-
 ** lisp
 #+begin_src emacs-lisp
 ;; elisp
@@ -1292,8 +1284,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| company-mode |
+
 
 ** python
 #+begin_src emacs-lisp
@@ -1307,8 +1298,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 #+end_src
-
-#+RESULTS:
 
 ** haskell
 #+begin_src emacs-lisp
@@ -1328,8 +1317,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-| haskell-doc-mode | haskell-indentation-mode |
+
 
 ** rust
 #+begin_src emacs-lisp
@@ -1354,7 +1342,9 @@ The pointer moves by +1, and restore by taking mod.  "
                      (< ch ?a))
                 (> ch ?z))
       (insert ?\())
-    (insert ch)))
+    (if (= ch ?)
+        (call-interactively #'backward-delete-char-untabify)
+      (insert ch))))
 
 (with-eval-after-load 'make-mode
   (define-key makefile-mode-map "$" #'(lambda ()
@@ -1383,8 +1373,6 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-
 ** www
 #+begin_src emacs-lisp
 (use-package eww
@@ -1397,8 +1385,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-: t
+
 
 ** IRC
 #+begin_src emacs-lisp
@@ -1406,8 +1393,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (setq circe-default-nick "tu10ng")
 #+end_src
 
-#+RESULTS:
-: tu10ng
+u10ng
 ** rss
 #+begin_src emacs-lisp
 #+end_src
@@ -1428,8 +1414,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 
-#+RESULTS:
-: elfeed-search-yank
+
 
 ** games
 #+begin_src emacs-lisp
@@ -1451,8 +1436,6 @@ The pointer moves by +1, and restore by taking mod.  "
   :defer t)
 
 #+end_src
-
-#+RESULTS:
 
 * casting magic
 ** our loyal assistent carrying all our books
@@ -1567,8 +1550,6 @@ The pointer moves by +1, and restore by taking mod.  "
 ;; a tool for hiding code blocks is `hideshow'
 #+end_src
 
-#+RESULTS:
-
 ** choosing your lyrics
 *** lsp
 #+begin_src emacs-lisp
@@ -1580,17 +1561,9 @@ The pointer moves by +1, and restore by taking mod.  "
 (add-hook 'org-mode-hook #'(lambda () (lsp-bridge-mode -1)) )  ;disable; before global-lsp, so the order in the hook is correct
 
 (global-lsp-bridge-mode)
-
-
 #+end_src
-
-
-
-
-
 **** functions
 #+begin_src emacs-lisp
-
 (setq lsp-bridge-jump-elisp-last-file nil)
 (defun lsp-bridge-jump ()
   (interactive)
@@ -1619,11 +1592,25 @@ The pointer moves by +1, and restore by taking mod.  "
    (t
     (require 'dumb-jump)
     (dumb-jump-back))))
+
+;; WRONG
+;; (defun tu10ng/lsp-bridge-clang-restart ()
+;;   "call `lsp-bridge-restart-process' when clang inform 'tring to get preamble'"
+;;   (run-with-idle-timer 0 0.3 #'(lambda ()
+;;                                  (when (= (current-message)
+;;                                           "[LSP-Bridge] trying to get preamble for non-added document")
+;;                                    (lsp-bridge-restart-process)))))
+
+;; (tu10ng/lsp-bridge-clang-restart)
+          
+          
+                                  
 #+end_src
-**** key bindings
+**** LSP BRIDGE key bindings
 #+begin_src emacs-lisp
-
-
+(define-key org-src-mode-map "\C-c\C-c" 'org-edit-src-exit)
+;; (define-key acm-mode-map "\M-p" #'acm-select-prev)
+;; (define-key acm-mode-map "\M-n" #'acm-select-next)
 (global-set-key (kbd "M-.") 'lsp-bridge-jump)
 (global-set-key (kbd "M-,") 'lsp-bridge-jump-back)
 (global-set-key (kbd "C-M-.") 'lsp-bridge-find-references)
@@ -1632,32 +1619,18 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-: lsp-bridge-rename
 
-*** yas
+
+*** yasnippet
+#+begin_src emacs-lisp
 (use-package yasnippet)
-;; (add-hook 'prog-mode-hook
-;;           #'(lambda ()
-;;               (require 'yasnippet)
+(yas-global-mode 1)
 
-;;               (defun get-git-user-name ()
-;;                 (interactive)
-;;                 (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.name")))
+(dolist (hook (list 'term-mode-hook))
+  (add-hook hook #'(lambda () (yas-minor-mode -1))))
 
-;;               (defun get-git-user-email ()
-;;                 (interactive)
-;;                 (replace-regexp-in-string "\n$" "" (shell-command-to-string "git config --get user.email")))
 
-;;               (add-to-list `yas/root-directory (concat lazycat-emacs-root-dir "/snippets"))
-;;               (yas-global-mode 1)
-
-;;               ;; Disable yasnippet mode on some mode.
-;;               (dolist (hook (list
-;;                              'term-mode-hook
-;;                              ))
-;;                 (add-hook hook #'(lambda () (yas-minor-mode -1))))
-;;               ))
+#+end_src
 
 *** documentation
 #+begin_src emacs-lisp
@@ -1673,8 +1646,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
-#+RESULTS:
-: separedit
+
 *** pastebin service
 #+begin_src emacs-lisp
 (use-package webpaste
@@ -1752,8 +1724,6 @@ one key
 
 #+end_src
 
-#+RESULTS:
-
 ** step by step we strengthen our spell
 *** magit
 #+begin_src emacs-lisp
@@ -1823,7 +1793,6 @@ one key
 
 #+end_src
 
-
 *** working with other magicians
 #+begin_src emacs-lisp
 (use-package editorconfig)
@@ -1831,8 +1800,7 @@ one key
 
 #+end_src
 
-#+RESULTS:
-: t
+
 
 ** see the power of spell
 *** compile
@@ -1865,8 +1833,7 @@ one key
 
 #+end_src
 
-#+RESULTS:
-: quickrun
+
 
 *** flycheck
 #+BEGIN_SRC emacs-lisp
@@ -1877,19 +1844,21 @@ one key
   ;;   (flycheck-temp-prefix ".flycheck")
   (flycheck-emacs-lisp-load-path 'inherit)
   ;;   (flycheck-indication-mode 'left-fringe)
-  (flycheck-idle-change-delay 0.01)
-  (flycheck-display-errors-delay 0.01))
+  (flycheck-idle-change-delay 0.3)
+  (flycheck-idle-buffer-switch-delay 0.1)
+  (flycheck-display-errors-delay 2))
+
+(use-package flycheck-popup-tip)
+(with-eval-after-load 'flycheck
+  (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode))
 
 ;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
 (dolist (hook (list
                'sh-mode-hook
                'fish-mode-hook
                'c-mode-common-hook
-               ;; 'ruby-mode-hook
                'python-mode-hook
                'verilog-mode-hook
-               ;; 'swift-mode-hook
-               ;; 'go-mode-hook
                'js-mode-hook
                ))
   (add-hook
@@ -1899,16 +1868,36 @@ one key
        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
                      (append flycheck-disabled-checkers
                              '(javascript-jshint)))
-       (flycheck-add-mode 'javascript-eslint 'web-mode) ;use eslint with web-mode for jsx files
-       (setq-default flycheck-temp-prefix ".flycheck")
        (flycheck-mode 1))))
 
-  ;; ;; Add flycheck for swift.
-  ;; (add-hook 'swift-mode-hook
-  ;;           #'(lambda ()
-  ;;               (require 'flycheck-swift)
-  ;;               (flycheck-swift-setup)
-  ;;               ))
+;; (use-package flycheck-clangcheck)
+;; (defun tu10ng/flycheck-clangcheck-select ()
+;;   "Select clangcheck for flycheck's checker, for detecting compile-commands.json."
+;;   (flycheck-set-checker-executable 'c/c++-clangcheck
+;;                                    "/usr/bin/clang-check")
+;;   (flycheck-select-checker 'c/c++-clangcheck))
+
+;; (add-hook 'c-mode-hook #'tu10ng/flycheck-clangcheck-select)
+;; (add-hook 'c++-mode-hook #'tu10ng/flycheck-clangcheck-select)
+
+;; ;; enable static analysis
+;; (setq flycheck-clangcheck-analyze t)  
   #+END_SRC
 
-  #+RESULTS:
+** EXPLOSION!
+*** gud
+maybe use gdb in terminal is better for asm view.
+#+begin_src emacs-lisp
+(setq gdb-show-main t
+      gdb-restore-window-configuration-after-quit t
+      )
+
+(gud-tooltip-mode 1)
+#+end_src
+*** [[https://github.com/realgud/realgud][readgud]]
+maybe realgud is better  
+#+begin_src emacs-lisp
+(use-package realgud)
+
+#+end_src
+

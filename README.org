@@ -1,6 +1,6 @@
 * Hi there!
 I am tu10ng.
-this is my personal emacs configuration directory.
+this is my personal emacs configuration.
 
 * installation
 build on vanilla emacs.
