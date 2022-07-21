@@ -1418,14 +1418,46 @@ u10ng
 
 ** games
 #+begin_src emacs-lisp
-(use-package figlet
-  :defer t)
-(use-package speed-type
-  :defer t)
+(use-package figlet)
+(use-package speed-type)
 ;;(use-package typit)
-(add-to-list 'load-path "~/.emacs.d/site-lisp/typit/")
-(setq typit-test-time (* 5 60)
-      typit-display-method 'display-buffer-at-bottom)
+;; (add-to-list 'load-path "~/.emacs.d/site-lisp/typit/")
+;; (setq typit-test-time (* 5 60)
+;;       typit-display-method 'display-buffer-at-bottom)
+
+(defun tu10ng/speed-type-buffer-n (n)
+  "type first N chars in current buffer."
+  (interactive "P")
+  (if n
+      (speed-type--setup (buffer-substring-no-properties (point-min) n))
+    (speed-type-buffer 1)))
+
+(defvar tu10ng/typegame-tmpfile "/tmp/typegame")
+
+(defun tu10ng/typegame (&optional char path ext)
+  "find all file recursively in PATH with extension EXT(string without leading point, like 'c'), concat into a file, open first CHAR chars for `speed-type'.
+Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
+  ;; (interactive "Dpath?:")
+  (interactive)
+  (let* ((char (if char char 1000))
+         (path (if path path "~/Projects/xv6-riscv"))
+         (ext (if ext ext "c")))
+    (shell-command (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile))
+    (print (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile "'"))
+    ;; failure
+    (if (f-empty? tu10ng/typegame-tmpfile)
+        (format "no files found or maybe are empty.")
+      (find-file-literally "/tmp/typegame")
+      (goto-char 0)
+      (replace-string "  " "")
+      (goto-char 0)    
+      (flush-lines "//")                ;execute from current point, need reset point to act on whole buffer
+      (save-buffer)
+      (tu10ng/speed-type-buffer-n (if (> (point-max) char) char (point-max)))
+      (kill-buffer "typegame"))))
+
+(tu10ng/typegame 1000 "~/st" "c")
+
 
 ;;(setq typit-line-length (window-width))
 (use-package zone-nyan
