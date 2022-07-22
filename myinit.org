@@ -1441,11 +1441,17 @@ u10ng
 ;; (setq typit-test-time (* 5 60)
 ;;       typit-display-method 'display-buffer-at-bottom)
 
+
+
 (defun tu10ng/speed-type-buffer-n (n)
-  "type first N chars in current buffer."
+  "type N chars starting from random point in current buffer. if current buffer has char less than n, use the whole buffer. "
   (interactive "P")
   (if n
-      (speed-type--setup (buffer-substring-no-properties (point-min) n))
+      (unless (< (point-max) n)
+        (let ((start (random (- (point-max) n))))
+          (speed-type--setup
+           (buffer-substring-no-properties start
+                                           (+ start n)))))
     (speed-type-buffer 1)))
 
 (defvar tu10ng/typegame-tmpfile "/tmp/typegame")
@@ -1462,13 +1468,25 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
     ;; failure
     (if (f-empty? tu10ng/typegame-tmpfile)
         (format "no files found or maybe are empty.")
+      ;; `find-file' is unbearably slow
       (find-file-literally "/tmp/typegame")
       (goto-char 0)
       (replace-string "  " "")
+      ;; execute from current point, need reset point to act on whole buffer
+      ;; comments should stay
+      ;; c has two var for comment `comment-start' `c-line-comment-starter', and the spacing after comment makes it hard to auto remove comment.
+      ;; maybe we can set `comment-start' for the tmpfile.
+      ;; only for c
       (goto-char 0)    
-      (flush-lines "//")                ;execute from current point, need reset point to act on whole buffer
+      (replace-string "// " "")
+      (goto-char 0)
+      (replace-string "//" "")
+      (goto-char 0)
+      (replace-string "
+
+" "")
       (save-buffer)
-      (tu10ng/speed-type-buffer-n (if (> (point-max) char) char (point-max)))
+      (tu10ng/speed-type-buffer-n char)
       (kill-buffer "typegame"))))
 
 ;;(setq typit-line-length (window-width))
