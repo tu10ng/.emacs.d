@@ -42,6 +42,7 @@
  '(c-hanging-braces-alist
    '((defun-open after)
      (class-open after)
+     (class-close before)
      (inline-open)
      (inline-close)
      (block-open after)
@@ -205,7 +206,7 @@
  '(org-latex-compiler "xelatex")
  '(org-latex-listings t)
  '(org-latex-packages-alist '("\\usepackage{ctex}"))
- '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes))
+ '(org-mouse-features '(activate-stars activate-bullets activate-checkboxes) t)
  '(org-speed-commands
    '(("Outline Navigation")
      ("n" org-speed-move-safe 'org-next-visible-heading)

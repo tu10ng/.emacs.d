@@ -350,8 +350,8 @@ vertico orderless
 ;; (vi-navigate-load-keys)
 
 
-(global-set-key "\M-p" #'previous-line)
-(global-set-key "\M-n" #'next-line)
+(global-set-key "\M-p" #'backward-paragraph)
+(global-set-key "\M-n" #'forward-paragraph)
 
 (global-set-key "\C-r" #'query-replace)
 
@@ -359,7 +359,7 @@ vertico orderless
 (global-set-key (kbd "M-u") (lambda (ARG) (interactive "p") (upcase-word (- ARG))))
 (global-set-key (kbd "M-c") (lambda (ARG) (interactive "p") (capitalize-word (- ARG))))
 
-;; (global-set-key "\C-cl" #'org-store-link)
+(global-set-key "\C-cl" #'org-store-link)
 (global-set-key "\C-ca" #'org-agenda-list)
 (global-set-key "\C-cc" #'org-capture)
 
@@ -450,11 +450,24 @@ is an upper-case character."
       lazycat-dark-comment-bg t
       lazycat-dark-padded-modeline t)
 
-;;can modeline change its color overtime if it doesnot have any other functionalies?
 (add-to-list 'load-path (expand-file-name "~/.emacs.d/site-lisp/awesome-tray"))
 (require 'awesome-tray)
+
+;; tree - show current dir with respect to git
+;; in the top dir, show full path.
+(defun tu10ng/awesome-tray-tree-info ()
+  (let ((rst (substring (buffer-file-name)
+                        (length (expand-file-name (magit-toplevel)))
+                        (- (length (buffer-file-name)) (length (file-name-nondirectory (buffer-file-name)))))))
+    (if (string-empty-p rst)
+        (magit-toplevel)
+      rst)))
+
+(add-to-list 'awesome-tray-module-alist
+             '("tree" . (tu10ng/awesome-tray-tree-info awesome-tray-module-file-path-face)))
+
 (setq awesome-tray-active-modules       ;flycheck total,
-      '("location" "belong" "mode-name" "buffer-name" "file-path"
+      '("location" "belong" "mode-name" "buffer-name" "tree"
         "circe" "buffer-read-only"
 	    "date"
 	    )
@@ -1108,7 +1121,6 @@ The pointer moves by +1, and restore by taking mod.  "
   :ensure t
   :hook ((markdown-mode org-mode) . valign-mode))
 
-;; The markdown mode is awesome! unbeatable
 (use-package markdown-mode
   :ensure t
   :init
@@ -1484,7 +1496,7 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
       (goto-char 0)
       (replace-string "
 
-" "")
+" "")                                   ;is this the only way?
       (save-buffer)
       (tu10ng/speed-type-buffer-n char)
       (kill-buffer "typegame"))))
