@@ -1458,8 +1458,7 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
   (let* ((char (if char char 1000))
          (path (if path path "~/Projects/xv6-riscv"))
          (ext (if ext ext "c")))
-    (shell-command (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile))
-    (print (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile "'"))
+    (shell-command (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile "'"))
     ;; failure
     (if (f-empty? tu10ng/typegame-tmpfile)
         (format "no files found or maybe are empty.")
@@ -1471,9 +1470,6 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
       (save-buffer)
       (tu10ng/speed-type-buffer-n (if (> (point-max) char) char (point-max)))
       (kill-buffer "typegame"))))
-
-(tu10ng/typegame 1000 "~/st" "c")
-
 
 ;;(setq typit-line-length (window-width))
 (use-package zone-nyan
