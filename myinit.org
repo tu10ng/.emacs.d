@@ -519,6 +519,7 @@ is an upper-case character."
 *** shackle
 #+begin_src emacs-lisp
 (setq split-height-threshold nil)         ;don't split vertically
+(setq split-width-threshold 0)            ;need to set this bc `split-window-sensibly' will disregard height-threshold
 
 ;; Customize popwin behavior
 (use-package shackle                    ;*customize* not working?
@@ -867,13 +868,15 @@ The pointer moves by +1, and restore by taking mod.  "
 #+begin_src elisp
 (use-package pyim)
 (pyim-default-scheme 'quanpin)
+;; (pyim-default-scheme 'pyim-shuangpin)
+;; (pyim-default-scheme 'xiaohe-shuangpin)
 ;; (if (posframe-workable-p)
 ;;     (setq pyim-page-tooltip 'posframe)
 ;;   (setq pyim-page-tooltip 'popup))
 (setq pyim-page-length 7)
 (setq pyim-cloudim 'google)
-(setq pyim-process-async-delay 0.01
-      pyim-process-run-delay 0.01)
+(setq pyim-process-async-delay 0.1
+      pyim-process-run-delay 0.1)
 ;; (setq pyim-indicator-list (list #'pyim-indicator-with-posframe))
 (setq pyim-indicator-list nil)
 ;; (setq pyim-punctuation-half-width-functions t)
@@ -1272,6 +1275,14 @@ The pointer moves by +1, and restore by taking mod.  "
 ;;                      (c-mode-style-setup))))
 #+end_src
 
+** scheme
+#+begin_src emacs-lisp
+(use-package geiser)
+(use-package geiser-guile)
+(use-package geiser-mit)
+
+#+end_src
+
 ** lisp
 #+begin_src emacs-lisp
 ;; elisp
@@ -1308,7 +1319,8 @@ The pointer moves by +1, and restore by taking mod.  "
   :ensure nil
   :hook (ielm-mode . company-mode))
 
-
+(use-package slime)
+(setq inferior-lisp-program "sbcl")
 
 #+end_src
 
@@ -1401,6 +1413,15 @@ The pointer moves by +1, and restore by taking mod.  "
 
 #+end_src
 
+** sql
+#+begin_src emacs-lisp
+(require 'sql)
+(defalias 'sql-get-login 'ignore)
+
+(use-package sqlup-mode)
+(add-hook 'sql-mode-hook #'sqlup-mode)
+
+#+end_src
 ** www
 #+begin_src emacs-lisp
 (use-package eww
@@ -1496,7 +1517,8 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
       (goto-char 0)
       (replace-string "
 
-" "")                                   ;is this the only way?
+" "
+")                                   ;is this the only way?
       (save-buffer)
       (tu10ng/speed-type-buffer-n char)
       (kill-buffer "typegame"))))
@@ -1613,8 +1635,8 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
 ;;   :hook (prog-mode . spdx-tempo-setup)
 ;;   :custom
 ;;   (spdx-ignore-deprecated t))
-;; tldr man info
 
+;; tldr man info
 (use-package tldr)
 
 ;; I would use grep for searching TODO
