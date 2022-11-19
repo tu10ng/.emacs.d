@@ -126,6 +126,9 @@ if the buffer isn't a file, simply restart emacs."
       (kill-buffer "*scratch*")))
 (add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
 
+;; persist history over emacs restarts.
+(use-package savehist
+  :init (savehist-mode))
 
 ;; key repeat delay through /usr/bin/xset
 ;; auto repeat delay, repeat rate
@@ -267,9 +270,10 @@ if the buffer isn't a file, simply restart emacs."
 
 #+END_SRC
 
-
-*** TODO consult: when press p or f in `consult-buffer', change into `consult-file'
+*** TODO consult
+when press p or f in `consult-buffer', change into `consult-file'
 vertico orderless
+
 #+begin_src emacs-lisp
 (setq enable-recursive-minibuffers t)
 
@@ -528,8 +532,9 @@ is an upper-case character."
   :custom
   (shackle-default-size 0.5)
   (shackle-default-alignment 'bellow)
-  (shackle-rules '((magit-status-mode    :select t :align right :size 0.5)
+  (shackle-rules '((magit-status-mode    :select t :align right)
                    (magit-log-mode       :select t :align right)
+                   (magit-rev-mode       :select t :align right)
                    ("*quickrun*"         :select t)
                    (profiler-report-mode :select t)
                    (xwidget-webkit-mode  :select t :same t)
@@ -798,6 +803,19 @@ The pointer moves by +1, and restore by taking mod.  "
     #+end_src
 
 
+** pretty symbol characters
+#+begin_src emacs-lisp
+(use-package prettify-greek)
+(use-package prettify-math)
+(setq-default prettify-symbols-alist prettify-greek-lower)
+;;(global-prettify-symbols-mode 1)
+;;(global-prettify-math-mode)
+(dolist (hook '(prog-mode-hook
+                shell-mode-hook
+                text-mode-hook))
+  (add-hook hook #'(lambda ()
+                     (prettify-symbols-mode 1))))
+#+end_src
 
 ** scroll
 #+BEGIN_SRC emacs-lisp
@@ -939,7 +957,7 @@ The pointer moves by +1, and restore by taking mod.  "
 
 
 * RECALL the structure of our magic array
-** ORG
+** ORG MODE
 *** org
 #+begin_src emacs-lisp
 (use-package org
@@ -1002,6 +1020,24 @@ The pointer moves by +1, and restore by taking mod.  "
                            ("LWN"    . "https://lwn.net/Articles/")
                            ("WG21"   . "https://wg21.link/"))))
 
+;; (setq org-emphasis-alist (quote (("*" bold "<b>" "</b>") 
+;;                                  ("/" italic "<i>" "</i>")
+;;                                  ("_" underline "<span 
+;; style=\"text-decoration:underline;\">" "</span>")
+;;                                  ("=" org-code "<code>" "</code>"
+;;                  verbatim)
+;;                                  ("~" org-verbatim "<code>" "</code>"
+;;                  verbatim)
+;;                                  ("+" (:strike-through t) "<del>" "</del>")
+;;                                  ("@" org-warning "<b>" "</b>")))
+;;       org-export-latex-emphasis-alist (quote 
+;;                                        (("*" "\\textbf{%s}" nil)
+;;                                         ("/" "\\emph{%s}" nil) 
+;;                                         ("_" "\\underline{%s}" nil)
+;;                                         ("+" "\\texttt{%s}" nil)
+;;                                         ("=" "\\verb=%s=" nil)
+;;                                         ("~" "\\verb~%s~" t)
+;;                                         ("@" "\\alert{%s}" nil))))
 
 ;; (setq org-startup-folded 'show2levels)
 #+end_src
@@ -1094,6 +1130,9 @@ The pointer moves by +1, and restore by taking mod.  "
 (require 'ox-latex)
 (add-to-list 'org-latex-packages-alist '("" "listings"))
 (add-to-list 'org-latex-packages-alist '("" "color"))
+
+;; (setq org-latex-pdf-process '("xelatex -interaction nonstopmode %f" "xelatex -interaction nonstopmode %f"))
+;; (setq org-export-allow-bind-keywords t)
  #+END_SRC
 
 
@@ -1173,19 +1212,20 @@ The pointer moves by +1, and restore by taking mod.  "
 #+begin_src emacs-lisp
 
 #+end_src
-** dired
+** directory(dired neotree)
 #+begin_src emacs-lisp
 (setq dired-kill-when-opening-new-dired-buffer t
       dired-auto-revert-buffer #'dired-directory-changed-p
       dired-hide-details-hide-symlink-targets nil)
 (setq dired-listing-switches "-AFhlv")  ;wt
 
-;; Make dired colorful
+;; dired font lock
 (use-package diredfl
   :ensure t
   :hook (dired-mode . diredfl-mode))
 
-
+(use-package neotree)
+(global-set-key [f8] 'neotree-toggle)
 #+end_src
 
 
@@ -1281,6 +1321,10 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package geiser-guile)
 (use-package geiser-mit)
 
+(setq geiser-active-implementations '(guile))
+(setq geiser-mode-start-repl-p t)
+(setq geiser-mode-eval-last-sexp-to-buffer t)     
+(setq geiser-mode-eval-to-buffer-prefix "\n;;=> ")
 #+end_src
 
 ** lisp
@@ -1398,6 +1442,8 @@ The pointer moves by +1, and restore by taking mod.  "
 ** other modes
 #+begin_src emacs-lisp
 (use-package fish-mode)
+(use-package fish-completion)
+(global-fish-completion-mode)
 (use-package lox-mode)
 (use-package php-mode)
 (use-package crontab-mode)
@@ -1405,7 +1451,7 @@ The pointer moves by +1, and restore by taking mod.  "
 (use-package json-mode)
 (use-package csharp-mode)
 (use-package gnuplot)
-
+(use-package peg)
 ;;  (use-package pdf-tools)
 
 ;;  (add-to-list 'load-path "~/.emacs.d/site-lisp/")
@@ -1495,8 +1541,8 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
   ;; (interactive "Dpath?:")
   (interactive)
   (let* ((char (if char char 1000))
-         (path (if path path "~/Projects/xv6-riscv"))
-         (ext (if ext ext "c")))
+         (path (if path path "~/Downloads/requests"))
+         (ext (if ext ext "py")))
     (shell-command (concat "fish -c 'fd . " path " --extension " ext " | xargs cat > " tu10ng/typegame-tmpfile "'"))
     ;; failure
     (if (f-empty? tu10ng/typegame-tmpfile)
@@ -1625,10 +1671,6 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
 
   :init
   (marginalia-mode))
-
-;; persist history over emacs restarts.
-(use-package savehist
-  :init (savehist-mode))
 
 ;; Insert SPDX license header
 ;; (use-package spdx
@@ -1783,7 +1825,10 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
                     [simple-query "www.felixcloutier.com"
                                   "www.felixcloutier.com/x86/" ""]))))
 
-;; Translator for Emacs
+#+end_src
+*** translate
+#+begin_src emacs-lisp
+
 ;; M-x fanyi-dwim{,2}, that's all.
 (use-package fanyi
   :ensure t
@@ -1792,8 +1837,15 @@ Call `tu10ng/speed-type-buffer-n' to set a new buffer for typing."
 (use-package youdao-dictionary
   :bind (("M-s" . youdao-dictionary-search-at-point+)))
 
-
+(defun mkq/q-trans ()
+  "simple translate function"
+  (interactive)
+  (message
+   (shell-command-to-string
+    (concat "trans " (downcase (thing-at-point 'word)) " | head -n 3"))))
 #+end_src
+
+
 
 ** forming
 learn from lazy-cat's thing-edit and move-text
@@ -1831,6 +1883,11 @@ one key
   )
 
 (setq magit-commit-ask-to-stage nil)    ;don't ask stage question
+
+;; `magit-find-file' used to view file in another branch
+(global-unset-key (kbd "C-x m"))
+(global-set-key (kbd "C-x mf") #'magit-find-file)
+(global-set-key (kbd "C-c g") #'magit-file-dispatch)
 
 (use-package vc
   :custom
@@ -1949,23 +2006,24 @@ one key
   (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode))
 
 ;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
-(dolist (hook (list
-               'sh-mode-hook
-               'fish-mode-hook
-               'c-mode-common-hook
-               'python-mode-hook
-               'verilog-mode-hook
-               'js-mode-hook
-               ))
-  (add-hook
-   hook
-   #'(lambda ()
-       (require 'flycheck)
-       (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
-                     (append flycheck-disabled-checkers
-                             '(javascript-jshint)))
-       (flycheck-mode 1))))
+;; (dolist (hook (list
+;;                'sh-mode-hook
+;;                'fish-mode-hook
+;;                'c-mode-common-hook
+;;                'python-mode-hook
+;;                'verilog-mode-hook
+;;                'js-mode-hook
+;;                ))
+;;   (add-hook
+;;    hook
+;;    #'(lambda ()
+;;        (require 'flycheck)
+;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+;;                      (append flycheck-disabled-checkers
+;;                              '(javascript-jshint)))
+;;        (flycheck-mode 1))))
 
+(global-flycheck-mode)
 ;; (use-package flycheck-clangcheck)
 ;; (defun tu10ng/flycheck-clangcheck-select ()
 ;;   "Select clangcheck for flycheck's checker, for detecting compile-commands.json."
@@ -1996,4 +2054,9 @@ maybe realgud is better
 (use-package realgud)
 
 #+end_src
+
+
+
+
+
 

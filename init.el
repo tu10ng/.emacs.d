@@ -1,7 +1,7 @@
 ;;; init.el --- The ma entry for emacs.
 ;;; Commentary:
 ;;; Code:
-(setq gc-cons-threshold (* 10 1024 1024 1024))
+;; (setq gc-cons-threshold (* 10 1024 1024 1024))
 
 (require 'package)
 (setq package-archives
@@ -188,7 +188,7 @@
  '(markdown-fontify-code-blocks-natively t)
  '(org-adapt-indentation nil)
  '(org-agenda-files
-   '("~/org/homework.org" "/home/qb/org/gtd.org" "/home/qb/org/diary.org" "/home/qb/.emacs.d/myinit.org"))
+   '("/home/qb/org/homework.org" "/home/qb/org/gtd.org" "/home/qb/org/diary.org" "/home/qb/.emacs.d/myinit.org"))
  '(org-agenda-restore-windows-after-quit t)
  '(org-agenda-span 8)
  '(org-agenda-window-setup 'other-window)
@@ -270,7 +270,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(slime geiser-mit geiser-guile geiser sqlup-mode flycheck-popup-tip flycheck-clangcheck real-gud read-gud wakatime-mode bookmark-view info-rename-buffer editorconfig gcmh elfeed circe gnu-plot tree-sitter noflet modern-cpp-font-lock json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org try restart-emacs org-bullets auto-complete))
+   '(peg prettify-math prettify-greek neotree fish-completion slime geiser-mit geiser-guile geiser sqlup-mode flycheck-popup-tip flycheck-clangcheck real-gud read-gud wakatime-mode bookmark-view info-rename-buffer editorconfig gcmh elfeed circe gnu-plot tree-sitter noflet modern-cpp-font-lock json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org try restart-emacs org-bullets auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
