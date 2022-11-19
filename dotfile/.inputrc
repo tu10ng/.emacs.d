@@ -1,0 +1,3 @@
+$if gdb
+"\C-l": "dashboard\n"
+$endif
