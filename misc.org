@@ -1,0 +1,223 @@
+* gud
+maybe use gdb in terminal is better for asm view.
+#+begin_src emacs-lisp
+(setq gdb-show-main t
+      gdb-restore-window-configuration-after-quit t
+      )
+
+(gud-tooltip-mode 1)
+#+end_src
+* [[https://github.com/realgud/realgud][readgud]]
+maybe realgud is better  
+#+begin_src emacs-lisp
+(use-package realgud)
+
+#+end_src
+* flycheck
+;; I don't like `global-flycheck-mode', some mode, such as elisp mode don't need.
+;; (dolist (hook (list
+;;                'sh-mode-hook
+;;                'fish-mode-hook
+;;                'c-mode-common-hook
+;;                'python-mode-hook
+;;                'verilog-mode-hook
+;;                'js-mode-hook
+;;                ))
+;;   (add-hook
+;;    hook
+;;    #'(lambda ()
+;;        (require 'flycheck)
+;;        (setq-default flycheck-disabled-checkers ;disable jshint since we prefer eslint checking
+;;                      (append flycheck-disabled-checkers
+;;                              '(javascript-jshint)))
+;;        (flycheck-mode 1))))
+
+;; (use-package flycheck-clangcheck)
+;; (defun tu10ng/flycheck-clangcheck-select ()
+;;   "Select clangcheck for flycheck's checker, for detecting compile-commands.json."
+;;   (flycheck-set-checker-executable 'c/c++-clangcheck
+;;                                    "/usr/bin/clang-check")
+;;   (flycheck-select-checker 'c/c++-clangcheck))
+
+;; (add-hook 'c-mode-hook #'tu10ng/flycheck-clangcheck-select)
+;; (add-hook 'c++-mode-hook #'tu10ng/flycheck-clangcheck-select)
+
+;; ;; enable static analysis
+;; (setq flycheck-clangcheck-analyze t)  
+
+
+* flycheck
+#+BEGIN_SRC emacs-lisp
+;; flycheck
+;; (use-package flycheck
+;;   ;; :hook (prog-mode . flycheck-mode)
+;;   :custom
+;;   ;;   (flycheck-temp-prefix ".flycheck")
+;;   (flycheck-emacs-lisp-load-path 'inherit)
+;;   ;;   (flycheck-indication-mode 'left-fringe)
+;;   (flycheck-idle-change-delay 0.3)
+;;   (flycheck-idle-buffer-switch-delay 0.1)
+;;   (flycheck-display-errors-delay 2))
+
+;; (use-package flycheck-popup-tip)
+;; (with-eval-after-load 'flycheck
+;;   (add-hook 'flycheck-mode-hook #'flycheck-popup-tip-mode))
+
+;; (global-flycheck-mode)
+#+END_SRC
+* lsp bridge
+(add-to-list 'load-path "~/.emacs.d/site-lisp/lsp-bridge/")
+(require 'yasnippet)
+(require 'lsp-bridge)
+(require 'lsp-bridge-jdtls)
+
+(add-hook 'org-mode-hook #'(lambda () (lsp-bridge-mode -1)) )  ;disable; before global-lsp, so the order in the hook is correct
+
+(global-lsp-bridge-mode)
+
+(setq lsp-bridge-jump-elisp-last-file nil)
+(defun lsp-bridge-jump ()
+  (interactive)
+  (cond
+   ((eq major-mode 'emacs-lisp-mode)
+    (let ((symb (function-called-at-point)))
+      (when symb
+        (push (buffer-name) lsp-bridge-jump-elisp-last-file)
+        (push-mark)
+        (find-function symb))))
+   (lsp-bridge-mode
+    (lsp-bridge-find-def))
+   (t
+    (require 'dumb-jump)
+    (dumb-jump-go))))
+
+(defun lsp-bridge-jump-back ()
+  (interactive)
+  (cond
+   ((eq major-mode 'emacs-lisp-mode)
+    (when lsp-bridge-jump-elisp-last-file
+      (switch-to-buffer (pop lsp-bridge-jump-elisp-last-file))))
+
+   (lsp-bridge-mode
+    (lsp-bridge-return-from-def))
+   (t
+    (require 'dumb-jump)
+    (dumb-jump-back))))
+
+;; WRONG
+;; (defun tu10ng/lsp-bridge-clang-restart ()
+;;   "call `lsp-bridge-restart-process' when clang inform 'tring to get preamble'"
+;;   (run-with-idle-timer 0 0.3 #'(lambda ()
+;;                                  (when (= (current-message)
+;;                                           "[LSP-Bridge] trying to get preamble for non-added document")
+;;                                    (lsp-bridge-restart-process)))))
+
+;; (tu10ng/lsp-bridge-clang-restart)
+
+(global-set-key (kbd "M-.") 'lsp-bridge-jump)
+(global-set-key (kbd "M-,") 'lsp-bridge-jump-back)
+(global-set-key (kbd "C-M-.") 'lsp-bridge-find-references)
+(global-set-key (kbd "C-c o e") 'lsp-bridge-toggle-english-helper)
+(global-set-key (kbd "C-c o r") 'lsp-bridge-rename)
+
+* yasnippet
+(use-package yasnippet)
+(yas-global-mode 1)
+
+(dolist (hook (list 'term-mode-hook))
+  (add-hook hook #'(lambda () (yas-minor-mode -1))))
+
+
+* pastebin service
+#+begin_src emacs-lisp
+(use-package webpaste
+  :ensure t
+  :commands webpaste-paste-buffer-or-region
+  :custom
+  (webpaste-open-in-browser t)
+  (webpaste-paste-confirmation t)
+  (webpaste-add-to-killring nil)
+  (webpaste-provider-priority '("paste.mozilla.org" "dpaste.org" "ix.io")))
+
+#+end_src
+
+* webjump
+#+begin_src emacs-lisp
+;; Web search
+(use-package webjump
+  :ensure nil
+  ;; C-c / will be shadowed by `org-sparse-tree' in org-mode
+  :bind ("C-c C-/" . webjump)
+  :custom
+  (webjump-sites '(;; Internet search engines.
+                   ("Google" .
+                    [simple-query "www.google.com"
+                                  "www.google.com/search?q=" ""])
+                   ("Wikipedia" .
+                    [simple-query "wikipedia.org" "wikipedia.org/wiki/" ""])
+                   ("Ludwig Guru" .
+                    [simple-query "ludwig.guru" "ludwig.guru/s/" ""])
+                   ("Stack Overflow" .
+                    [simple-query "stackoverflow.com" "stackoverflow.com/search?q=" ""])
+                   ("Man Search" .
+                    [simple-query "archlinux.org" "man.archlinux.org/search?q=" ""])
+                   ("Man Go" .
+                    [simple-query "archlinux.org" "man.archlinux.org/search?q=" "&go=Go"])
+
+                   ;; Language specific engines.
+                   ("x86 Instructions Reference" .
+                    [simple-query "www.felixcloutier.com"
+                                  "www.felixcloutier.com/x86/" ""]))))
+
+#+end_src
+
+* translate
+;; M-x fanyi-dwim{,2}, that's all.
+(use-package fanyi
+  :ensure t
+  :commands fanyi-dwim fanyi-dwim2)
+
+(defun mkq/q-trans ()
+  "simple translate function"
+  (interactive)
+  (message
+   (shell-command-to-string
+    (concat "trans " (downcase (thing-at-point 'word)) " | head -n 3"))))
+* separedit
+#+begin_src emacs-lisp
+(use-package separedit
+  :bind (:map prog-mode-map
+         ("C-c '" . separedit))
+  :custom
+  (separedit-default-mode 'markdown-mode)
+  (separedit-remove-trailing-spaces-in-comment t)
+  (separedit-continue-fill-column t)
+  (separedit-buffer-creation-hook #'auto-fill-mode))
+
+
+#+end_src
+
+
+* face
+  (set-face-attribute 'rainbow-delimiters-depth-1-face nil :weight 'ultra-heavy)
+  (set-face-attribute 'rainbow-delimiters-depth-2-face nil :weight 'ultra-heavy)
+  (set-face-attribute 'rainbow-delimiters-depth-3-face nil :weight 'ultra-heavy)
+  (set-face-attribute 'rainbow-delimiters-depth-4-face nil :weight 'thin)
+  (set-face-attribute 'rainbow-delimiters-depth-5-face nil :weight 'thin)
+  (set-face-attribute 'rainbow-delimiters-depth-6-face nil :weight 'thin)
+  (set-face-attribute 'rainbow-delimiters-depth-7-face nil :weight 'ultra-heavy)
+  (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'ultra-heavy)
+  (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'ultra-heavy)
+
+                        (set-face-attribute 'rainbow-delimiters-depth-1-face nil :weight 'ultra-heavy)
+                        (set-face-attribute 'rainbow-delimiters-depth-2-face nil :weight 'ultra-heavy)
+                        (set-face-attribute 'rainbow-delimiters-depth-3-face nil :weight 'ultra-heavy)
+                        (set-face-attribute 'rainbow-delimiters-depth-4-face nil :weight 'thin)
+                        (set-face-attribute 'rainbow-delimiters-depth-5-face nil :weight 'thin)
+                        (set-face-attribute 'rainbow-delimiters-depth-6-face nil :weight 'thin)
+                        (set-face-attribute 'rainbow-delimiters-depth-7-face nil :weight 'ultra-heavy)
+                        (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'ultra-heavy)
+                        (set-face-attribute 'rainbow-delimiters-depth-8-face nil :weight 'ultra-heavy))
+
+* st
+(pixel-scroll-precision-mode 1)

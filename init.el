@@ -61,7 +61,7 @@
      (arglist-cont-nonempty)))
  '(connection-local-criteria-alist
    '(((:application tramp)
-      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)))
+      tramp-connection-local-default-system-profile tramp-connection-local-default-shell-profile)) t)
  '(connection-local-profile-alist
    '((tramp-connection-local-darwin-ps-profile
       (tramp-process-attributes-ps-args "-acxww" "-o" "pid,uid,user,gid,comm=abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ" "-o" "state=abcde" "-o" "ppid,pgid,sess,tty,tpgid,minflt,majflt,time,pri,nice,vsz,rss,etime,pcpu,pmem,args")
@@ -134,7 +134,7 @@
       (shell-command-switch . "-c"))
      (tramp-connection-local-default-system-profile
       (path-separator . ":")
-      (null-device . "/dev/null"))))
+      (null-device . "/dev/null"))) t)
  '(eaf-proxy-host "127.0.0.1")
  '(eaf-proxy-port "8889")
  '(eaf-proxy-type "http")
@@ -195,10 +195,12 @@
  '(org-capture-templates
    '(("d" "diary" entry
       (file+olp+datetree "~/org/diary.org")
-      "* %^{heading|记录|回忆} %U\12%?" :tree-type week)
+      "* %^{heading|记录|回忆} %U
+%?" :tree-type week)
      ("h" "homework" entry
       (file "~/org/homework.org")
-      "* TODO %^{什么课？|数据结构|计组|汇编|逻辑|运筹|模式识别|计图|英语|职业} %?\12DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)
+      "* TODO %^{什么课？|数据结构|计组|汇编|逻辑|运筹|模式识别|计图|英语|职业} %?
+DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)
      ("g" "gtd" entry
       (file "~/org/gtd.org")
       "* TODO %^{gtd?}" :prepend t :immediate-finish t)))
@@ -270,7 +272,7 @@
  '(org-startup-truncated nil)
  '(org-use-speed-commands t)
  '(package-selected-packages
-   '(peg prettify-math prettify-greek neotree fish-completion slime geiser-mit geiser-guile geiser sqlup-mode flycheck-popup-tip flycheck-clangcheck real-gud read-gud wakatime-mode bookmark-view info-rename-buffer editorconfig gcmh elfeed circe gnu-plot tree-sitter noflet modern-cpp-font-lock json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org try restart-emacs org-bullets auto-complete))
+   '(corfu-doc corfu eglot nasm-mode peg prettify-math prettify-greek neotree fish-completion slime geiser-mit geiser-guile geiser sqlup-mode flycheck-popup-tip flycheck-clangcheck real-gud read-gud wakatime-mode bookmark-view info-rename-buffer editorconfig gcmh elfeed circe gnu-plot tree-sitter noflet modern-cpp-font-lock json-mode pyvenv cmake-font-lock bison-mode tldr dired valign org-agenda shackle exa py-autopep8 lox-mode counsel-projectile ivy-rich company-lsp helm-lsp yasnippet flames-of-freedom zone-nyan autotetris-mode autotetris crontab-mode rime rainbow-fart figlet visible-mark popup-kill-ring js-mode xref company-tabnine vue-mode vue-html-mode web-mode fuzzy eslint-fix flymake-eslint linum-relative nlinum-relative ac-js2 ac-html minesweeper abyss-theme 2048-game walkman typing-game quickrun wolfram-mode youdao-dictionary zh-align undo-tree smex org-plus-contrib htmlize ox-reveal org-pdftools org-pdfview info-colors rainbow-delimiters pdf-tools hungry-delete org try restart-emacs org-bullets auto-complete))
  '(projectile-completion-system 'auto)
  '(show-paren-mode t)
  '(truncate-lines nil)
