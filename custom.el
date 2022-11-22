@@ -1,67 +1,3 @@
-;;; init.el --- The ma entry for emacs.
-;;; Commentary:
-;;; Code:
-;; (setq gc-cons-threshold (* 10 1024 1024 1024))
-
-(require 'package)
-(setq package-archives
-      '(("gnu"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/gnu/")
-        ("melpa" . "http://mirrors.tuna.tsinghua.edu.cn/elpa/melpa/")
-	    ("org"   . "http://mirrors.tuna.tsinghua.edu.cn/elpa/org/")))
-(package-initialize)
-
-;; Bootstrap `use-package'
-(unless (package-installed-p 'use-package)
-  (package-refresh-contents)
-  (package-install 'use-package))
-(eval-and-compile
-  (setq use-package-always-ensure t
-        use-package-always-demand t
-        use-package-expand-minimally t))
-(eval-when-compile
-  (require 'use-package))
-
-(setq debug-on-error t)
-
-;; ;; Bootstrap
-;;(org-babel-load-file "~/.emacs.d/myinit.org")
-
-(add-to-list 'load-path (expand-file-name "lisp" user-emacs-directory))
-
-(setq normal-gc-cons-threshold (* 20 1024 1024))
-(let ((init-gc-cons-threshold (* 128 1024 1024)))
-  (setq gc-cons-threshold init-gc-cons-threshold)
-  (add-hook 'emacs-startup-hook
-            (lambda () (setq gc-cons-threshold normal-gc-cons-threshold))))
-
-(setq custom-file (locate-user-emacs-file "custom.el"))
-(require 'init-utils)                   ;init-commands
-(require 'init-site-lisp)
-
-(use-package scratch)                   ;should not be in top level
-
-(require 'init-theme)
-(require 'init-gui)
-(require 'init-flymake)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -324,7 +260,6 @@ DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)
  '(warning-suppress-log-types '((lsp-mode)))
  '(warning-suppress-types '((lsp-mode)))
  '(word-wrap t))
-
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -337,15 +272,3 @@ DEADLINE: %^{截止日期？}t" :prepend t :empty-lines 1 :time-prompt t)
  '(rainbow-delimiters-depth-8-face ((t (:foreground "lime green" :inherit rainbow-delimiters-base-face))))
  '(rainbow-delimiters-depth-9-face ((t (:foreground "#ECBE7B" :inherit rainbow-delimiters-base-face))))
  '(show-paren-match ((t (:background "#1B2229" :foreground "#ffffff" :underline t :weight ultra-bold)))))
-
-;; (defun set-font (english chinese english-size chinese-size)
-;;   (set-face-attribute 'default nil :font
-;; 		      (format "%s:pixelsize=%d" english english-size))
-;;   (dolist (charset '(kana han symbol cjk-misc bopomofo))
-;;     (set-fontset-font (frame-parameter nil 'font) charset
-;; 		      (font-spec :family chinese :size chinese-size))))
-
-;; (set-font "Source Code Pro" "黑体" 20 17)
-
-(find-file "~/org/gtd.org")
-(put 'list-timers 'disabled nil)
