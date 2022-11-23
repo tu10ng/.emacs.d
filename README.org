@@ -1,3 +1,5 @@
+* its structure is hard to maintain. i decided to build a new one
+
 * Hi there!
 I am tu10ng.
 this is my personal emacs configuration.
